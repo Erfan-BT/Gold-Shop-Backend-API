@@ -1,0 +1,45 @@
+import express, { Request, Response } from 'express'
+import helmet from 'helmet'
+import cors from 'cors'
+import compression from 'compression'
+import { errorHandler } from './middleware/errorHandler.js'
+// Routes Files
+import AuthRoutes from './routes/auth.routes.js'
+
+const app = express()
+
+app.use(compression({
+    level: 6, 
+    threshold: 1024,
+    filter: (req, res) => {
+        if (req.path.startsWith('/api/')) {
+            return true
+        }
+        return compression.filter(req, res)
+    }
+}))
+
+app.use(helmet())
+app.use(cors())
+
+app.use(express.json())
+app.use(express.urlencoded())
+
+
+// ---------- Routes ----------
+// Health
+app.get('/health', (req: Request, res: Response) => {
+    res.json({
+        success : true,
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+    })
+})
+
+// Main Routes
+app.use('/api/v1/auth', AuthRoutes)
+
+// Error Handler
+app.use(errorHandler)
+
+export default app
