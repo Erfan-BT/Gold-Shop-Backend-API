@@ -1,10 +1,11 @@
-import express, { Request, Response } from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
 import { errorHandler } from './middleware/errorHandler.js'
 // Routes Files
 import AuthRoutes from './routes/auth.routes.js'
+import { NotFoundError } from './utils/appError.js'
 
 const app = express()
 
@@ -40,6 +41,9 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/v1/auth', AuthRoutes)
 
 // Error Handler
+app.use((req : Request , res : Response, next : NextFunction) => {
+    next(new NotFoundError(req.method + ' => ' + req.path))
+})
 app.use(errorHandler)
 
 export default app
