@@ -391,7 +391,7 @@ async function seedDatabase() {
             name : 'Owner',
             email : 'owner@gmail.com',
             phone : '09123456789',
-            password : '$2b$12$DMFO4K6KPSFp.7rR0B1tmOelCkpA1BNS6a/aqIDan9pWXPD9ZKcA.', // admin123
+            password : '$2b$12$O5kQW/PfPZDxoFiyBeILtOEFH3DtlrvAp87N4GLZbyLEs14nfys4u', // admin123
             isEmailVerified : true,
             emailVerifiedAt : sequelize.fn('NOW') as unknown as Date,
             isActive : true,  
@@ -403,7 +403,7 @@ async function seedDatabase() {
             name : 'Admin',
             email : 'admin@gmail.com',
             phone : '09123456789',
-            password : '$2b$12$DMFO4K6KPSFp.7rR0B1tmOelCkpA1BNS6a/aqIDan9pWXPD9ZKcA.', // admin123
+            password : '$2b$12$O5kQW/PfPZDxoFiyBeILtOEFH3DtlrvAp87N4GLZbyLEs14nfys4u', // admin123
             isEmailVerified : true,
             emailVerifiedAt : sequelize.fn('NOW') as unknown as Date,
             isActive : true,  
@@ -415,7 +415,7 @@ async function seedDatabase() {
             name : 'User1',
             email : 'user1@gmail.com',
             phone : '09123456789',
-            password : '$2b$12$DMFO4K6KPSFp.7rR0B1tmOelCkpA1BNS6a/aqIDan9pWXPD9ZKcA.', // admin123
+            password : '$2b$12$O5kQW/PfPZDxoFiyBeILtOEFH3DtlrvAp87N4GLZbyLEs14nfys4u', // admin123
             isEmailVerified : true,
             emailVerifiedAt : sequelize.fn('NOW') as unknown as Date,
             isActive : true,  
@@ -427,7 +427,7 @@ async function seedDatabase() {
             name : 'User2',
             email : 'user2@gmail.com',
             phone : '09123456789',
-            password : '$2b$12$DMFO4K6KPSFp.7rR0B1tmOelCkpA1BNS6a/aqIDan9pWXPD9ZKcA.', // admin123
+            password : '$2b$12$O5kQW/PfPZDxoFiyBeILtOEFH3DtlrvAp87N4GLZbyLEs14nfys4u', // admin123
             isEmailVerified : false,
             // emailVerifiedAt : sequelize.fn('NOW') as unknown as Date,
             isActive : true,  

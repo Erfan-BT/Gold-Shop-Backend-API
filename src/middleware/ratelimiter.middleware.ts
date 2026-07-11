@@ -20,14 +20,17 @@ const createRateLimiter = (
         message,
         standardHeaders: true,
         legacyHeaders: false,
-        // keyGenerator: (req: any) => req.user?.id || req.ip,
-        // handler: (req: any, res: any) => {
-        //     res.status(429).json({
-        //         success : false,
-        //         message,
-        //         data : Math.ceil(windowMs / 1000),
-        //     })
+        // keyGenerator: (req: any) => {
+        //     console.log(`🔑 Rate Limiter Key: test`)
+        //     // return req.user?.id || null
         // },
+        handler: (req: any, res: any) => {
+            res.status(429).json({
+                success : false,
+                message,
+                data : 'Try Again ' + Math.ceil(windowMs / (1000 * 60)) + 'm Later',
+            })
+        },
     }
 
     if (redisClient.isOpen) {

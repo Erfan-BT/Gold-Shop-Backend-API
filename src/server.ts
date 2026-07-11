@@ -9,9 +9,12 @@ const port = process.env.SERVER_PORT ?? 3000
 
 async function startServer() {
     try {
+        // Start Redis
         await connectRedis()
         await connectBullmqRedis()
+        // Init DB
         await initializeDatabase()
+        // Init RL
         const { general, auth, heavy } = initializeRateLimiters()
 
         // Start Server
