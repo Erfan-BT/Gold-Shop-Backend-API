@@ -41,21 +41,26 @@ redisClient.on('error', (error) => {
     }
 })
 
+let bullmqConnection : Redis | null = null;
+
 export const connectBullmqRedis = async () => {
-    const bullmqConnection = new Redis({
+    if (bullmqConnection) {
+        return bullmqConnection;
+    }
+    bullmqConnection = new Redis({
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
         // password: process.env.REDIS_PASSWORD,
         db: parseInt(process.env.REDIS_DB || '0'),
-        maxRetriesPerRequest: 3,
-        retryStrategy: (times: number) => {
-            if (times > 2) {
-                logger.error(`Number Of Failed Attempts To Connect To BullMQ Redis : ${times}`)
-                return null
-            }
-            const delay = Math.min(times * 1000, 5000)
-            return delay
-        },
+        maxRetriesPerRequest: null,
+        // retryStrategy: (times: number) => {
+        //     if (times > 2) {
+        //         logger.error(`Number Of Failed Attempts To Connect To BullMQ Redis : ${times}`)
+        //         return null
+        //     }
+        //     const delay = Math.min(times * 1000, 5000)
+        //     return delay
+        // },
     }) 
 
     let isRedisErrorLogged : boolean = false;
@@ -67,11 +72,14 @@ export const connectBullmqRedis = async () => {
 
     bullmqConnection.on('error', (error) => {
         if (!isRedisErrorLogged) {
-            logger.fatal({error : String(error)}, 'Failed To Connect To BullMQ-Redis');
+            logger.error({error : String(error)}, 'Failed To Connect To BullMQ-Redis');
             isRedisErrorLogged = true
             // process.exit(1)
         }
     })
+
+    await bullmqConnection.ping()
+    return bullmqConnection
 }
 
 export default redisClient

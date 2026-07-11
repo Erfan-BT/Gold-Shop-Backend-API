@@ -4,6 +4,7 @@ import { logger } from "./configs/pino.config.js";
 import initializeDatabase from "./models/index.js";
 import { connectBullmqRedis, connectRedis } from './configs/redis.config.js';
 import { initializeRateLimiters } from './middleware/ratelimiter.middleware.js';
+import { initWorkers } from "./workers/index.js";
 
 const port = process.env.SERVER_PORT ?? 3000
 
@@ -16,7 +17,8 @@ async function startServer() {
         await initializeDatabase()
         // Init RL
         const { general, auth, email, refresh } = initializeRateLimiters()
-
+        // Init Workers
+        await initWorkers();
         // Start Server
         app.listen(port, () => {
             logger.info(`Server Run On Port ${port}`)

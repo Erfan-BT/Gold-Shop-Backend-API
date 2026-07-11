@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken'
 import { logger } from '../configs/pino.config.js'
 import { RedisCache } from '../utils/cache.redis.js';
 import userRepository from '../repository/user.repository.js';
+import { randomBytes } from "crypto";
+import { UnauthorizedError } from '../utils/appError.js';
 
 export interface TokenPayload {
     userId : number;
@@ -13,21 +15,25 @@ export interface TokenPayload {
 class TokenService {
     private readonly accessTokenSecret : string
     private readonly refreshTokenSecret : string
+    private readonly otpTokenSecret : string
     private readonly accessTokenExpiry : string
     private readonly refreshTokenExpiry : string
+    private readonly otpTokenExpiry : string
     private readonly REFRESH_PREFIX = 'refresh:'
 
     constructor() {
         this.accessTokenSecret = process.env.JWT_SECRET!
         this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET!
-        this.accessTokenExpiry = process.env.JWT_EXPIRY ?? '15m'
-        this.refreshTokenExpiry = process.env.JWT_REFRESH_EXPIRY ?? '7d'
+        this.otpTokenSecret = process.env.JWT_OTP_SECRET!
+        this.accessTokenExpiry = process.env.JWT_EXPIRES_IN ?? '15m'
+        this.refreshTokenExpiry = process.env.JWT_REFRESH_EXPIRES_IN ?? '7d'
+        this.otpTokenExpiry = process.env.JWT_OTP_EXPIRES_IN ?? '10m'
 
         if (!process.env.JWT_SECRET) {
             logger.error('JWT_SECRET Not Set')
         }
     }
-
+    // ---------- Refresh & Access ----------
     generateAccessToken(payload: TokenPayload) : string {
         return jwt.sign(
             {
@@ -103,6 +109,22 @@ class TokenService {
             email : user.email
         })
     }
+    // ---------- Verify Email & Forget Password
+    async generateOTP(userId : number, prefix : string) : Promise<string> {
+        const token = randomBytes(32).toString("hex");
+        await RedisCache.set(`otp:${prefix}:${token}`, userId.toString(), 10 * 60)
+        return token
+    }
+
+    async verifyOTP (prefix : string, token : string) : Promise<number> {
+        const payload = await RedisCache.getAndDelete<{ userId: number }>(
+            `otp:${prefix}:${token}`
+        )
+        if (!payload)
+            throw new UnauthorizedError("Invalid OTP");
+        return payload.userId;
+    }
+
 }
 
 export default new TokenService()

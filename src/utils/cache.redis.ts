@@ -16,6 +16,12 @@ export class RedisCache {
         await redisClient.del(key)
     }
     
+    static async getAndDelete<T>(key: string): Promise<T | null> {
+        const data = await redisClient.getDel(key);
+        if (!data) return null;
+        return JSON.parse(data) as T;
+    }
+
     static async deletePattern(pattern : string): Promise<void> {
         const keys = await redisClient.keys(pattern)
         if (keys.length > 0) {
