@@ -18,6 +18,10 @@ class AuthRepository {
     : Promise<boolean> {
         return (await User.findOne({where : {email}})) ? true : false
     }
+    async isEmailVerified (userId : number)
+    : Promise<boolean> {
+        return (await User.findByPk(userId))?.toJSON().isEmailVerified ?? false
+    }
     async register (name : string, email : string, phone : string, password : string) 
     : Promise<UserAttributes> {
         return (await User.create({
