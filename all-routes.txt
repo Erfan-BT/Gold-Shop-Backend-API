@@ -1,0 +1,13 @@
+METHOD  |                 ROUTE                 |   AUTH   |      Q-S      |  BODY-INFO
+_______________________________________________________________________________________
+POST   | auth/register                          |     -    |       -       | name , email, phone, password
+POST   | auth/login                             |     -    |       -       |
+POST   | auth/logout                            |   User   |       -       |
+POST   | auth/refresh                           |   User   |       -       |
+GET    | auth/my-account                        |   User   |       -       |
+POST   | auth/verify-email                      |   User   |       -       |
+POST   | auth/verify-email/confirm/:token       |   User   |       -       |
+POST   | auth/forget-password                   |     -    |       -       |
+POST   | auth/reset-password/:token             |     -    |       -       |
+PUT    | auth/change-password                   |   User   |       -       |
+_______________________________________________________________________________________
