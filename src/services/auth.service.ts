@@ -1,5 +1,5 @@
 import authRepository from "../repository/auth.repository.js"
-import { ConflictError, UnauthorizedError } from "../utils/appError.js"
+import { BadRequestError, ConflictError, UnauthorizedError } from "../utils/appError.js"
 import bcrypt from 'bcrypt'
 import tokenService from "./token.service.js"
 import roleRepository from "../repository/role.repository.js"
@@ -41,7 +41,6 @@ class AuthService {
         const hashedPassword : string = await authRepository.userPassword(email)
         const checkPassword : boolean = await bcrypt.compare(password, hashedPassword)
         if (!checkPassword) {
-            console.log("Wrong pass");
             throw new UnauthorizedError('Email Or Password Is Incorrect')
         }
             
@@ -81,6 +80,14 @@ class AuthService {
         if (!accessToken)
             throw new UnauthorizedError('Refresh Token Is Invalid Or Expired')
         return accessToken
+    }
+
+    async myAccount (userId : number) {
+        // Get User
+        const user = await userRepository.userById(userId)
+        if (!user)
+            throw new BadRequestError()
+        return user
     }
 }
 

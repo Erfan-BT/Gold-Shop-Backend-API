@@ -4,7 +4,7 @@ POST   | auth/register                          |     -    |       -       | nam
 POST   | auth/login                             |     -    |       -       | email , password
 POST   | auth/logout                            |   User   |       -       |    -
 POST   | auth/refresh                           |   User   |       -       | refreshToken
-GET    | auth/my-account                        |   User   |       -       |
+GET    | auth/my-account                        |   User   |       -       |    -
 POST   | auth/verify-email                      |   User   |       -       |
 POST   | auth/verify-email/confirm/:token       |   User   |       -       |
 POST   | auth/forget-password                   |     -    |       -       |

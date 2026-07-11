@@ -13,4 +13,6 @@ router.post('/login', (req, res, next) => getAuthLimiter()(req, res, next), notL
 router.post('/logout', authMiddleware, authController.logout)
 router.post('/refresh', (req, res, next) => getRefreshLimiter()(req, res, next), authMiddleware, validate({ body : refreshScema }), authController.refresh)
 
+router.get('/my-account', authMiddleware, authController.myAccount)
+
 export default router

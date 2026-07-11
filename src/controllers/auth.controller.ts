@@ -33,7 +33,7 @@ class AuthController {
 
     async logout (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const userId = req.user!.userId
+            const { userId } = req.user!
             await authService.logout(userId)
 
             res.status(200).json({
@@ -54,6 +54,21 @@ class AuthController {
             res.status(200).json({
                 success : false,
                 msg : 'New Access Token',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async myAccount (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const result = await authService.myAccount(userId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Account',
                 data : result
             })
         } catch (error) {
