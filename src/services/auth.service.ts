@@ -74,6 +74,14 @@ class AuthService {
         // Delete Token
         await tokenService.revokeRefreshToken(userId)
     }
+
+    async refresh (refreshToken : string) {
+        // Create Access Token
+        const accessToken = await tokenService.refreshAccessToken(refreshToken)
+        if (!accessToken)
+            throw new UnauthorizedError('Refresh Token Is Invalid Or Expired')
+        return accessToken
+    }
 }
 
 export default new AuthService()

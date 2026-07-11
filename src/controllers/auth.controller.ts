@@ -45,6 +45,21 @@ class AuthController {
             next(error)
         }
     }
+
+    async refresh (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { refreshToken } = req.body
+            const result = await authService.refresh(refreshToken)
+            
+            res.status(200).json({
+                success : false,
+                msg : 'New Access Token',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AuthController()

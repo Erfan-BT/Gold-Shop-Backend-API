@@ -15,7 +15,7 @@ async function startServer() {
         // Init DB
         await initializeDatabase()
         // Init RL
-        const { general, auth, heavy } = initializeRateLimiters()
+        const { general, auth, email, refresh } = initializeRateLimiters()
 
         // Start Server
         app.listen(port, () => {

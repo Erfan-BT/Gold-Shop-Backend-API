@@ -3,7 +3,7 @@ ________________________________________________________________________________
 POST   | auth/register                          |     -    |       -       | name , email, phone, password
 POST   | auth/login                             |     -    |       -       | email , password
 POST   | auth/logout                            |   User   |       -       |    -
-POST   | auth/refresh                           |   User   |       -       |
+POST   | auth/refresh                           |   User   |       -       | refreshToken
 GET    | auth/my-account                        |   User   |       -       |
 POST   | auth/verify-email                      |   User   |       -       |
 POST   | auth/verify-email/confirm/:token       |   User   |       -       |

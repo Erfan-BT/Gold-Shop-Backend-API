@@ -2,6 +2,7 @@ import 'dotenv/config'
 import jwt from 'jsonwebtoken'
 import { logger } from '../configs/pino.config.js'
 import { RedisCache } from '../utils/cache.redis.js';
+import userRepository from '../repository/user.repository.js';
 
 export interface TokenPayload {
     userId : number;
@@ -75,14 +76,32 @@ class TokenService {
         return jwt.verify(token, this.refreshTokenSecret) as { userId : number, email : string }
     }
 
-    async getRefreshToken(userId : number): Promise<string | null> {
+    async getRefreshToken(userId : number) : Promise<string | null> {
         const key = `${this.REFRESH_PREFIX}${userId}`;
         return await RedisCache.get(key)
     }
 
-    async revokeRefreshToken(userId: number): Promise<void> {
+    async revokeRefreshToken(userId: number) : Promise<void> {
         const key = `${this.REFRESH_PREFIX}${userId}`;
         await RedisCache.delete(key)
+    }
+
+    async refreshAccessToken(refreshToken : string) : Promise<string | null> {
+        const decoded = this.verifyRefreshToken(refreshToken);
+        if (!decoded) {
+            return null
+        }
+        
+        const user = (await userRepository.userById(decoded.userId))
+        if (!user) {
+            return null
+        }
+        
+        return this.generateAccessToken({
+            userId : user.id,
+            name : user.name,
+            email : user.email
+        })
     }
 }
 

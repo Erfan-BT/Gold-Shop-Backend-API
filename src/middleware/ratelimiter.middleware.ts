@@ -7,6 +7,7 @@ import { InternalServerError } from '../utils/appError.js';
 let generalLimiter : RateLimitRequestHandler | null = null
 let authLimiter : RateLimitRequestHandler | null = null
 let EmailLimiter : RateLimitRequestHandler | null = null
+let RefreshLimiter : RateLimitRequestHandler | null = null
 
 const createRateLimiter = (
     windowMs: number,
@@ -59,7 +60,7 @@ export const getGeneralLimiter = () : RateLimitRequestHandler => {
             15 * 60 * 1000,
             100,
             'general',
-            'Too many requests from this IP, please try again later.'
+            'Too Many Requests From This IP, Please Try Again Later'
         )
     }
     return generalLimiter
@@ -71,7 +72,7 @@ export const getAuthLimiter = (): RateLimitRequestHandler => {
             15 * 60 * 1000,
             5,
             'auth',
-            'Too many login attempts, please try again later.'
+            'Too Many Login Attempts, Please Try Again Later'
         )
     }
     return authLimiter
@@ -83,16 +84,29 @@ export const getEmailLimiter = () : RateLimitRequestHandler => {
             60 * 1000,
             20,
             'email',
-            'The email has just been sent. Please try again later.'
+            'The Email Has Just Been Sent. Please Try Again Later'
         )
     }
     return EmailLimiter
 }
 
+export const getRefreshLimiter = () : RateLimitRequestHandler => {
+    if (!RefreshLimiter) {
+        RefreshLimiter = createRateLimiter(
+            15 * 60 * 1000,
+            20,
+            'refresh',
+            'The Number Of Token Renewal Requests Exceeded The Limit. Please Try Again Later'
+        )
+    }
+    return RefreshLimiter
+}
+
 export const initializeRateLimiters = () => {
     const general = getGeneralLimiter()
     const auth = getAuthLimiter()
-    const heavy = getEmailLimiter()
+    const email = getEmailLimiter()
+    const refresh = getRefreshLimiter()
 
-    return { general, auth, heavy }
+    return { general, auth, email, refresh }
 }

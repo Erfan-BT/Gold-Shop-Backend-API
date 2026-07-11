@@ -88,7 +88,7 @@ export const authMiddleware = async (
             next(error)
         } else {
             logger.error({ error: String(error) }, 'Auth Middleware Error')
-            next(new UnauthorizedError('Auth Error'))
+            next(new UnauthorizedError('Auth Error : ' + String(error)))
         }
     }
 }
