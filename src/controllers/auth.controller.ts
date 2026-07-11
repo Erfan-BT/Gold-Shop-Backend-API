@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import authService from "../services/auth.service.js";
+import { AuthRequest } from "../middleware/auth.middleware.js";
 
 class AuthController {
     async register (req : Request, res : Response, next : NextFunction) {
@@ -24,6 +25,21 @@ class AuthController {
                 success : true,
                 msg : 'Login',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async logout (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const userId = req.user!.userId
+            await authService.logout(userId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'LogOut',
+                data : {}
             })
         } catch (error) {
             next(error)

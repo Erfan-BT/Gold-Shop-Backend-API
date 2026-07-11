@@ -3,6 +3,7 @@ import { ConflictError, UnauthorizedError } from "../utils/appError.js"
 import bcrypt from 'bcrypt'
 import tokenService from "./token.service.js"
 import roleRepository from "../repository/role.repository.js"
+import userRepository from "../repository/user.repository.js"
 
 class AuthService {
     async register (name : string, email : string, phone : string, password : string) {
@@ -30,6 +31,7 @@ class AuthService {
             tokens
         }
     }
+
     async login (email : string, password : string) {
         // Check Exists Email
         const existsEmail : boolean = await authRepository.existsEmail(email)
@@ -37,10 +39,6 @@ class AuthService {
             throw new UnauthorizedError('Email Or Password Is Incorrect')
         // Get User Password & Check Password
         const hashedPassword : string = await authRepository.userPassword(email)
-        console.log(hashedPassword);
-        console.log(await bcrypt.hash('admin123', 12));
-        
-        
         const checkPassword : boolean = await bcrypt.compare(password, hashedPassword)
         if (!checkPassword) {
             console.log("Wrong pass");
@@ -62,6 +60,19 @@ class AuthService {
             email,
             tokens
         }
+    }
+
+    async logout (userId : number) {
+        // Check Exists User
+        const user = await userRepository.userById(userId)
+        if (!user)
+            throw new UnauthorizedError('Login First')
+        // Check Exists Token
+        const refreshToken = await tokenService.getRefreshToken(userId)
+        if (!refreshToken)
+            throw new UnauthorizedError('Login First')
+        // Delete Token
+        await tokenService.revokeRefreshToken(userId)
     }
 }
 

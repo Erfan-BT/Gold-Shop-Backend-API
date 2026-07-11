@@ -2,7 +2,7 @@ METHOD  |                 ROUTE                 |   AUTH   |      Q-S      |  BO
 _______________________________________________________________________________________
 POST   | auth/register                          |     -    |       -       | name , email, phone, password
 POST   | auth/login                             |     -    |       -       | email , password
-POST   | auth/logout                            |   User   |       -       |
+POST   | auth/logout                            |   User   |       -       |    -
 POST   | auth/refresh                           |   User   |       -       |
 GET    | auth/my-account                        |   User   |       -       |
 POST   | auth/verify-email                      |   User   |       -       |
