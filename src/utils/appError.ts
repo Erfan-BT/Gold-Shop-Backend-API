@@ -3,10 +3,10 @@ export class AppError<T> extends Error {
     public readonly isOperatinal : boolean;
     public readonly context : T | undefined;
     
-    constructor(message : string, statusCode : number = 500, context ?: T) {
+    constructor(message : string, statusCode : number = 500, context ?: T, isOperatinal : boolean = true) {
         super(message)
         this.statusCode = statusCode
-        this.isOperatinal = true
+        this.isOperatinal = isOperatinal
         this.context = context
         Error.captureStackTrace(this.constructor)
     }
@@ -17,14 +17,14 @@ export class NotFoundError extends AppError<undefined> {
         super(`URL Not Found : ${resource}`, 404)
     }
 }
-export class ValidationError extends AppError<string[] | undefined> {
-    constructor(message : string =  'Invalid Params', invalidList ?: string[]) {
+export class ValidationError extends AppError<any> {
+    constructor(message : string =  'Invalid Params', invalidList ?: any) {
         super(message, 400, invalidList)
     }
 }
 
 export class BadRequestError extends AppError<string | undefined> {
-    constructor(message : string =  'wrong Data', context ?: string) {
+    constructor(message : string =  'Wrong Data', context ?: string) {
         super(message, 400, context)
     }
 }
@@ -42,7 +42,13 @@ export class ForbiddenError extends AppError<string | undefined> {
 }
 
 export class InternalServerError extends AppError<any> {
-    constructor(message : string = 'Server Error', context ?: any) {
-        super(message, 500, context)
+    constructor(message : string = 'Server Error', context ?: any, isOperatinal : boolean = true) {
+        super(message, 500, context, isOperatinal)
+    }
+}
+
+export class ConflictError extends AppError<string | null> {
+    constructor(message : string = 'Interference With Current Information', context ?: string) {
+        super(message, 409, context)
     }
 }

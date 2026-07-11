@@ -9,9 +9,9 @@ export function errorHandler(
     next : NextFunction
 ) {
     if (!(err instanceof AppError)) {
-        err = new InternalServerError(String(err))
+        err = new InternalServerError(String(err), undefined, false)
     }
-    logger.error(`[${err.statusCode}] =>  ${err.message}`)
+    // logger.warn(`[${err.statusCode}] =>  ${err.message}`)
     res.status(err.statusCode).json({
         success : false,
         msg : err.message,
