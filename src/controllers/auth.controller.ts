@@ -15,6 +15,20 @@ class AuthController {
             next(error)
         }
     }
+
+    async login (req : Request, res : Response, next : NextFunction) {
+        try {
+            const { email, password } = req.body
+            const result = await authService.login(email, password)
+            res.status(200).json({
+                success : true,
+                msg : 'Login',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AuthController()
