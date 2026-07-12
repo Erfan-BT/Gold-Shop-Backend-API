@@ -7,7 +7,7 @@ POST   | auth/refresh                           |   User   |       -       | ref
 GET    | auth/my-account                        |   User   |       -       |    -
 POST   | auth/verify-email                      |   User   |       -       |    -
 GET    | auth/verify-email/confirm/:token       |     -    |       -       |    -
-POST   | auth/forget-password                   |     -    |       -       |
-POST   | auth/reset-password/:token             |     -    |       -       |
+POST   | auth/forget-password                   |     -    |       -       | email
+GET    | auth/reset-password/:token             |     -    |       -       |
 PUT    | auth/change-password                   |   User   |       -       |
 _______________________________________________________________________________________

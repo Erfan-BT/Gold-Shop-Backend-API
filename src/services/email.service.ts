@@ -29,29 +29,31 @@ class EmailService {
         logger.info({response : info.response}, 'EmailService - Send Verify Email Response');
     }
 
-    // static sendResetPasswordEmail (token : string, name : string, email : string) : void {
-    //     const mailOptions = {
-    //         from : process.env.NODEMAILER_URL,
-    //         to : email,
-    //         subject : "Reset Password",
-    //         html : `
-    //             <center>
-    //             <h1>سلام ${name}</h1>
-    //             <h2>برای تغییر دادن رمزعبورت بزن روی لینک زیر</h2>
-    //             <hr>
-    //             <p>${token}</p>
-    //             <a href="http://localhost:3000/api/auth/reset-password/${token}">اینجا را کلیک کن</a>
-    //             </center>
-    //         `
-    //     }
-    //     transporter.sendMail(mailOptions, (error, info) => {
-    //         if (error) {
-    //             logger.error({error}, "Email not send")
-    //         } else {
-    //             logger.info(info.response)
-    //         }
-    //     })
-    // }
+    async sendForgetPasswordEmail(
+        token: string,
+        name: string,
+        email: string
+    ): Promise<void> {
+        const mailOptions = {
+            from: process.env.NODEMAILER_URL,
+            to: email,
+            subject: "Forget Password",
+            html : `
+                <center>
+                    <h1>سلام ${name}</h1>
+                    <h2>برای تغییر دادن رمزعبورت بزن روی لینک زیر</h2>
+                    <hr>
+                    <a href="http://localhost:3000/api/v1/auth/reset-password/${token}">
+                        تغییر رمزعبور
+                    </a>
+                </center>
+            `
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+
+        logger.info({response : info.response}, 'EmailService - Send ForgerPassword Email Response');
+    }
 }
 
 export default new EmailService()

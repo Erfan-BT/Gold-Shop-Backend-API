@@ -20,7 +20,12 @@ export const optSchema = z.object({
     token : z.string().min(10, 'OPT Token Is Required')
 })
 
+export const emailSchema = z.object({
+    email : z.string().email('Invalid Email')
+})
+
 export type RegisterDto = z.infer<typeof registerSchema>
 export type LoginDto = z.infer<typeof loginSchema>
 export type RefreshDto = z.infer<typeof refreshSchema>
 export type OptDto = z.infer<typeof optSchema>
+export type EmailDto = z.infer<typeof emailSchema>

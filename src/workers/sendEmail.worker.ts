@@ -18,18 +18,39 @@ export async function initSendEmailWorker() {
         'send-email',
         async (job) => {
             const { userId, name, email } = job.data
+            let token : string;
+            switch (job.name) {
+                case 'send-verify-email':
+                    token = await tokenService.generateOTP(
+                        userId,
+                        'verify-email'
+                    )
 
-            const token = await tokenService.generateOTP(
-                userId,
-                'verify-email'
-            )
+                    await emailService.sendVerifiedEmail(
+                        token,
+                        name,
+                        email
+                    )
+                    break;
+                case 'send-forgetPassword-email':
+                    token = await tokenService.generateOTP(
+                        userId,
+                        'forget-password'
+                    )
 
-            await emailService.sendVerifiedEmail(
-                token,
-                name,
-                // email
-                'erfanweb1385@gmail.com'
-            )
+                    await emailService.sendForgetPasswordEmail(
+                        token,
+                        name,
+                        email
+                    )
+                    break;
+
+                default:
+                    break;
+            }
+            
+
+            
         },
         {
             connection: await connectBullmqRedis(),
@@ -40,13 +61,14 @@ export async function initSendEmailWorker() {
     )
 
     sendEmailWorker.on("completed", (job) => {
-        logger.info({ jobId: job.id }, "sendEmail Job Completed");
+        logger.info({ jobId: job.id , jobName : job.name }, "sendEmail Job Completed");
     })
 
     sendEmailWorker.on("failed", (job, err) => {
         logger.error(
             {
                 jobId: job?.id,
+                jobName : job?.name,
                 error: err.message,
             },
             "sendEmail Job Failed"

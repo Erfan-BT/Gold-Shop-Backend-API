@@ -1,7 +1,7 @@
 import express from 'express'
 import authController from '../controllers/auth.controller.js'
 import { validate } from '../middleware/validation.js'
-import { loginSchema, optSchema, refreshSchema, registerSchema } from '../validation/auth.validation.js'
+import { emailSchema, loginSchema, optSchema, refreshSchema, registerSchema } from '../validation/auth.validation.js'
 import { getAuthLimiter, getEmailLimiter, getRefreshLimiter } from '../middleware/ratelimiter.middleware.js'
 import { authMiddleware, notLoginMiddleware } from '../middleware/auth.middleware.js'
 
@@ -18,4 +18,5 @@ router.get('/my-account', authMiddleware, authController.myAccount)
 router.post('/verify-email', (req, res, next) => getEmailLimiter()(req, res, next), authMiddleware, authController.verifyEmail)
 router.get('/verify-email/confirm/:token', validate({ params : optSchema }), authController.verifyEmailConfirm)
 
+router.post('/forget-password', (req, res, next) => getEmailLimiter()(req, res, next), validate({ body : emailSchema }), authController.forgetPassword)
 export default router

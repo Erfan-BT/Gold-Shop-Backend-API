@@ -123,6 +123,22 @@ class AuthService {
             throw new InternalServerError('Email Not Verified, Please Try Again Later')
         return
     }
+
+    async forgetPassword (email : string) {
+        // Get User
+        const user = await authRepository.userByEmail(email)
+        // // Add Sending Email To Queue
+        if (user) {
+            await emailQueue.add('send-forgetPassword-email',
+                {
+                    userId : user.id,
+                    name : user.name,
+                    email
+                }
+            )
+        }
+        return
+    }
 }
 
 export default new AuthService()
