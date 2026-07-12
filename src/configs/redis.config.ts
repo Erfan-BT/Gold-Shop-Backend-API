@@ -2,14 +2,15 @@ import { createClient } from 'redis';
 import { Redis } from 'ioredis';
 import "dotenv/config"
 import { logger } from './pino.config.js';
+import { env } from './env.config.js';
 
 export const redisClient = createClient({
     socket : {
-        host : process.env.REDIS_HOST || 'localhost',
-        port : parseInt(process.env.REDIS_PORT || '6379')
+        host : env.REDIS_HOST,
+        port : env.REDIS_PORT
     },
-    password : process.env.REDIS_PASSWORD!,
-    database : parseInt(process.env.REDIS_DB || '0')
+    password : env.REDIS_PASSWORD,
+    database : env.REDIS_DB
 })
 
 export const connectRedis = async () => {
@@ -29,15 +30,14 @@ export const disconnectRedis = async () => {
         logger.error({error : String(error)}, 'Error Disconnecting Redis');
     }
 }
-let test : boolean = false
+let isRedisErrorLogged : boolean = false
 redisClient.on('connect', () => {
     logger.info('Redis Connected Successfully');
 })
 redisClient.on('error', (error) => {
-    if (!test) {
+    if (!isRedisErrorLogged) {
         logger.fatal({error : String(error)}, 'Failed To Connect To Redis');
-        test = true
-        // process.exit(1)
+        isRedisErrorLogged = true
     }
 })
 
@@ -48,19 +48,11 @@ export const connectBullmqRedis = async () => {
         return bullmqConnection;
     }
     bullmqConnection = new Redis({
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        // password: process.env.REDIS_PASSWORD,
-        db: parseInt(process.env.REDIS_DB || '0'),
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+        password: env.REDIS_PASSWORD,
+        db: env.REDIS_DB,
         maxRetriesPerRequest: null,
-        // retryStrategy: (times: number) => {
-        //     if (times > 2) {
-        //         logger.error(`Number Of Failed Attempts To Connect To BullMQ Redis : ${times}`)
-        //         return null
-        //     }
-        //     const delay = Math.min(times * 1000, 5000)
-        //     return delay
-        // },
     }) 
 
     let isRedisErrorLogged : boolean = false;
@@ -74,7 +66,6 @@ export const connectBullmqRedis = async () => {
         if (!isRedisErrorLogged) {
             logger.error({error : String(error)}, 'Failed To Connect To BullMQ-Redis');
             isRedisErrorLogged = true
-            // process.exit(1)
         }
     })
 

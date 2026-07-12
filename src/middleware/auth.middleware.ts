@@ -87,8 +87,8 @@ export const authMiddleware = async (
         if (error instanceof UnauthorizedError) {
             next(error)
         } else {
-            logger.error({ error: String(error) }, 'Auth Middleware Error')
-            next(new UnauthorizedError('Auth Error : ' + String(error)))
+            req.logger.error({ error }, 'Auth Middleware Error')
+            next(new UnauthorizedError())
         }
     }
 }
@@ -105,7 +105,7 @@ export const roleMiddleware = (allowedRoles: string[]) => {
             )
 
             if (!hasRole)
-                throw new UnauthorizedError('Not Access')
+                throw new ForbiddenError('Not Access')
 
             next()
         } catch (error) {

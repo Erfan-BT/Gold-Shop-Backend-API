@@ -15,7 +15,10 @@ const User = sequelize.define<Model<UserAttributes, UserCreationAttributes>, Use
         },
         email : {
             type : DataTypes.STRING(100),
-            allowNull : false
+            allowNull : false,
+            validate: {
+                isEmail: true
+            }
         },
         password : {
             type : DataTypes.STRING(255),

@@ -1,6 +1,7 @@
 import 'dotenv/config'
 import { transporter } from '../configs/nodemailer.config.js'
 import { logger } from '../configs/pino.config.js'
+import { env } from '../configs/env.config.js';
 
 class EmailService {
     async sendVerifiedEmail(
@@ -9,7 +10,7 @@ class EmailService {
         email: string
     ): Promise<void> {
         const mailOptions = {
-            from: process.env.NODEMAILER_URL,
+            from: env.NODEMAILER_URL,
             to: email,
             subject: "Verify Email",
             html: `
@@ -35,7 +36,7 @@ class EmailService {
         email: string
     ): Promise<void> {
         const mailOptions = {
-            from: process.env.NODEMAILER_URL,
+            from: env.NODEMAILER_URL,
             to: email,
             subject: "Forget Password",
             html : `

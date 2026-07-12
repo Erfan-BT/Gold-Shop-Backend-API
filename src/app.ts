@@ -6,6 +6,7 @@ import { errorHandler } from './middleware/errorHandler.js'
 // Routes Files
 import AuthRoutes from './routes/auth.routes.js'
 import { NotFoundError } from './utils/appError.js'
+import { loggerMiddleware } from './middleware/logger.middleware.js'
 
 const app = express()
 
@@ -24,12 +25,15 @@ app.use(helmet())
 app.use(cors())
 
 app.use(express.json())
-app.use(express.urlencoded())
-
+app.use(express.urlencoded({
+    extended:true
+}))
+app.use(loggerMiddleware)
 
 // ---------- Routes ----------
 // Health
 app.get('/health', (req: Request, res: Response) => {
+    req.logger.info('HEALTH')
     res.json({
         success : true,
         timestamp: new Date().toISOString(),

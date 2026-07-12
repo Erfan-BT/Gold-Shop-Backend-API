@@ -17,6 +17,9 @@ import User from "./user.model.js";
 import Wishlist from "./wishlist.model.js";
 
 export default async function initializeDatabase() {
+    // ---------- Associations ----------
+    associations()
+
     // ---------- Sync ----------
     // USER
     await User.sync({alter : true})
@@ -51,8 +54,7 @@ export default async function initializeDatabase() {
     await Setting.sync({alter : true})
     await FailedJob.sync({alter : true})
 
-    // ---------- Associations ----------
-    associations()
+    
     // ---------- SEEDER ---------
     await seedDatabase()
 }
@@ -201,13 +203,13 @@ function associations() {
     ProductVariant.hasMany(ProductPricing, {
         foreignKey : 'variantId',
         as : 'prices',
-        onDelete : 'SET NULL',
+        onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
     })
     Category.hasMany(ProductPricing, {
         foreignKey : 'categoryId',
         as : 'prices',
-        onDelete : 'SET NULL',
+        onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
     })
     ProductPricing.belongsTo(ProductVariant, {

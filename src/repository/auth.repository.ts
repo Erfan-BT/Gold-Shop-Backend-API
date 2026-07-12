@@ -1,4 +1,4 @@
-import { Model } from "sequelize";
+import { Model, Transaction } from "sequelize";
 import User from "../models/user.model.js";
 import { UserAttributes, UserCreationAttributes } from "../types/user.interface.js";
 import sequelize from "../configs/sequelize.config.js";
@@ -23,18 +23,18 @@ class AuthRepository {
     : Promise<boolean> {
         return (await User.findByPk(userId))?.toJSON().isEmailVerified ?? false
     }
-    async register (name : string, email : string, phone : string, password : string) 
+    async register (name : string, email : string, phone : string, password : string, transaction : Transaction) 
     : Promise<UserAttributes> {
         return (await User.create({
             name,
             email,
             phone,
             password
-        })).toJSON()
+        }, { transaction })).toJSON()
     }
-    async userPassword (email : string)
-    : Promise<string> {
-        return (await User.findOne({where : {email}}))!.toJSON().password
+    async userWithPassword (email : string)
+    : Promise<UserAttributes> {
+        return (await User.findOne({where : {email}}))!.toJSON()
     }
     async verifyEmail (userId : number)
     : Promise<number> {
@@ -48,7 +48,7 @@ class AuthRepository {
         })
         return rows
     }
-    async chnageUserPassword (userId : number, password : string)
+    async changeUserPassword (userId : number, password : string)
     : Promise<number> {
         const [rows] = await User.update({
             password

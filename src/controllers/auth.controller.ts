@@ -52,7 +52,7 @@ class AuthController {
             const result = await authService.refresh(refreshToken)
             
             res.status(200).json({
-                success : false,
+                success : true,
                 msg : 'New Access Token',
                 data : result
             })
@@ -145,7 +145,7 @@ class AuthController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Chnage Password',
+                msg : 'Change Password',
                 data : {}
             })
         } catch (error) {

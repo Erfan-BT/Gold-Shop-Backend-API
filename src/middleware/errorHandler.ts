@@ -1,20 +1,24 @@
 import { Request, Response, NextFunction } from 'express'
-import { AppError, InternalServerError } from '../utils/appError.js' 
+import { AppError, InternalServerError, UnauthorizedError } from '../utils/appError.js' 
 import { logger } from '../configs/pino.config.js'
+// import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 export function errorHandler(
     err : any,
     req : Request,
     res : Response,
-    next : NextFunction
+    _next : NextFunction
 ) {
     if (!(err instanceof AppError)) {
         err = new InternalServerError(String(err), undefined, false)
     }
-    // logger.warn(`[${err.statusCode}] =>  ${err.message}`)
+    // if (err instanceof JsonWebTokenError || err instanceof TokenExpiredError) {
+    //     err = new UnauthorizedError("Token Is Invalid")
+    // }
+    req.logger.error({errorCode : err.statusCode, errorMsg : err.message, err}, "ERROR MIDDLEWARE")
     res.status(err.statusCode).json({
         success : false,
         msg : err.message,
-        data : err
+        data : {}
     })
 }

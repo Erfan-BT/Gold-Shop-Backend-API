@@ -1,11 +1,11 @@
-import { Model } from "sequelize"
+import { Model, Transaction } from "sequelize"
 import { Role, UserRole } from "../models/role.model.js"
 import { RoleAttributes, UserRoleAttributes, UserRoleCreationAttributes } from "../types/role.interface.js"
 
 class RoleRepository {
-    async setUserRole (userId : number, roleId : number)
+    async setUserRole (userId : number, roleId : number, transaction : Transaction | null)
     : Promise<UserRoleAttributes> {
-        return (await UserRole.create({userId, roleId})).toJSON()
+        return (await UserRole.create({userId, roleId}, { transaction })).toJSON()
     }
     async getUserRoles (userId : number)
     :  Promise<Model<UserRoleAttributes, UserRoleCreationAttributes>[]> {

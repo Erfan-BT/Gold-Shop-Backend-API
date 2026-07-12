@@ -5,8 +5,9 @@ import initializeDatabase from "./models/index.js";
 import { connectBullmqRedis, connectRedis } from './configs/redis.config.js';
 import { initializeRateLimiters } from './middleware/ratelimiter.middleware.js';
 import { initWorkers } from "./workers/index.js";
+import { env } from './configs/env.config.js';
 
-const port = process.env.SERVER_PORT ?? 3000
+const port = env.SERVER_PORT
 
 async function startServer() {
     try {
@@ -16,7 +17,7 @@ async function startServer() {
         // Init DB
         await initializeDatabase()
         // Init RL
-        const { general, auth, email, refresh } = initializeRateLimiters()
+        initializeRateLimiters()
         // Init Workers
         await initWorkers();
         // Start Server

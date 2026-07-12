@@ -5,6 +5,7 @@ import tokenService from "./token.service.js"
 import roleRepository from "../repository/role.repository.js"
 import userRepository from "../repository/user.repository.js"
 import { emailQueue } from "../queue/email.queue.js"
+import sequelize from "../configs/sequelize.config.js"
 
 class AuthService {
     async register (name : string, email : string, phone : string, password : string) {
@@ -14,10 +15,13 @@ class AuthService {
             throw new ConflictError('This Email Already Exists')
         // Hash Password
         const hashedPassword : string = await bcrypt.hash(password, 12)
-        // Add User To DataBase
-        const user = await authRepository.register(name, email, phone, hashedPassword)
-        // Set User Role
-        const setRole = await roleRepository.setUserRole(user.id, 3)
+        // Add User To DataBase && Set User Role
+        const user = await sequelize.transaction(async (t) => {
+            const user = await authRepository.register(name, email, phone, hashedPassword, t)
+            await roleRepository.setUserRole(user.id, 3, t)
+            return user
+        })
+        
         // Token
         const tokens = await tokenService.generateTokens({
             userId : user.id,
@@ -34,19 +38,12 @@ class AuthService {
     }
 
     async login (email : string, password : string) {
-        // Check Exists Email
-        const existsEmail : boolean = await authRepository.existsEmail(email)
-        if (!existsEmail)
-            throw new UnauthorizedError('Email Or Password Is Incorrect')
-        // Get User Password & Check Password
-        const hashedPassword : string = await authRepository.userPassword(email)
-        const checkPassword : boolean = await bcrypt.compare(password, hashedPassword)
+        // Get User & Check Password
+        const user = await authRepository.userWithPassword(email)
+        const checkPassword : boolean = await bcrypt.compare(password, user.password)
         if (!checkPassword) {
             throw new UnauthorizedError('Email Or Password Is Incorrect')
         }
-            
-        // Get User
-        const user = await authRepository.userByEmail(email)
         // Token
         const tokens = await tokenService.generateTokens({
             userId : user!.id,
@@ -150,7 +147,7 @@ class AuthService {
         // Hash Password
         const hashedPassword : string = await bcrypt.hash(password, 12)
         // Update Password
-        const rows = await authRepository.chnageUserPassword(userId, hashedPassword)
+        const rows = await authRepository.changeUserPassword(userId, hashedPassword)
         if (rows === 0)
             throw new InternalServerError('Password Not Changed, Please Try Again Later')
     }
@@ -161,14 +158,14 @@ class AuthService {
         if (!user)
             throw new BadRequestError()
         // Get User Password & Check Password
-        const hashedOldPassword : string = await authRepository.userPassword(user.email)
+        const hashedOldPassword : string = (await authRepository.userWithPassword(user.email)).password
         const checkPassword : boolean = await bcrypt.compare(oldPassword, hashedOldPassword)
         if (!checkPassword)
             throw new UnauthorizedError('The Old Password Is Incorrect')
         // Hash New Password
         const hashedNewPassword : string = await bcrypt.hash(newPassword, 12)
         // Update Password
-        const rows = await authRepository.chnageUserPassword(userId, hashedNewPassword)
+        const rows = await authRepository.changeUserPassword(userId, hashedNewPassword)
         if (rows === 0)
             throw new InternalServerError('Password Not Changed, Please Try Again Later')
     }

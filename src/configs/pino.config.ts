@@ -2,11 +2,10 @@ import "dotenv/config"
 import pino from "pino";
 import path from "path";
 import fs from "fs";
+import { env } from "./env.config.js";
 
-// const isDevelopment = process.env.NODE_ENV === 'development';
-// const isProduction = process.env.NODE_ENV === 'production';
-const isDevelopment = true;
-const isProduction = false;
+const isDevelopment = env.NODE_ENV === 'development';
+const isProduction = env.NODE_ENV === 'production';
 
 const logDir = path.join(process.cwd(), '../Logs');
 if (isProduction && !fs.existsSync(logDir)) {
@@ -18,7 +17,7 @@ export const logger = pino({
     
     base : {
         service : 'gold-shop',
-        env : process.env.NODE_ENV || 'dev',
+        env : env.NODE_ENV || 'dev',
     },
     
     redact : {
@@ -33,6 +32,11 @@ export const logger = pino({
             'req.headers.authorization'
         ],
         censor : '[REDACTED]',
+    },
+    serializers : {
+        err : pino.stdSerializers.err,
+        req : pino.stdSerializers.req,
+        res : pino.stdSerializers.res
     },
     
     transport : isDevelopment ?
