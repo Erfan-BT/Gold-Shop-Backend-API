@@ -154,6 +154,24 @@ class AuthService {
         if (rows === 0)
             throw new InternalServerError('Password Not Changed, Please Try Again Later')
     }
+
+    async changePassword (userId : number, oldPassword : string, newPassword : string) {
+        // Get User
+        const user = await userRepository.userById(userId)
+        if (!user)
+            throw new BadRequestError()
+        // Get User Password & Check Password
+        const hashedOldPassword : string = await authRepository.userPassword(user.email)
+        const checkPassword : boolean = await bcrypt.compare(oldPassword, hashedOldPassword)
+        if (!checkPassword)
+            throw new UnauthorizedError('The Old Password Is Incorrect')
+        // Hash New Password
+        const hashedNewPassword : string = await bcrypt.hash(newPassword, 12)
+        // Update Password
+        const rows = await authRepository.chnageUserPassword(userId, hashedNewPassword)
+        if (rows === 0)
+            throw new InternalServerError('Password Not Changed, Please Try Again Later')
+    }
 }
 
 export default new AuthService()
