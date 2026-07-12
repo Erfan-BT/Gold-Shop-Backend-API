@@ -90,6 +90,21 @@ class AuthController {
             next(error)
         }
     }
+
+    async verifyEmailConfirm (req : Request, res : Response, next : NextFunction) {
+        try {
+            const { token } = req.params
+            await authService.verifyEmailConfirm(String(token))
+
+            res.status(200).json({
+                success : true,
+                msg : 'Email Verified',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AuthController()

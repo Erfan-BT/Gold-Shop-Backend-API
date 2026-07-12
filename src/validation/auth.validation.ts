@@ -12,10 +12,15 @@ export const loginSchema = z.object({
     password: z.string().min(1, 'Password Is Required'),
 })
 
-export const refreshScema = z.object({
-    refreshToken : z.string().min(1, 'Refresh Token Is Required')
+export const refreshSchema = z.object({
+    refreshToken : z.string().min(10, 'Refresh Token Is Required')
+})
+
+export const optSchema = z.object({
+    token : z.string().min(10, 'OPT Token Is Required')
 })
 
 export type RegisterDto = z.infer<typeof registerSchema>
 export type LoginDto = z.infer<typeof loginSchema>
-export type RefreshDto = z.infer<typeof refreshScema>
+export type RefreshDto = z.infer<typeof refreshSchema>
+export type OptDto = z.infer<typeof optSchema>

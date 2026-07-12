@@ -4,7 +4,7 @@ import { logger } from '../configs/pino.config.js'
 import { RedisCache } from '../utils/cache.redis.js';
 import userRepository from '../repository/user.repository.js';
 import { randomBytes } from "crypto";
-import { UnauthorizedError } from '../utils/appError.js';
+import { BadRequestError, UnauthorizedError } from '../utils/appError.js';
 
 export interface TokenPayload {
     userId : number;
@@ -117,12 +117,12 @@ class TokenService {
     }
 
     async verifyOTP (prefix : string, token : string) : Promise<number> {
-        const payload = await RedisCache.getAndDelete<{ userId: number }>(
+        const payload = await RedisCache.getAndDelete<number>(
             `otp:${prefix}:${token}`
         )
         if (!payload)
-            throw new UnauthorizedError("Invalid OTP");
-        return payload.userId;
+            throw new BadRequestError("Invalid OTP");
+        return payload
     }
 
 }

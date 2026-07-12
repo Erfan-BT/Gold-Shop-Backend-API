@@ -1,5 +1,5 @@
 import authRepository from "../repository/auth.repository.js"
-import { BadRequestError, ConflictError, UnauthorizedError } from "../utils/appError.js"
+import { BadRequestError, ConflictError, InternalServerError, UnauthorizedError } from "../utils/appError.js"
 import bcrypt from 'bcrypt'
 import tokenService from "./token.service.js"
 import roleRepository from "../repository/role.repository.js"
@@ -95,7 +95,7 @@ class AuthService {
         // Get User
         const user = await authRepository.userByEmail(email)
         // Add Sending Email To Queue
-        if (user) {
+        if (user && !user.isEmailVerified) {
             await emailQueue.add('send-verify-email',
                 {
                     userId : user.id,
@@ -104,6 +104,23 @@ class AuthService {
                 }
             )
         }
+        return
+    }
+
+    async verifyEmailConfirm (token : string) {
+        // Verify Token
+        const userId = await tokenService.verifyOTP('verify-email', token)
+        // Get User
+        const user = await userRepository.userById(userId)
+        if (!user)
+            throw new BadRequestError('OPT Token Data Is Invalid')
+        // Check Email
+        if (user.isEmailVerified)
+            throw new ConflictError('Your Email Is Already Verified')
+        // Set Email Verified
+        const rows = await authRepository.verifyEmail(userId)
+        if (rows === 0)
+            throw new InternalServerError('Email Not Verified, Please Try Again Later')
         return
     }
 }

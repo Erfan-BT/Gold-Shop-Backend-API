@@ -8,24 +8,27 @@ import { InternalServerError } from "../utils/appError.js";
 let sendEmailWorker: Worker | null = null;
 
 export async function initSendEmailWorker() {
+    logger.info("Initializing Send Email Worker");
+
     if (sendEmailWorker) {
         return sendEmailWorker;
     }
 
     sendEmailWorker = new Worker(
-        "send-email",
+        'send-email',
         async (job) => {
             const { userId, name, email } = job.data
 
             const token = await tokenService.generateOTP(
                 userId,
-                "verify-email"
+                'verify-email'
             )
 
             await emailService.sendVerifiedEmail(
                 token,
                 name,
-                email
+                // email
+                'erfanweb1385@gmail.com'
             )
         },
         {

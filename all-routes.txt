@@ -6,7 +6,7 @@ POST   | auth/logout                            |   User   |       -       |    
 POST   | auth/refresh                           |   User   |       -       | refreshToken
 GET    | auth/my-account                        |   User   |       -       |    -
 POST   | auth/verify-email                      |   User   |       -       |    -
-POST   | auth/verify-email/confirm/:token       |   User   |       -       |
+GET    | auth/verify-email/confirm/:token       |     -    |       -       |    -
 POST   | auth/forget-password                   |     -    |       -       |
 POST   | auth/reset-password/:token             |     -    |       -       |
 PUT    | auth/change-password                   |   User   |       -       |

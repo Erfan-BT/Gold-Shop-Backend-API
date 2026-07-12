@@ -1,6 +1,7 @@
 import { Model } from "sequelize";
 import User from "../models/user.model.js";
 import { UserAttributes, UserCreationAttributes } from "../types/user.interface.js";
+import sequelize from "../configs/sequelize.config.js";
 
 class AuthRepository {
     async userByEmail (email : string) 
@@ -34,6 +35,18 @@ class AuthRepository {
     async userPassword (email : string)
     : Promise<string> {
         return (await User.findOne({where : {email}}))!.toJSON().password
+    }
+    async verifyEmail (userId : number)
+    : Promise<number> {
+        const [rows] = await User.update({
+            isEmailVerified : true,
+            emailVerifiedAt : new Date()
+        },{
+            where : {
+                id : userId
+            }
+        })
+        return rows
     }
 }
 
