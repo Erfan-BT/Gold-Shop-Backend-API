@@ -5,7 +5,7 @@ POST   | auth/login                             |     -    |       -       | ema
 POST   | auth/logout                            |   User   |       -       |    -
 POST   | auth/refresh                           |   User   |       -       | refreshToken
 GET    | auth/my-account                        |   User   |       -       |    -
-POST   | auth/verify-email                      |   User   |       -       |
+POST   | auth/verify-email                      |   User   |       -       |    -
 POST   | auth/verify-email/confirm/:token       |   User   |       -       |
 POST   | auth/forget-password                   |     -    |       -       |
 POST   | auth/reset-password/:token             |     -    |       -       |

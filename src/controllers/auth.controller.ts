@@ -75,6 +75,21 @@ class AuthController {
             next(error)
         }
     }
+
+    async verifyEmail (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { email } = req.user!
+            await authService.verifyEmail(email)
+
+            res.status(200).json({
+                success : true,
+                msg : 'If The Email Exists, A Verification Email Has Been Sent',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AuthController()

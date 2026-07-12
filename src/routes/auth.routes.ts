@@ -2,7 +2,7 @@ import express from 'express'
 import authController from '../controllers/auth.controller.js'
 import { validate } from '../middleware/validation.js'
 import { loginSchema, refreshScema, registerSchema } from '../validation/auth.validation.js'
-import { getAuthLimiter, getRefreshLimiter } from '../middleware/ratelimiter.middleware.js'
+import { getAuthLimiter, getEmailLimiter, getRefreshLimiter } from '../middleware/ratelimiter.middleware.js'
 import { authMiddleware, notLoginMiddleware } from '../middleware/auth.middleware.js'
 
 const router = express.Router()
@@ -14,5 +14,7 @@ router.post('/logout', authMiddleware, authController.logout)
 router.post('/refresh', (req, res, next) => getRefreshLimiter()(req, res, next), authMiddleware, validate({ body : refreshScema }), authController.refresh)
 
 router.get('/my-account', authMiddleware, authController.myAccount)
+
+router.post('/verify-email', (req, res, next) => getEmailLimiter()(req, res, next), authMiddleware, authController.verifyEmail)
 
 export default router

@@ -21,10 +21,6 @@ const createRateLimiter = (
         message,
         standardHeaders: true,
         legacyHeaders: false,
-        // keyGenerator: (req: any) => {
-        //     console.log(`🔑 Rate Limiter Key: test`)
-        //     // return req.user?.id || null
-        // },
         handler: (req: any, res: any) => {
             res.status(429).json({
                 success : false,
@@ -82,7 +78,7 @@ export const getEmailLimiter = () : RateLimitRequestHandler => {
     if (!EmailLimiter) {
         EmailLimiter = createRateLimiter(
             60 * 1000,
-            20,
+            1,
             'email',
             'The Email Has Just Been Sent. Please Try Again Later'
         )

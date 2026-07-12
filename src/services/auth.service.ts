@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import tokenService from "./token.service.js"
 import roleRepository from "../repository/role.repository.js"
 import userRepository from "../repository/user.repository.js"
+import { emailQueue } from "../queue/email.queue.js"
 
 class AuthService {
     async register (name : string, email : string, phone : string, password : string) {
@@ -88,6 +89,22 @@ class AuthService {
         if (!user)
             throw new BadRequestError()
         return user
+    }
+
+    async verifyEmail (email : string) {
+        // Get User
+        const user = await authRepository.userByEmail(email)
+        // Add Sending Email To Queue
+        if (user) {
+            await emailQueue.add('send-verify-email',
+                {
+                    userId : user.id,
+                    name : user.name,
+                    email
+                }
+            )
+        }
+        return
     }
 }
 
