@@ -8,6 +8,6 @@ GET    | auth/my-account                        |   User   |       -       |    
 POST   | auth/verify-email                      |   User   |       -       |    -
 GET    | auth/verify-email/confirm/:token       |     -    |       -       |    -
 POST   | auth/forget-password                   |     -    |       -       | email
-GET    | auth/reset-password/:token             |     -    |       -       |
+POST   | auth/reset-password/:token             |     -    |       -       | password
 PUT    | auth/change-password                   |   User   |       -       |
 _______________________________________________________________________________________

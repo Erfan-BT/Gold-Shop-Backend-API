@@ -139,6 +139,21 @@ class AuthService {
         }
         return
     }
+
+    async resetPassword (token : string, password : string) {
+        // Verify Token
+        const userId = await tokenService.verifyOTP('forget-password', token)
+        // Get User
+        const user = await userRepository.userById(userId)
+        if (!user)
+            throw new BadRequestError('OPT Token Data Is Invalid')
+        // Hash Password
+        const hashedPassword : string = await bcrypt.hash(password, 12)
+        // Update Password
+        const rows = await authRepository.chnageUserPassword(userId, hashedPassword)
+        if (rows === 0)
+            throw new InternalServerError('Password Not Changed, Please Try Again Later')
+    }
 }
 
 export default new AuthService()

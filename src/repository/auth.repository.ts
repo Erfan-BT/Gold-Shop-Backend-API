@@ -48,6 +48,17 @@ class AuthRepository {
         })
         return rows
     }
+    async chnageUserPassword (userId : number, password : string)
+    : Promise<number> {
+        const [rows] = await User.update({
+            password
+        },{
+            where : {
+                id : userId
+            }
+        })
+        return rows
+    }
 }
 
 export default new AuthRepository()

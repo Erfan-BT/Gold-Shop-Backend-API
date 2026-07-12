@@ -24,8 +24,13 @@ export const emailSchema = z.object({
     email : z.string().email('Invalid Email')
 })
 
+export const passwordSchema = z.object({
+    password: z.string().min(8, 'At Least 8 Characters Are Required')
+})
+
 export type RegisterDto = z.infer<typeof registerSchema>
 export type LoginDto = z.infer<typeof loginSchema>
 export type RefreshDto = z.infer<typeof refreshSchema>
 export type OptDto = z.infer<typeof optSchema>
 export type EmailDto = z.infer<typeof emailSchema>
+export type PasswordDto = z.infer<typeof passwordSchema>
