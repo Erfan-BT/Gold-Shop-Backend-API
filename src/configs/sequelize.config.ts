@@ -1,6 +1,5 @@
 import "dotenv/config"
 import { Sequelize } from "sequelize";
-import { logger } from "../configs/pino.config.js";
 import { env } from "./env.config.js";
 
 const sequelize = new Sequelize ({
@@ -13,10 +12,8 @@ const sequelize = new Sequelize ({
     logging : false
 });
 
-try {
+export async function connectDB () {
     await sequelize.authenticate();
-} catch (error) {
-    logger.fatal({error : String(error)}, "Can Not Connect To DB !!!")
 }
 
 export default sequelize;

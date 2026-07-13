@@ -6,6 +6,7 @@ import { connectBullmqRedis, connectRedis } from './configs/redis.config.js';
 import { initializeRateLimiters } from './middleware/ratelimiter.middleware.js';
 import { initWorkers } from "./workers/index.js";
 import { env } from './configs/env.config.js';
+import { connectDB } from './configs/sequelize.config.js';
 
 const port = env.SERVER_PORT
 
@@ -14,6 +15,8 @@ async function startServer() {
         // Start Redis
         await connectRedis()
         await connectBullmqRedis()
+        // Start DB
+        await connectDB()
         // Init DB
         await initializeDatabase()
         // Init RL
