@@ -13,8 +13,8 @@ class AuthService {
 
     async register (name : string, email : string, phone : string, password : string) {
         // Check Exists Email
-        const existsEmail : boolean = await authRepository.existsEmail(email)
-        if (existsEmail)
+        const checkExistsUser = await authRepository.userByEmail(email)
+        if (!checkExistsUser)
             throw new ConflictError('This Email Already Exists')
         // Hash Password
         const hashedPassword : string = await bcrypt.hash(password, this.HASHROUNDS)
@@ -42,7 +42,7 @@ class AuthService {
 
     async login (email : string, password : string) {
         // Get User & Check Password
-        const user = await authRepository.userWithPassword(email)
+        const user = await authRepository.userByEmail(email, true)
         if (!user)
             throw new UnauthorizedError('Email Or Password Is Incorrect')
         const checkPassword : boolean = await bcrypt.compare(password, user.password)
@@ -157,10 +157,10 @@ class AuthService {
 
     async changePassword (userId : number, oldPassword : string, newPassword : string) {
         // Get User
-        const user = await authRepository.userWithPasswordById(userId)
+        const user = await authRepository.userById(userId, true)
         if (!user)
             throw new BadRequestError()
-        // Get User & Check Password
+        // Check Password
         const hashedOldPassword : string = user.password
         const checkPassword : boolean = await bcrypt.compare(oldPassword, hashedOldPassword)
         if (!checkPassword)

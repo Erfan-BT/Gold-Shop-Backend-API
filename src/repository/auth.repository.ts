@@ -2,26 +2,30 @@ import { Model, Transaction } from "sequelize";
 import User from "../models/user.model.js";
 
 class AuthRepository {
-    async userByEmail (email : string) 
+    async userByEmail (email : string, showPassword : boolean = false) 
     : Promise<User | null> {
         return await User.findOne({
             where : {
                 email
             },
             attributes : {
-                exclude : ['password']
+                exclude : showPassword ? [] : ['password']
             }
         })
     }
 
-    async existsEmail (email : string)
-    : Promise<boolean> {
-        return (await User.findOne({where : {email}})) ? true : false
+    async userById (userId : number, showPassword : boolean = false) 
+    : Promise<User | null> {
+        return await User.findByPk(userId, {
+            attributes : {
+                exclude : showPassword ? [] : ['password']
+            }
+        })
     }
 
     async isEmailVerified (userId : number)
     : Promise<boolean> {
-        return (await User.findByPk(userId))?.toJSON().isEmailVerified ?? false
+        return (await User.findByPk(userId))?.isEmailVerified ?? false
     }
 
     async register (name : string, email : string, phone : string, password : string, transaction : Transaction) 
@@ -32,16 +36,6 @@ class AuthRepository {
             phone,
             password
         }, { transaction })
-    }
-
-    async userWithPassword (email : string)
-    : Promise<User | null> {
-        return await User.findOne({where : {email}})
-    }
-
-    async userWithPasswordById (userId : number)
-    : Promise<User | null> {
-        return await User.findOne({where : {id : userId}})
     }
 
     async verifyEmail (userId : number)
