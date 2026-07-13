@@ -7,6 +7,7 @@
     // "types": ["node", "express"],
     "outDir": "./dist",
     "rootDir": "./src",
+    
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -21,5 +22,11 @@
     "noUnusedParameters": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-  }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "tests"
+  ],
 }
