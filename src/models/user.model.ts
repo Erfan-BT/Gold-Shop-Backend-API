@@ -1,64 +1,113 @@
-import { DataTypes, Model } from "sequelize";
-import sequelize from "../configs/sequelize.config.js";
-import { UserAttributes, UserCreationAttributes } from "../types/user.interface.js";
+import {
+    DataTypes,
+    Model,
+    InferAttributes,
+    InferCreationAttributes,
+    CreationOptional,
+    NonAttribute
+} from "sequelize";
 
-const User = sequelize.define<Model<UserAttributes, UserCreationAttributes>, UserCreationAttributes>('User',
-    {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
-        },
-        name : {
-            type : DataTypes.STRING(100),
-            allowNull : false
-        },
-        email : {
-            type : DataTypes.STRING(100),
-            allowNull : false,
-            validate: {
-                isEmail: true
-            }
-        },
-        password : {
-            type : DataTypes.STRING(255),
-            allowNull : false
-        },
-        phone : {
-            type : DataTypes.STRING(15),
-            allowNull : false
-        },
-        isEmailVerified : {
-            type : DataTypes.BOOLEAN,
-            defaultValue : false
-        },
-        emailVerifiedAt : {
-            type : DataTypes.DATE
-        },
-        isActive : {
-            type : DataTypes.BOOLEAN,
-            defaultValue : true
-        },
-        createdAt : {
-            type : DataTypes.DATE
-        },
-        updatedAt : {
-            type : DataTypes.DATE
+import sequelize from "../configs/sequelize.config.js";
+import { UserRole } from "./role.model.js";
+
+export default class User extends Model<
+    InferAttributes<User>,
+    InferCreationAttributes<User>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare name: string;
+
+    declare email: string;
+
+    declare password: string;
+
+    declare phone: string;
+
+    declare isEmailVerified: CreationOptional<boolean>;
+
+    declare emailVerifiedAt: CreationOptional<Date | null>;
+
+    declare isActive: CreationOptional<boolean>;
+
+    declare createdAt: CreationOptional<Date>;
+
+    declare updatedAt: CreationOptional<Date>;
+
+    // Associations
+    declare roles?: NonAttribute<UserRole[]>;
+}
+
+User.init(
+{
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+
+    name: {
+        type: DataTypes.STRING(100),
+        allowNull: false
+    },
+
+    email: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+        validate: {
+            isEmail: true
         }
     },
-    {
-        createdAt : 'createdAt',
-        updatedAt : 'updatedAt',
-        indexes : [
-            {
-                fields : ['email'],
-                unique : true
-            },
-            {
-                fields : ['name']
-            }
-        ]
-    }
-)
 
-export default User
+    password: {
+        type: DataTypes.STRING(255),
+        allowNull: false
+    },
+
+    phone: {
+        type: DataTypes.STRING(15),
+        allowNull: false
+    },
+
+    isEmailVerified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+
+    emailVerifiedAt: {
+        type: DataTypes.DATE
+    },
+
+    isActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    },
+
+    createdAt: {
+        type: DataTypes.DATE
+    },
+
+    updatedAt: {
+        type: DataTypes.DATE
+    }
+},
+{
+    sequelize,
+
+    modelName: "User",
+
+    createdAt: "createdAt",
+
+    updatedAt: "updatedAt",
+
+    indexes: [
+        {
+            fields: ["email"],
+            unique: true
+        },
+        {
+            fields: ["name"]
+        }
+    ]
+})

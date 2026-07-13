@@ -1,42 +1,71 @@
-import { DataTypes, Model } from "sequelize";
+import {
+    CreationOptional,
+    DataTypes,
+    ForeignKey,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
-import { InventoryAttributes, InventoryCreationAttributes } from "../types/inventory.interface.js";
+import { ProductVariant } from "./product.model.js";
 
-const Inventory = sequelize.define<Model<InventoryAttributes, InventoryCreationAttributes>, InventoryCreationAttributes>('Inventory',
+class Inventory extends Model<
+    InferAttributes<Inventory>,
+    InferCreationAttributes<Inventory>
+> {
+    declare id: CreationOptional<number>;
+
+    declare variantId: ForeignKey<ProductVariant["id"]>;
+
+    declare quantity: number;
+
+    declare minThreshold: number;
+
+    declare updatedAt: CreationOptional<Date | null>;
+
+    // Associations
+
+    declare variant?: NonAttribute<ProductVariant>;
+}
+
+Inventory.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        variantId : {
-            type : DataTypes.INTEGER,
-            allowNull : false,
+        variantId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        quantity : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+        quantity: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        minThershold : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+        minThreshold: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        updatedAt : {
-            type : DataTypes.DATE
+        updatedAt: {
+            type: DataTypes.DATE
         }
     },
     {
-        createdAt : false,
-        updatedAt : 'updatedAt',
-        indexes : [
+        sequelize,
+        modelName: "Inventory",
+        createdAt: false,
+        updatedAt: "updatedAt",
+        indexes: [
             {
-                fields : ['minThershold']
+                fields: ["minThreshold"]
             },
             {
-                fields : ['variantId']
+                fields: ["variantId"]
             }
         ]
     }
-)
+);
 
-export default Inventory
+export default Inventory;

@@ -1,264 +1,489 @@
-import { DataTypes, Model } from "sequelize";
+import {
+    CreationOptional,
+    DataTypes,
+    ForeignKey,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
-import { ProductAttributes, ProductCreationAttributes, ProductDiscountAttributes, ProductDiscountCreationAttributes, ProductImageAttributes, ProductImageCreationAttributes, ProductPricingAttributes, ProductPricingCreationAttributes, ProductVariantAttributes, ProductVariantCreationAttributes } from "../types/product.interface.js";
 import { ProductKarat } from "../types/product.enum.js";
+import { Category } from "./category.model.js";
 
 // Product
-export const Product = sequelize.define<Model<ProductAttributes, ProductCreationAttributes>, ProductCreationAttributes>('Product',
+export class Product extends Model<
+    InferAttributes<Product>,
+    InferCreationAttributes<Product>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare title: string;
+
+    declare slug: string;
+
+    declare description: string;
+
+    declare isActive: boolean;
+
+    declare createdAt: CreationOptional<Date>;
+
+    declare updatedAt: CreationOptional<Date | null>;
+
+    // Associations
+    declare variants?: NonAttribute<ProductVariant[]>;
+}
+
+Product.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        title : {
-            type : DataTypes.STRING(200),
-            allowNull : false
+
+        title: {
+            type: DataTypes.STRING(200),
+            allowNull: false
         },
-        slug : {
-            type : DataTypes.STRING(200),
-            allowNull : false
+
+        slug: {
+            type: DataTypes.STRING(200),
+            allowNull: false
         },
-        description : {
-            type : DataTypes.TEXT,
-            allowNull : false
+
+        description: {
+            type: DataTypes.TEXT,
+            allowNull: false
         },
-        isActive : {
-            type : DataTypes.BOOLEAN,
-            allowNull : false
+
+        isActive: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
         },
-        createdAt : {
-            type : DataTypes.DATE
+
+        createdAt: {
+            type: DataTypes.DATE
         },
-        updatedAt : {
-            type : DataTypes.DATE
+
+        updatedAt: {
+            type: DataTypes.DATE
         }
     },
     {
-        createdAt : 'createdAt',
-        updatedAt : 'updatedAt',
-        indexes : [
+        sequelize,
+
+        modelName: "Product",
+
+        createdAt: "createdAt",
+
+        updatedAt: "updatedAt",
+
+        indexes: [
             {
-                fields : ['title']
+                fields: ["title"]
             },
             {
-                fields : ['slug'],
-                unique : true
+                fields: ["slug"],
+                unique: true
             }
         ]
     }
-)
+);
+
 // Product Variant
-export const ProductVariant = sequelize.define<Model<ProductVariantAttributes, ProductVariantCreationAttributes>, ProductVariantCreationAttributes>('ProductVariant',
+export class ProductVariant extends Model<
+    InferAttributes<ProductVariant>,
+    InferCreationAttributes<ProductVariant>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare productId: ForeignKey<Product["id"]>;
+
+    declare weight: number;
+
+    declare karat: ProductKarat;
+
+    declare stoneType: CreationOptional<string | null>;
+
+    declare color: string;
+
+    declare sku: string;
+
+    declare isActive: boolean;
+
+    declare createdAt: CreationOptional<Date>;
+
+    // Associations
+    declare product?: NonAttribute<Product>;
+
+    declare images?: NonAttribute<ProductImage[]>;
+
+    declare prices?: NonAttribute<ProductPricing[]>;
+
+    declare discounts?: NonAttribute<ProductDiscount[]>;
+}
+
+ProductVariant.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        productId : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        productId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        weight : {
-            type : DataTypes.DECIMAL(8, 3),
-            allowNull : false
+
+        weight: {
+            type: DataTypes.DECIMAL(8, 3),
+            allowNull: false
         },
-        karat : {
-            type : DataTypes.ENUM(...Object.values(ProductKarat)),
-            allowNull : false
+
+        karat: {
+            type: DataTypes.ENUM(...Object.values(ProductKarat)),
+            allowNull: false
         },
-        stoneType : {
-            type : DataTypes.STRING(50),
+
+        stoneType: {
+            type: DataTypes.STRING(50)
         },
-        color : {
-            type : DataTypes.STRING(30),
-            allowNull : false
+
+        color: {
+            type: DataTypes.STRING(30),
+            allowNull: false
         },
-        sku : {
-            type : DataTypes.STRING(50),
-            allowNull : false
+
+        sku: {
+            type: DataTypes.STRING(50),
+            allowNull: false
         },
-        isActive : {
-            type : DataTypes.BOOLEAN,
-            allowNull : false
+
+        isActive: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
         },
-        createdAt : {
-            type : DataTypes.DATE,
+
+        createdAt: {
+            type: DataTypes.DATE
         }
     },
     {
-        createdAt : 'createdAt',
-        updatedAt : false,
-        indexes : [
+        sequelize,
+
+        modelName: "ProductVariant",
+
+        createdAt: "createdAt",
+
+        updatedAt: false,
+
+        indexes: [
             {
-                fields : ['karat']
+                fields: ["karat"]
             },
             {
-                fields : ['sku'],
-                unique : true
+                fields: ["sku"],
+                unique: true
             }
         ]
     }
-)
+);
+
 // Product Image
-export const ProductImage = sequelize.define<Model<ProductImageAttributes, ProductImageCreationAttributes>, ProductImageCreationAttributes>('ProductImage',
+export class ProductImage extends Model<
+    InferAttributes<ProductImage>,
+    InferCreationAttributes<ProductImage>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare variantId: ForeignKey<ProductVariant["id"]>;
+
+    declare imageUrl: string;
+
+    declare altText: string;
+
+    declare isPrimary: boolean;
+
+    declare sortOrder: number;
+
+    declare fileName: string;
+
+    declare createdAt: CreationOptional<Date>;
+
+    // Associations
+    declare variant?: NonAttribute<ProductVariant>;
+}
+
+ProductImage.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        variantId : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        variantId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        imageUrl : {
-            type : DataTypes.TEXT,
-            allowNull : false
+
+        imageUrl: {
+            type: DataTypes.TEXT,
+            allowNull: false
         },
-        altText : {
-            type : DataTypes.STRING(200),
-            allowNull : false
+
+        altText: {
+            type: DataTypes.STRING(200),
+            allowNull: false
         },
-        isPrimary : {
-            type : DataTypes.BOOLEAN,
-            allowNull : false
+
+        isPrimary: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
         },
-        sortOrder : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        sortOrder: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        fileName : {
-            type : DataTypes.STRING(255),
-            allowNull : false
+
+        fileName: {
+            type: DataTypes.STRING(255),
+            allowNull: false
         },
-        createdAt : {
-            type : DataTypes.DATE
+
+        createdAt: {
+            type: DataTypes.DATE
         }
     },
     {
-        createdAt : 'createdAt',
-        updatedAt : false,
-        indexes : [
+        sequelize,
+
+        modelName: "ProductImage",
+
+        createdAt: "createdAt",
+
+        updatedAt: false,
+
+        indexes: [
             {
-                fields : ['fileName'],
-                unique : true
+                fields: ["fileName"],
+                unique: true
             },
             {
-                fields : ['sortOrder', 'variantId'],
-                unique : true
+                fields: ["sortOrder", "variantId"],
+                unique: true
             }
         ]
     }
-)
+);
+
 // Product Pricing
-export const ProductPricing = sequelize.define<Model<ProductPricingAttributes, ProductPricingCreationAttributes>, ProductPricingCreationAttributes>('ProductPricing',
+export class ProductPricing extends Model<
+    InferAttributes<ProductPricing>,
+    InferCreationAttributes<ProductPricing>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare variantId: ForeignKey<ProductVariant["id"]>;
+
+    declare categoryId: ForeignKey<Category["id"]>;
+
+    declare wageType: "fixed" | "percent";
+
+    declare wageValue: number;
+
+    declare profitType: "fixed" | "percent";
+
+    declare profitValue: number;
+
+    declare taxPercent: number;
+
+    declare priority: number;
+
+    declare validFrom: Date;
+
+    declare validTo: Date;
+
+    declare isActive: boolean;
+
+    declare createdAt: CreationOptional<Date>;
+
+    declare updatedAt: CreationOptional<Date | null>;
+
+    // Associations
+    declare variant?: NonAttribute<ProductVariant>;
+
+    declare category?: NonAttribute<Category>;
+}
+
+ProductPricing.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        variantId : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        variantId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        categoryId : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        categoryId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        wageType : {
-            type : DataTypes.ENUM('fixed', 'percent'),
-            allowNull : false
+
+        wageType: {
+            type: DataTypes.ENUM("fixed", "percent"),
+            allowNull: false
         },
-        wageValue : {
-            type : DataTypes.DECIMAL(10, 2),
-            allowNull : false
+
+        wageValue: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false
         },
-        profitType : {
-            type : DataTypes.ENUM('fixed', 'percent'),
-            allowNull : false
+
+        profitType: {
+            type: DataTypes.ENUM("fixed", "percent"),
+            allowNull: false
         },
-        profitValue : {
-            type : DataTypes.DECIMAL(10, 2),
-            allowNull : false
+
+        profitValue: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false
         },
-        taxPercent : {
-            type : DataTypes.DECIMAL(5, 2),
-            allowNull : false
+
+        taxPercent: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: false
         },
-        priority : {
-            type : DataTypes.TINYINT // 1 : By Variant Id, 2 : By Category Id
+
+        priority: {
+            type: DataTypes.TINYINT
         },
-        validFrom : {
-            type : DataTypes.DATE,
-            allowNull : false
+
+        validFrom: {
+            type: DataTypes.DATE,
+            allowNull: false
         },
-        validTo : {
-            type : DataTypes.DATE,
-            allowNull : false
+
+        validTo: {
+            type: DataTypes.DATE,
+            allowNull: false
         },
-        isActive : {
-            type : DataTypes.BOOLEAN,
-            allowNull : false
+
+        isActive: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
         },
-        createdAt : {
-            type : DataTypes.DATE
+
+        createdAt: {
+            type: DataTypes.DATE
         },
-        updatedAt : {
-            type : DataTypes.DATE
+
+        updatedAt: {
+            type: DataTypes.DATE
         }
     },
     {
-        createdAt : 'createdAt',
-        updatedAt : 'updatedAt',
-        indexes : [
+        sequelize,
+
+        modelName: "ProductPricing",
+
+        createdAt: "createdAt",
+
+        updatedAt: "updatedAt",
+
+        indexes: [
             {
-                fields : ['isActive']
+                fields: ["isActive"]
             }
         ]
     }
-)
+);
+
+
 // Product Discount
-export const ProductDiscount = sequelize.define<Model<ProductDiscountAttributes, ProductDiscountCreationAttributes>, ProductDiscountCreationAttributes>('ProductDiscount',
+export class ProductDiscount extends Model<
+    InferAttributes<ProductDiscount>,
+    InferCreationAttributes<ProductDiscount>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare variantId: ForeignKey<ProductVariant["id"]>;
+
+    declare type: "fixed" | "percent";
+
+    declare value: number;
+
+    declare startDate: Date;
+
+    declare endDate: Date;
+
+    declare isActive: boolean;
+
+    // Associations
+    declare variant?: NonAttribute<ProductVariant>;
+}
+
+ProductDiscount.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        variantId : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        variantId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        type : {
-            type : DataTypes.ENUM('fixed', 'percent'),
-            allowNull : false
+
+        type: {
+            type: DataTypes.ENUM("fixed", "percent"),
+            allowNull: false
         },
-        value : {
-            type : DataTypes.DECIMAL(10, 2),
-            allowNull : false
+
+        value: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false
         },
-        startDate : {
-            type : DataTypes.DATE,
-            allowNull : false
+
+        startDate: {
+            type: DataTypes.DATE,
+            allowNull: false
         },
-        endDate : {
-            type : DataTypes.DATE,
-            allowNull : false
+
+        endDate: {
+            type: DataTypes.DATE,
+            allowNull: false
         },
-        isActive : {
-            type : DataTypes.BOOLEAN,
-            allowNull : false
+
+        isActive: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
         }
     },
     {
-        timestamps : false,
-        indexes : [
+        sequelize,
+
+        modelName: "ProductDiscount",
+
+        timestamps: false,
+
+        indexes: [
             {
-                fields : ['isActive']
+                fields: ["isActive"]
             }
         ]
     }
-)
+);

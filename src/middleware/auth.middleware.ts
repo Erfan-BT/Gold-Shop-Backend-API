@@ -5,13 +5,14 @@ import tokenService from '../services/token.service.js'
 import userRepository from '../repository/user.repository.js'
 import roleRepository from '../repository/role.repository.js'
 import authRepository from '../repository/auth.repository.js'
+import { UserRole } from '../models/role.model.js'
 
 export interface AuthRequest extends Request {
     user ?: {
         userId : number;
         name : string;
         email : string;
-        roles : string[];
+        roles : UserRole[];
     }
 }
 
@@ -58,8 +59,6 @@ export const authMiddleware = async (
         // Get Token And Payload
         const token : string = authHeader.split(' ')[1]!
         const payload = tokenService.verifyAccessToken(token)
-        if (!payload)
-            throw new UnauthorizedError('The Token Is Invalid Or Expired')
 
         // User
         const user = await userRepository.userById(payload.userId)
@@ -72,14 +71,12 @@ export const authMiddleware = async (
 
         // Get User Roles Name
         const roles = await roleRepository.getUserRoles(user.id)
-        const rolesName : string[] = await roleRepository.getRolesName(roles)
-
         // Add User To Request
         req.user = {
             userId : user.id,
             name : user.name,
             email : user.email,
-            roles : rolesName
+            roles
         }
 
         next()
@@ -100,8 +97,8 @@ export const roleMiddleware = (allowedRoles: string[]) => {
             if (!user)
                 throw new UnauthorizedError('Login First')
 
-            const hasRole = user.roles?.some((role: string) =>
-                allowedRoles.includes(role)
+            const hasRole = user.roles?.some((role) =>
+                allowedRoles.includes(role.role?.name ?? 'NO')
             )
 
             if (!hasRole)

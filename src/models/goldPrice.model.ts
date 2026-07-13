@@ -1,34 +1,52 @@
-import { DataTypes, Model } from "sequelize";
+import {
+    CreationOptional,
+    DataTypes,
+    InferAttributes,
+    InferCreationAttributes,
+    Model
+} from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
-import { GoldPriceAttributes, GoldPriceCreationAttributes } from "../types/goldPrice.interface.js";
 import { ProductKarat } from "../types/product.enum.js";
 
-const GoldPrice = sequelize.define<Model<GoldPriceAttributes, GoldPriceCreationAttributes>, GoldPriceCreationAttributes>('GoldPrice',
+class GoldPrice extends Model<
+    InferAttributes<GoldPrice>,
+    InferCreationAttributes<GoldPrice>
+> {
+    declare id: CreationOptional<number>;
+    declare karat: ProductKarat;
+    declare pricePerGram: number;
+    declare currency: string;
+    declare effectiveDate: CreationOptional<Date>;
+}
+
+GoldPrice.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        karat : {
-            type : DataTypes.ENUM(...Object.values(ProductKarat)),
-            allowNull : false
+        karat: {
+            type: DataTypes.ENUM(...Object.values(ProductKarat)),
+            allowNull: false
         },
-        pricePerGram : {
-            type : DataTypes.DECIMAL(15, 2),
-            allowNull : false
+        pricePerGram: {
+            type: DataTypes.DECIMAL(15, 2),
+            allowNull: false
         },
-        currencry : {
-            type : DataTypes.CHAR(3),
-            allowNull : false
+        currency: {
+            type: DataTypes.CHAR(3),
+            allowNull: false
         },
-        effectiveDate : {
-            type : DataTypes.DATE,
+        effectiveDate: {
+            type: DataTypes.DATE
         }
     },
     {
-        timestamps : false
+        sequelize,
+        modelName: "GoldPrice",
+        timestamps: false
     }
-)
+);
 
-export default GoldPrice
+export default GoldPrice;

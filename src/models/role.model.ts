@@ -1,57 +1,114 @@
-import { DataTypes, Model } from "sequelize";
+import {
+    CreationOptional,
+    DataTypes,
+    ForeignKey,
+    InferAttributes,
+    InferCreationAttributes,
+    Model,
+    NonAttribute
+} from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
-import { RoleAttributes, RoleCreationAttributes, UserRoleAttributes, UserRoleCreationAttributes } from "../types/role.interface.js";
+import type User from "./user.model.js";
 
-export const Role = sequelize.define<Model<RoleAttributes, RoleCreationAttributes>, RoleCreationAttributes>('Role',
+// Role
+export class Role extends Model<
+    InferAttributes<Role>,
+    InferCreationAttributes<Role>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare name: string;
+
+    declare createdAt: CreationOptional<Date>;
+
+    // Associations
+    declare users?: NonAttribute<UserRole[]>;
+}
+
+Role.init(
     {
-        id : {
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        name : {
-            type : DataTypes.STRING(50),
-            allowNull : false
+
+        name: {
+            type: DataTypes.STRING(50),
+            allowNull: false
         },
-        createdAt : {
-            type : DataTypes.DATE
+
+        createdAt: {
+            type: DataTypes.DATE
         }
     },
     {
-        createdAt : 'createdAt',
-        updatedAt : false,
-        indexes : [
+        sequelize,
+
+        modelName: "Role",
+
+        createdAt: "createdAt",
+
+        updatedAt: false,
+
+        indexes: [
             {
-                fields : ['name'],
-                unique : true
+                fields: ["name"],
+                unique: true
             }
         ]
     }
 )
 
-export const UserRole = sequelize.define<Model<UserRoleAttributes, UserRoleCreationAttributes>, UserRoleCreationAttributes>('UserRole',
+// UserRole
+export class UserRole extends Model<
+    InferAttributes<UserRole>,
+    InferCreationAttributes<UserRole>
+> {
+
+    declare id: CreationOptional<number>;
+
+    declare userId: ForeignKey<User["id"]>;
+
+    declare roleId: ForeignKey<Role["id"]>;
+
+    // Associations
+    declare user?: NonAttribute<User>;
+
+    declare role?: NonAttribute<Role>;
+}
+
+UserRole.init(
     {
-        id  :{
-            type : DataTypes.INTEGER,
-            primaryKey : true,
-            autoIncrement : true
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
         },
-        userId : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        userId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        roleId : {
-            type : DataTypes.INTEGER,
-            allowNull : false
+
+        roleId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
     },
     {
-        timestamps : false,
-        indexes : [
+        sequelize,
+
+        modelName: "UserRole",
+
+        timestamps: false,
+
+        indexes: [
             {
-                fields : ['userId', 'roleId'],
-                unique : true
+                fields: ["userId", "roleId"],
+                unique: true
             }
         ]
     }
-)
+);

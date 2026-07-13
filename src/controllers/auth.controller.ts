@@ -46,7 +46,7 @@ class AuthController {
         }
     }
 
-    async refresh (req : AuthRequest, res : Response, next : NextFunction) {
+    async refresh (req : Request, res : Response, next : NextFunction) {
         try {
             const { refreshToken } = req.body
             const result = await authService.refresh(refreshToken)

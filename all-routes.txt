@@ -1,13 +1,13 @@
-METHOD  |                 ROUTE                 |   AUTH   |      Q-S      |  BODY-INFO
+METHOD  |                 ROUTE                 |     AUTH     |      Q-S      |  BODY-INFO
 _______________________________________________________________________________________
-POST   | auth/register                          |     -    |       -       | name, email, phone, password
-POST   | auth/login                             |     -    |       -       | email, password
-POST   | auth/logout                            |   User   |       -       |    -
-POST   | auth/refresh                           |   User   |       -       | refreshToken
-GET    | auth/my-account                        |   User   |       -       |    -
-POST   | auth/verify-email                      |   User   |       -       |    -
-GET    | auth/verify-email/confirm/:token       |     -    |       -       |    -
-POST   | auth/forget-password                   |     -    |       -       | email
-POST   | auth/reset-password/:token             |     -    |       -       | password
-PATCH  | auth/change-password                   |   User   |       -       | oldPassword, newPassword
+POST   | auth/register                          |       -      |       -       | name, email, phone, password
+POST   | auth/login                             |       -      |       -       | email, password
+POST   | auth/logout                            |   Customer   |       -       |    -
+POST   | auth/refresh                           |   Customer   |       -       | refreshToken
+GET    | auth/my-account                        |   Customer   |       -       |    -
+POST   | auth/verify-email                      |   Customer   |       -       |    -
+GET    | auth/verify-email/confirm/:token       |       -      |       -       |    -
+POST   | auth/forget-password                   |       -      |       -       | email
+POST   | auth/reset-password/:token             |       -      |       -       | password
+PATCH  | auth/change-password                   |   Customer   |       -       | oldPassword, newPassword
 _______________________________________________________________________________________

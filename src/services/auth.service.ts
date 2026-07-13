@@ -6,19 +6,22 @@ import roleRepository from "../repository/role.repository.js"
 import userRepository from "../repository/user.repository.js"
 import { emailQueue } from "../queue/email.queue.js"
 import sequelize from "../configs/sequelize.config.js"
+import { Roles } from "../types/role.enum.js"
 
 class AuthService {
+    private HASHROUNDS = 12;
+
     async register (name : string, email : string, phone : string, password : string) {
         // Check Exists Email
         const existsEmail : boolean = await authRepository.existsEmail(email)
         if (existsEmail)
             throw new ConflictError('This Email Already Exists')
         // Hash Password
-        const hashedPassword : string = await bcrypt.hash(password, 12)
+        const hashedPassword : string = await bcrypt.hash(password, this.HASHROUNDS)
         // Add User To DataBase && Set User Role
         const user = await sequelize.transaction(async (t) => {
             const user = await authRepository.register(name, email, phone, hashedPassword, t)
-            await roleRepository.setUserRole(user.id, 3, t)
+            await roleRepository.setUserRole(user.id, Roles.CUSTOMER, t)
             return user
         })
         
@@ -40,6 +43,8 @@ class AuthService {
     async login (email : string, password : string) {
         // Get User & Check Password
         const user = await authRepository.userWithPassword(email)
+        if (!user)
+            throw new UnauthorizedError('Email Or Password Is Incorrect')
         const checkPassword : boolean = await bcrypt.compare(password, user.password)
         if (!checkPassword) {
             throw new UnauthorizedError('Email Or Password Is Incorrect')
@@ -60,15 +65,11 @@ class AuthService {
     }
 
     async logout (userId : number) {
-        // Check Exists User
-        const user = await userRepository.userById(userId)
-        if (!user)
-            throw new UnauthorizedError('Login First')
         // Check Exists Token
         const refreshToken = await tokenService.getRefreshToken(userId)
         if (!refreshToken)
             throw new UnauthorizedError('Login First')
-        // Delete Token
+        // Remove Refresh Token
         await tokenService.revokeRefreshToken(userId)
     }
 
@@ -145,29 +146,33 @@ class AuthService {
         if (!user)
             throw new BadRequestError('OPT Token Data Is Invalid')
         // Hash Password
-        const hashedPassword : string = await bcrypt.hash(password, 12)
+        const hashedPassword : string = await bcrypt.hash(password, this.HASHROUNDS)
         // Update Password
         const rows = await authRepository.changeUserPassword(userId, hashedPassword)
         if (rows === 0)
             throw new InternalServerError('Password Not Changed, Please Try Again Later')
+        // Remove Refresh Token
+        await tokenService.revokeRefreshToken(userId)
     }
 
     async changePassword (userId : number, oldPassword : string, newPassword : string) {
         // Get User
-        const user = await userRepository.userById(userId)
+        const user = await authRepository.userWithPasswordById(userId)
         if (!user)
             throw new BadRequestError()
-        // Get User Password & Check Password
-        const hashedOldPassword : string = (await authRepository.userWithPassword(user.email)).password
+        // Get User & Check Password
+        const hashedOldPassword : string = user.password
         const checkPassword : boolean = await bcrypt.compare(oldPassword, hashedOldPassword)
         if (!checkPassword)
             throw new UnauthorizedError('The Old Password Is Incorrect')
         // Hash New Password
-        const hashedNewPassword : string = await bcrypt.hash(newPassword, 12)
+        const hashedNewPassword : string = await bcrypt.hash(newPassword, this.HASHROUNDS)
         // Update Password
         const rows = await authRepository.changeUserPassword(userId, hashedNewPassword)
         if (rows === 0)
             throw new InternalServerError('Password Not Changed, Please Try Again Later')
+        // Remove Refresh Token
+        await tokenService.revokeRefreshToken(userId)
     }
 }
 

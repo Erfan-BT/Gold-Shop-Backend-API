@@ -1,7 +1,7 @@
 export enum ReturnStatus {
     NOTCHECKED = 'Not Checked',
     APPROVED = 'Approved',
-    NOTAPROVED = 'Not Aproved',
+    NOTAPPROVED = 'Not Approved',
     CANCELED = 'Canceled'
 }
 
