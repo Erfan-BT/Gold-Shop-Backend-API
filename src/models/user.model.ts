@@ -9,6 +9,7 @@ import {
 
 import sequelize from "../configs/sequelize.config.js";
 import { UserRole } from "./role.model.js";
+import Address from "./address.model.js";
 
 export default class User extends Model<
     InferAttributes<User>,
@@ -35,8 +36,11 @@ export default class User extends Model<
 
     declare updatedAt: CreationOptional<Date>;
 
+    declare deletedAt: CreationOptional<Date>;
+
     // Associations
     declare roles?: NonAttribute<UserRole[]>;
+    declare addresses?: NonAttribute<Address[]>;
 }
 
 User.init(
@@ -90,6 +94,10 @@ User.init(
 
     updatedAt: {
         type: DataTypes.DATE
+    },
+
+    deletedAt: {
+        type : DataTypes.DATE
     }
 },
 {
@@ -100,6 +108,10 @@ User.init(
     createdAt: "createdAt",
 
     updatedAt: "updatedAt",
+
+    deletedAt: "deletedAt",
+
+    paranoid : true,
 
     indexes: [
         {

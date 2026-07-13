@@ -159,7 +159,7 @@ function associations() {
     User.hasMany(Review, {
         foreignKey : 'userId',
         as : 'reviews',
-        onDelete : 'CASCADE',
+        onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
     Review.belongsTo(ProductVariant, {
@@ -265,7 +265,7 @@ function associations() {
     Order.belongsTo(User, {
         foreignKey : 'userId',
         as : 'user',
-        onDelete : 'CASCADE',
+        onDelete : 'NO ACTION',
         onUpdate : 'CASCADE'
     })
     Order.belongsTo(Address, {
@@ -312,7 +312,7 @@ function associations() {
     Payment.belongsTo(Order, {
         foreignKey : 'orderId',
         as : 'order',
-        onDelete : 'CASCADE',
+        onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
     Order.hasMany(Payment, {
@@ -323,7 +323,7 @@ function associations() {
     ReturnRequest.belongsTo(Order, {
         foreignKey : 'orderId',
         as : 'order',
-        onDelete : 'CASCADE',
+        onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
     ReturnRequest.belongsTo(User, {
@@ -355,7 +355,7 @@ function associations() {
     ReturnItem.belongsTo(OrderItem, {
         foreignKey : 'orderItemId',
         as : 'orderItem',
-        onDelete : 'CASCADE',
+        onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
     OrderItem.hasMany(ReturnItem, {
@@ -366,7 +366,7 @@ function associations() {
     ReturnRequest.belongsTo(Payment, {
         foreignKey : 'refundId',
         as : 'payment',
-        onDelete : 'CASCADE',
+        onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
     Payment.hasMany(ReturnRequest, {
