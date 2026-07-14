@@ -1,3 +1,4 @@
+import { addressSeeder } from "../seeders/address.seeder.js";
 import { categorySeeder, productCategorySeeder } from "../seeders/category.seeder.js";
 import { productSeeder } from "../seeders/product.seeder.js";
 import { roleSeeder, userRoleSeeder } from "../seeders/role.seeder.js";
@@ -382,9 +383,11 @@ async function seedDatabase() {
     await userSeeder()
     // USER-ROLE
     await userRoleSeeder()
-    // Category
+    // ADDRESSES
+    await addressSeeder()
+    // CATEGORIES
     await categorySeeder()
-    // Product
+    // PRODUCTS
     await productSeeder()
     // PRODUCT-CATEGORY
     await productCategorySeeder()

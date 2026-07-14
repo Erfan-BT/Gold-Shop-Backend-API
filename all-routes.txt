@@ -1,5 +1,5 @@
 METHOD  |                 ROUTE                 |     AUTH     |      Q-S      |  BODY-INFO
-_______________________________________________________________________________________
+________________________________________________________________________________________________________________
 POST   | auth/register                          |       -      |       -       | name, email, phone, password
 POST   | auth/login                             |       -      |       -       | email, password
 POST   | auth/logout                            |   Customer   |       -       |    -
@@ -10,4 +10,12 @@ GET    | auth/verify-email/confirm/:token       |       -      |       -       |
 POST   | auth/forget-password                   |       -      |       -       | email
 POST   | auth/reset-password/:token             |       -      |       -       | password
 PATCH  | auth/change-password                   |   Customer   |       -       | oldPassword, newPassword
-_______________________________________________________________________________________
+________________________________________________________________________________________________________________
+PATCH  | users/me                               |   Customer   |       -       | name, phone
+DELETE | users/me                               |   Customer   |       -       |    -
+GET    | users/addresses                        |   Customer   |       -       |    -
+GET    | users/addresses/:id                    |   Customer   |       -       |    -
+POST   | users/addresses                        |   Customer   |       -       | addressLine, city, postalCode
+PATCH  | users/addresses/:id                    |   Customer   |       -       | addressLine, city, postalCode
+PATCH  | users/addresses/:id/default            |   Customer   |       -       |    -
+DELETE | users/addresses/:id                    |   Customer   |       -       |    -

@@ -2,11 +2,13 @@ import express, { NextFunction, Request, Response } from 'express'
 import helmet from 'helmet'
 import cors from 'cors'
 import compression from 'compression'
+// Middlewares
 import { errorHandler } from './middleware/errorHandler.js'
-// Routes Files
-import AuthRoutes from './routes/auth.routes.js'
 import { NotFoundError } from './utils/appError.js'
 import { loggerMiddleware } from './middleware/logger.middleware.js'
+// Routes Files
+import AuthRoutes from './routes/auth.routes.js'
+import UsersRoutes from './routes/users.route.js'
 
 const app = express()
 
@@ -43,6 +45,7 @@ app.get('/health', (req: Request, res: Response) => {
 
 // Main Routes
 app.use('/api/v1/auth', AuthRoutes)
+app.use('/api/v1/users', UsersRoutes)
 
 // Error Handler
 app.use((req : Request , res : Response, next : NextFunction) => {
