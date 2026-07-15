@@ -8,6 +8,10 @@ export async function productSeeder () {
             slug: 'gold-ring-18k',
             description: 'انگشتر طلای ۱۸ عیار با طراحی کلاسیک و وزن ۲.۱۵ گرم. مناسب برای استفاده روزمره و هدیه.',
             isActive: true,
+            averageRating : 4.4,
+            reviewCount : 5,
+            soldCount : 15,
+            lowestPrice : 130000
         }
     })
 
@@ -25,6 +29,10 @@ export async function productSeeder () {
             • مناسب برای: هدیه نامزدی و سالگرد ازدواج
             • گارانتی: ۱۲ ماهه`,
             isActive: true,
+            averageRating : 1.4,
+            reviewCount : 0,
+            soldCount : 2,
+            lowestPrice : 1300
         }
     })
 
@@ -35,6 +43,10 @@ export async function productSeeder () {
             slug: 'gold-necklace-classic',
             description: 'گردنبند طلای ۱۸ عیار با طرح کلاسیک و ظریف. وزن ۵.۰۰ گرم.',
             isActive: false,
+            averageRating : 3.4,
+            reviewCount : 2,
+            soldCount : 4,
+            lowestPrice : 15000
         }
     })
 
@@ -53,6 +65,10 @@ export async function productSeeder () {
             </ul>
             <p>مناسب برای: استفاده رسمی و مجالس</p>`,
             isActive: true,
+            averageRating : 0,
+            reviewCount : 0,
+            soldCount : 0,
+            lowestPrice : 139000
         }
     })
 
@@ -63,6 +79,10 @@ export async function productSeeder () {
             slug: 'gold-bracelet',
             description: 'دستبند طلای ۱۸ عیار با طراحی ظریف و شیک. وزن ۲.۵۰ گرم.',
             isActive: true,
+            averageRating : 4,
+            reviewCount : 12,
+            soldCount : 15,
+            lowestPrice : 100000
         }
     })
 
@@ -76,6 +96,10 @@ export async function productSeeder () {
             وزن طلا ۸.۵۰ گرم، عیار ۲۱، الماس ۱.۲۰ قیراط، دارای گارانتی ۲۴ ماهه و کارت تضمین اصالت. 
             طراحی مدرن و شیک، مناسب برای استفاده در جشن‌ها و مهمانی‌های رسمی.`,
             isActive: true,
+            averageRating : 2.4,
+            reviewCount : 5,
+            soldCount : 5,
+            lowestPrice : 13000
         }
     })
 }

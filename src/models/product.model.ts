@@ -27,6 +27,14 @@ export class Product extends Model<
 
     declare isActive: boolean;
 
+    declare lowestPrice : number;
+
+    declare soldCount : number;
+
+    declare reviewCount : number;
+
+    declare averageRating : number;
+
     declare createdAt: CreationOptional<Date>;
 
     declare updatedAt: CreationOptional<Date | null>;
@@ -61,6 +69,26 @@ Product.init(
         isActive: {
             type: DataTypes.BOOLEAN,
             allowNull: false
+        },
+
+        lowestPrice : {
+            type : DataTypes.DECIMAL(15, 2),
+            allowNull : false
+        },
+
+        soldCount : {
+            type : DataTypes.INTEGER,
+            defaultValue : 0
+        },
+
+        reviewCount : {
+            type : DataTypes.INTEGER,
+            defaultValue : 0
+        },
+
+        averageRating : {
+            type : DataTypes.DECIMAL(3, 2),
+            defaultValue : 0
         },
 
         createdAt: {
@@ -112,6 +140,10 @@ export class ProductVariant extends Model<
 
     declare sku: string;
 
+    declare soldCount : number;
+
+    declare currentPrice : number;
+
     declare isActive: boolean;
 
     declare createdAt: CreationOptional<Date>;
@@ -161,6 +193,16 @@ ProductVariant.init(
         sku: {
             type: DataTypes.STRING(50),
             allowNull: false
+        },
+
+        soldCount : {
+            type : DataTypes.INTEGER,
+            defaultValue : 0
+        },
+
+        currentPrice :{
+            type : DataTypes.DECIMAL(15, 2),
+            allowNull : false
         },
 
         isActive: {
