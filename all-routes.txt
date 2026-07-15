@@ -19,3 +19,10 @@ POST   | users/addresses                        |   Customer   |       -       |
 PATCH  | users/addresses/:id                    |   Customer   |       -       | addressLine, city, postalCode
 PATCH  | users/addresses/:id/default            |   Customer   |       -       |    -
 DELETE | users/addresses/:id                    |   Customer   |       -       |    -
+________________________________________________________________________________________________________________
+GET    | products/                              |       -      | ............. |    -
+GET    | products/:slug                         |       -      |       -       |    -
+GET    | products/:slug/reviews                 |       -      | page-limit    |    -
+POST   | products/:slug/reviews                 |   Customer   |       -       |    -
+PATCH  | products/:slug/reviews/:reviewId       |   Customer   |       -       |    -
+DELETE | products/:slug/reviews/:reviewId       |   Customer   |       -       |    -
