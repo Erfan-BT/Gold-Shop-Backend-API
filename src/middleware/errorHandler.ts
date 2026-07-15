@@ -10,7 +10,7 @@ export function errorHandler(
     _next : NextFunction
 ) {
     if (!(err instanceof AppError)) {
-        req.logger.error({ error : err }, 'Unhandled Error')
+        req.logger.error({ error : String(err) }, 'Unhandled Error')
         err = new InternalServerError(undefined, undefined, false)
     }
     // if (err instanceof JsonWebTokenError || err instanceof TokenExpiredError) {

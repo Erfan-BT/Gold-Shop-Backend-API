@@ -8,7 +8,13 @@ export function validate(schemas: ValidationSchemas) {
     return (req : Request, res: Response, next: NextFunction) => {
         try {
             if (schemas.body) req.body = schemas.body.parse(req.body);
-            if (schemas.query) req.query = schemas.query.parse(req.query) as any
+            if (schemas.query) {
+                Object.defineProperty(req, "query", {
+                    value: schemas.query.parse(req.query),
+                    writable: true,
+                    configurable: true
+                });
+            }
             if (schemas.params) req.params = schemas.params.parse(req.params) as any
             next();
         } catch (error) {
