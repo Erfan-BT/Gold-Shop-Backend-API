@@ -103,7 +103,3 @@ export async function productSeeder () {
         }
     })
 }
-
-export async function productVariantSeeder () {
-    
-}

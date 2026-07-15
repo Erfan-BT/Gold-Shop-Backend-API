@@ -25,6 +25,8 @@ export class Product extends Model<
 
     declare description: string;
 
+    declare thumbnailImageId : CreationOptional<ForeignKey<ProductImage["id"]> | null>
+
     declare isActive: boolean;
 
     declare lowestPrice : number;
@@ -64,6 +66,10 @@ Product.init(
         description: {
             type: DataTypes.TEXT,
             allowNull: false
+        },
+
+        thumbnailImageId : {
+            type : DataTypes.INTEGER
         },
 
         isActive: {

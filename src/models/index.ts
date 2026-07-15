@@ -1,6 +1,11 @@
 import { addressSeeder } from "../seeders/address.seeder.js";
 import { categorySeeder, productCategorySeeder } from "../seeders/category.seeder.js";
+import { inventorySeeder } from "../seeders/inventory.seeder.js";
 import { productSeeder } from "../seeders/product.seeder.js";
+import { productDiscountSeeder } from "../seeders/productDiscount.seeder.js";
+import { productPricingSeeder } from "../seeders/productPricing.seeder.js";
+import { productVariantSeeder } from "../seeders/productVariant.seeder.js";
+import { reviewSeeder } from "../seeders/review.seeder.js";
 import { roleSeeder, userRoleSeeder } from "../seeders/role.seeder.js";
 import { userSeeder } from "../seeders/user.seeder.js";
 import Address from "./address.model.js";
@@ -391,4 +396,14 @@ async function seedDatabase() {
     await productSeeder()
     // PRODUCT-CATEGORY
     await productCategorySeeder()
+    // PRODUCT-VARIANTS
+    await productVariantSeeder()
+    // PRODUCT-PRICING
+    await productPricingSeeder()
+    // PRODUCT-DISCOUNT
+    await productDiscountSeeder()
+    // INVENTORY
+    await inventorySeeder()
+    // REVIEW
+    await reviewSeeder()
 }
