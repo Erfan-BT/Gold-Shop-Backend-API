@@ -1,9 +1,10 @@
 import { FindAndCountOptions } from "sequelize";
 import Review from "../models/review.model.js";
 import { Product, ProductVariant } from "../models/product.model.js";
+import { ReviewDto } from "../validation/review.validation.js";
 
 class ReviewRepository {
-    async productReviews (slug : string ,options: FindAndCountOptions<Review>)
+    async productReviews (slug : string, options: FindAndCountOptions<Review>)
     : Promise<{
         rows: Review[];
         count: number;
@@ -36,6 +37,27 @@ class ReviewRepository {
                     ]
                 }
             ]
+        })
+    }
+
+    async getUserProductReview (variantId : number, userId : number, isApproved : boolean = true)
+    : Promise<Review | null> {
+        return await Review.findOne({
+            where : {
+                userId,
+                variantId,
+                isApproved
+            }
+        })
+    }
+
+    async createReview (slug : string, userId : number, isVerifiedPurchase : boolean, reviewData : ReviewDto)
+    : Promise<Review> {
+        return await Review.create({
+            userId,
+            ...reviewData,
+            isApproved : false,
+            isVerifiedPurchase
         })
     }
 }

@@ -10,4 +10,11 @@ export const reviewQS = z.object({
     verified : z.coerce.boolean().optional()
 })
 
+export const reviewSchema = z.object({
+    variantId : z.coerce.number().int().positive(),
+    rating : z.coerce.number().int().positive().min(0).max(5),
+    comment : z.string().min(1)
+})
+
 export type ReviewQSDto = z.infer<typeof reviewQS>
+export type ReviewDto = z.infer<typeof reviewSchema>

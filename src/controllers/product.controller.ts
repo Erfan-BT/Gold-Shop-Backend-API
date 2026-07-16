@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { ProductQSDto } from "../validation/product.validation.js";
 import productService from "../services/product.service.js";
 import reviewService from "../services/review.service.js";
-import { ReviewQSDto } from "../validation/review.validation.js";
+import { ReviewDto, ReviewQSDto } from "../validation/review.validation.js";
+import { AuthRequest } from "../middleware/auth.middleware.js";
 
 class ProductController {
     async allProducts (req : Request, res : Response, next : NextFunction) {
@@ -44,6 +45,23 @@ class ProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Reviews',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async addProductReview (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { slug } = req.params
+            const { userId } = req.user!
+            const reviewData : ReviewDto = req.body
+            const result = await reviewService.createReview(String(slug), userId, reviewData)
+
+            res.status(201).json({
+                success : true,
+                msg : 'Create Review',
                 data : result
             })
         } catch (error) {

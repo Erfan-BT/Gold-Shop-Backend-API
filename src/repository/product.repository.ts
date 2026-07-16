@@ -71,6 +71,28 @@ class ProductRepository {
             ]
         })
     }
+
+    async getVariant (slug : string, variantId : number)
+    : Promise<ProductVariant | null> {
+        return await ProductVariant.findOne({
+            where : {
+                id : variantId,
+                isActive : true
+            },
+            include : [
+                {
+                    model : Product,
+                    as : 'product',
+                    required : true,
+                    where : {
+                        slug,
+                        isActive : true
+                    },
+                    attributes : []
+                }
+            ],
+        })
+    }
 }
 
 export default new ProductRepository()
