@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ProductQSDto } from "../validation/product.validation.js";
+import { ProductQSDto, ProductSlugDto } from "../validation/product.validation.js";
 import productService from "../services/product.service.js";
 
 class ProductController {
@@ -11,6 +11,21 @@ class ProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Products',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async productBySlug (req : Request, res : Response, next : NextFunction) {
+        try {
+            const { slug } = req.params
+            const result = await productService.productBySlug(String(slug))
+
+            res.status(200).json({
+                success : true,
+                msg : 'Product',
                 data : result
             })
         } catch (error) {

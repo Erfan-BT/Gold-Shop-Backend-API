@@ -23,4 +23,9 @@ export const productQS = z.object({
     inStock : z.coerce.boolean().optional(),
 })
 
+export const productSlug = z.object({
+    slug : z.string().min(1).max(200)
+})
+
 export type ProductQSDto = z.infer<typeof productQS>
+export type ProductSlugDto = z.infer<typeof productSlug>
