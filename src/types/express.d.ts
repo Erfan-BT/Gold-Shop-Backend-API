@@ -5,6 +5,11 @@ declare global {
         interface Request {
             requestId: string;
             logger: pino.Logger;
+            validated: {
+                body?: any;
+                query?: any;
+                params?: any;
+            };
         }
     }
 }

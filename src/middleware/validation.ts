@@ -7,15 +7,17 @@ import { ValidationError } from "../utils/appError.js";
 export function validate(schemas: ValidationSchemas) {
     return (req : Request, res: Response, next: NextFunction) => {
         try {
-            if (schemas.body) req.body = schemas.body.parse(req.body);
-            if (schemas.query) {
-                Object.defineProperty(req, "query", {
-                    value: schemas.query.parse(req.query),
-                    writable: true,
-                    configurable: true
-                });
-            }
-            if (schemas.params) req.params = schemas.params.parse(req.params) as any
+            req.validated ??= {};
+
+            if (schemas.body)
+                req.validated.body = schemas.body.parse(req.body);
+
+            if (schemas.query)
+                req.validated.query = schemas.query.parse(req.query);
+
+            if (schemas.params)
+                req.validated.params = schemas.params.parse(req.params);
+
             next();
         } catch (error) {
             let errors : string[] = []
