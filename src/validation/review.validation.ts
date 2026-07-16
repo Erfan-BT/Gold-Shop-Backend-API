@@ -1,0 +1,13 @@
+import z from "zod";
+import { ReviewSort } from "../types/review.enum.js";
+
+export const reviewQS = z.object({
+    page : z.coerce.number().int().positive().min(1).default(1),
+    limit : z.coerce.number().int().positive().min(1).max(50).default(20),
+    sort : z.enum(ReviewSort).default(ReviewSort.NEWEST),
+
+    rating : z.coerce.number().int().positive().min(0).max(5).optional(),
+    verified : z.coerce.boolean().optional()
+})
+
+export type ReviewQSDto = z.infer<typeof reviewQS>

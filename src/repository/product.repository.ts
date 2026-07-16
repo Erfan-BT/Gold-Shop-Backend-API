@@ -1,8 +1,6 @@
 import { FindAndCountOptions, Op } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
-import Review from "../models/review.model.js";
-import User from "../models/user.model.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)

@@ -21,6 +21,8 @@ class ProductService {
             throw new NotFoundError(`Product [${slug}] Not Found`)
         return product
     }
+
+
 }
 
 export default new ProductService()
