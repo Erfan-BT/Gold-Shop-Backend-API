@@ -19,7 +19,7 @@ class ReviewService {
     async createReview (slug : string, userId : number, reviewData : ReviewDto)
     : Promise<Review> {
         // Check Slug+VariantId
-        const variant = await productRepository.getVariant(slug, reviewData.variantId)
+        const variant = await productRepository.getVariantBySlug(slug, reviewData.variantId)
         if (!variant)
             throw new BadRequestError('Product Variant ID Is Wrong')
         // Check User Reviews

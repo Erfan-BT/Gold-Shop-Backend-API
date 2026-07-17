@@ -2,6 +2,16 @@ import { Product, ProductImage, ProductVariant } from "../models/product.model.j
 import Wishlist from "../models/wishlist.model.js"
 
 class Wishlistrepository {
+    async ExistsWishlist (userId : number, variantId : number)
+    : Promise<Wishlist | null> {
+        return (await Wishlist.findOne({
+            where : {
+                userId,
+                variantId
+            }
+        }))
+    }
+
     async getWishlist (userId : number)
     : Promise<{
         rows: Wishlist[];
@@ -36,6 +46,14 @@ class Wishlistrepository {
                     ]
                 }
             ]
+        })
+    }
+
+    async createWishlist (userId : number, variantId : number)
+    : Promise<Wishlist> {
+        return await Wishlist.create({
+            userId,
+            variantId
         })
     }
 }

@@ -72,7 +72,7 @@ class ProductRepository {
         })
     }
 
-    async getVariant (slug : string, variantId : number)
+    async getVariantBySlug (slug : string, variantId : number)
     : Promise<ProductVariant | null> {
         return await ProductVariant.findOne({
             where : {
@@ -91,6 +91,16 @@ class ProductRepository {
                     attributes : []
                 }
             ],
+        })
+    }
+
+    async getVariant (variantId : number)
+    : Promise<ProductVariant | null> {
+        return await ProductVariant.findOne({
+            where : {
+                id : variantId,
+                isActive : true
+            }
         })
     }
 }

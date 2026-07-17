@@ -23,7 +23,9 @@ export const productQS = z.object({
     inStock : z.coerce.boolean().optional(),
 })
 
-
+export const variantId = z.object({
+    variantId : z.coerce.number().int().positive()
+})
 
 export const productSlug = z.object({
     slug : z.string().min(1).max(200)

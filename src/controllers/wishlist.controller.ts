@@ -17,6 +17,22 @@ class WishlistController {
             next(error)
         }
     }
+
+    async createWishlist (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const { variantId } = req.validated.body
+            const result = await wishlistService.createWishlist(userId, Number(variantId))
+
+            res.status(200).json({
+                success : true,
+                msg : 'Create Wishlist',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new WishlistController()
