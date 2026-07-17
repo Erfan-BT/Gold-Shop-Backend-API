@@ -1,9 +1,42 @@
 import { FindAndCountOptions } from "sequelize";
 import Review from "../models/review.model.js";
 import { Product, ProductVariant } from "../models/product.model.js";
-import { ReviewDto } from "../validation/review.validation.js";
+import { ChangeReviewDto, ReviewDto } from "../validation/review.validation.js";
 
 class ReviewRepository {
+    async reviewById (reviewId : number, productSlug : string)
+    : Promise<Review | null> {
+        return await Review.findOne({
+            where : {
+                id : reviewId,
+
+            },
+            include : [
+                {
+                    model : ProductVariant,
+                    as : 'variant',
+                    attributes : [],
+                    required : true,
+                    where : {
+                        isActive : true
+                    },
+                    include : [
+                        {
+                            model : Product,
+                            as : 'product',
+                            required : true,
+                            where : {
+                                slug : productSlug,
+                                isActive : true
+                            },
+                            attributes : []
+                        }
+                    ]
+                }
+            ]
+        })
+    }
+
     async productReviews (slug : string, options: FindAndCountOptions<Review>)
     : Promise<{
         rows: Review[];
@@ -59,6 +92,23 @@ class ReviewRepository {
             isApproved : false,
             isVerifiedPurchase
         })
+    }
+
+    async changeReview (reviewId : number, reviewDate : ChangeReviewDto)
+    : Promise<number> {
+        const [rows] = await Review.update(
+        {
+            comment : reviewDate.comment,
+            rating : reviewDate.rating,
+            isApproved : false,
+            adminReply : null,
+            repliedAt : null
+        },{
+            where : {
+                id : reviewId
+            }
+        })
+        return rows
     }
 }
 

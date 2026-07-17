@@ -16,5 +16,17 @@ export const reviewSchema = z.object({
     comment : z.string().min(1)
 })
 
+export const changeReviewSchema = z.object({
+    rating : z.coerce.number().int().positive().min(0).max(5),
+    comment : z.string().min(1)
+})
+
+export const changeReviewParams = z.object({
+    slug : z.string().min(1).max(200),
+    reviewId : z.coerce.number().int().positive()
+})
+
 export type ReviewQSDto = z.infer<typeof reviewQS>
 export type ReviewDto = z.infer<typeof reviewSchema>
+export type ChangeReviewDto = z.infer<typeof changeReviewSchema>
+export type ReviewParamsDto = z.infer<typeof changeReviewParams>

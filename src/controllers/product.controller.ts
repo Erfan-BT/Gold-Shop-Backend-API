@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ProductQSDto } from "../validation/product.validation.js";
 import productService from "../services/product.service.js";
 import reviewService from "../services/review.service.js";
-import { ReviewDto, ReviewQSDto } from "../validation/review.validation.js";
+import { ChangeReviewDto, ReviewDto, ReviewParamsDto, ReviewQSDto } from "../validation/review.validation.js";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 
 class ProductController {
@@ -62,6 +62,23 @@ class ProductController {
             res.status(201).json({
                 success : true,
                 msg : 'Create Review',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeReview (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { slug, reviewId } = req.validated.params as ReviewParamsDto
+            const reviewData = req.validated.body as ChangeReviewDto
+            const { userId } = req.user!
+            const result = await reviewService.changeReview(slug, userId, reviewId, reviewData)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Review',
                 data : result
             })
         } catch (error) {

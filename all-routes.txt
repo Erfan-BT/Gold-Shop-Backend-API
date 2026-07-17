@@ -23,6 +23,6 @@ ________________________________________________________________________________
 GET    | products/                              |       -      | ............. |    -
 GET    | products/:slug                         |       -      |       -       |    -
 GET    | products/:slug/reviews                 |       -      | ............. |    -
-POST   | products/:slug/reviews                 |   Customer   |       -       |    -
-PATCH  | products/:slug/reviews/:reviewId       |   Customer   |       -       |    -
+POST   | products/:slug/reviews                 |   Customer   |       -       | variantId, rating, comment
+PATCH  | products/:slug/reviews/:reviewId       |   Customer   |       -       | rating, comment
 DELETE | products/:slug/reviews/:reviewId       |   Customer   |       -       |    -
