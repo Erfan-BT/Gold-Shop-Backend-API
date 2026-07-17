@@ -11,6 +11,7 @@ router.get('/', validate({ query : productQS }), productController.allProducts)
 router.get('/:slug', validate({ params : productSlug }), productController.productBySlug)
 router.get('/:slug/reviews', validate({ query : reviewQS, params : productSlug }), productController.productReviews)
 router.post('/:slug/reviews', authMiddleware, validate({ body : reviewSchema, params : productSlug }), productController.addProductReview)
-router.post('/:slug/reviews/:reviewId', authMiddleware, validate({ body : changeReviewParams, params : changeReviewParams }), productController.changeReview)
+router.patch('/:slug/reviews/:reviewId', authMiddleware, validate({ body : changeReviewParams, params : changeReviewParams }), productController.changeReview)
+router.delete('/:slug/reviews/:reviewId', authMiddleware, validate({ params : changeReviewParams }), productController.changeReview)
 
 export default router

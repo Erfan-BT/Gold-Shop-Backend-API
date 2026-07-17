@@ -48,6 +48,20 @@ class ReviewService {
             throw new InternalServerError("Review Not Updated");
         return (await reviewRepository.reviewById(reviewId, slug)) as Review
     }
+
+    async deleteReview (slug : string, userId : number, reviewId : number)
+    : Promise<void> {
+        // Get Review
+        const review = await reviewRepository.reviewById(reviewId, slug)
+        if (!review)
+            throw new NotFoundError('Review Not Found')
+        if (review.userId !== userId)
+            throw new ForbiddenError()
+        // Delete Review
+        const rows = await reviewRepository.deleteReview(reviewId)
+        if (rows === 0)
+            throw new InternalServerError("Review Not Deleted");
+    }
 }
 
 export default new ReviewService()

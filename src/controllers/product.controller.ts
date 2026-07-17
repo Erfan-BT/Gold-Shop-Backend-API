@@ -85,6 +85,22 @@ class ProductController {
             next(error)
         }
     }
+
+    async deleteReview (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { slug, reviewId } = req.validated.params as ReviewParamsDto
+            const { userId } = req.user!
+            await reviewService.deleteReview(slug, userId, reviewId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Review',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new ProductController()

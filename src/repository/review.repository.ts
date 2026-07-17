@@ -110,6 +110,15 @@ class ReviewRepository {
         })
         return rows
     }
+
+    async deleteReview (reviewId : number)
+    : Promise<number> {
+        return await Review.destroy({
+            where : {
+                id : reviewId
+            }
+        })
+    }
 }
 
 export default new ReviewRepository()
