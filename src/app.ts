@@ -10,6 +10,7 @@ import { loggerMiddleware } from './middleware/logger.middleware.js'
 import AuthRoutes from './routes/auth.routes.js'
 import UsersRoutes from './routes/users.route.js'
 import ProductsRoutes from './routes/product.routes.js'
+import WishlistRoutes from './routes/wishlist.routes.js'
 
 const app = express()
 
@@ -48,6 +49,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/v1/auth', AuthRoutes)
 app.use('/api/v1/users', UsersRoutes)
 app.use('/api/v1/products', ProductsRoutes)
+app.use('/api/v1/wishlist', WishlistRoutes)
 
 // Error Handler
 app.use((req : Request , res : Response, next : NextFunction) => {

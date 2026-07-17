@@ -56,6 +56,16 @@ class Wishlistrepository {
             variantId
         })
     }
+
+    async deleteWishlist (userId : number, variantId : number)
+    : Promise<number> {
+        return await Wishlist.destroy({
+            where : {
+                userId,
+                variantId
+            }
+        })
+    }
 }
 
 export default new Wishlistrepository()

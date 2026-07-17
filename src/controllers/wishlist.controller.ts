@@ -33,6 +33,22 @@ class WishlistController {
             next(error)
         }
     }
+
+    async deleteWishlist (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const { variantId } = req.validated.params
+            await wishlistService.deleteWishlist(userId, Number(variantId))
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Wishlist',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new WishlistController()

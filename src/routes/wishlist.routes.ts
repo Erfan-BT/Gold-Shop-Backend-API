@@ -6,7 +6,8 @@ import { variantId } from '../validation/product.validation.js'
 
 const router = express.Router()
 
-router.get('/wishlist/', authMiddleware, wishlistController.getWishlist)
-router.post('/wishlist/', authMiddleware, validate({ body : variantId }), wishlistController.createWishlist)
+router.get('/', authMiddleware, wishlistController.getWishlist)
+router.post('/', authMiddleware, validate({ body : variantId }), wishlistController.createWishlist)
+router.delete('/:variantId', authMiddleware, validate({ params : variantId }), wishlistController.deleteWishlist)
 
 export default router
