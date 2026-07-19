@@ -100,7 +100,14 @@ class ProductRepository {
             where : {
                 id : variantId,
                 isActive : true
-            }
+            },
+            include : [
+                {
+                    model : Inventory,
+                    as : 'inventory',
+                    attributes : ['quantity']
+                }
+            ]
         })
     }
 }

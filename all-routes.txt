@@ -30,3 +30,9 @@ ________________________________________________________________________________
 GET    | wishlist/                              |   Customer   |       -       |    -
 POST   | wishlist/                              |   Customer   |       -       | variantId
 DELETE | wishlist/:variantId                    |   Customer   |       -       |    -
+________________________________________________________________________________________________________________
+GET    | cart/                                  |   Customer   |       -       |
+POST   | cart/items/                            |   Customer   |       -       | variantId, quantity
+PATCH  | cart/items/:variantId                  |   Customer   |       -       | quantity
+DELETE | cart/items/:variantId                  |   Customer   |       -       |
+DELETE | cart/                                  |   Customer   |       -       |

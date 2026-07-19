@@ -11,6 +11,7 @@ import AuthRoutes from './routes/auth.routes.js'
 import UsersRoutes from './routes/users.route.js'
 import ProductsRoutes from './routes/product.routes.js'
 import WishlistRoutes from './routes/wishlist.routes.js'
+import CartRoutes from './routes/cart.routes.js'
 
 const app = express()
 
@@ -50,6 +51,7 @@ app.use('/api/v1/auth', AuthRoutes)
 app.use('/api/v1/users', UsersRoutes)
 app.use('/api/v1/products', ProductsRoutes)
 app.use('/api/v1/wishlist', WishlistRoutes)
+app.use('/api/v1/cart', CartRoutes)
 
 // Error Handler
 app.use((req : Request , res : Response, next : NextFunction) => {
