@@ -106,7 +106,7 @@ class CartRepository {
     }
 
     async addItem (cartId : number, variantId : number, quantity : number)
-    {
+    : Promise<CartItem> {
         return await CartItem.create({
             cartId,
             variantId,
@@ -115,7 +115,7 @@ class CartRepository {
     }
 
     async setItemQuantity (itemId : number, quantity : number)
-    {
+    : Promise<number> {
         const [rows] = await CartItem.update({
             quantity
         },

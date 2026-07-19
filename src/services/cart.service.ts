@@ -50,7 +50,7 @@ class CartService {
     }
 
     async addItem (userId : number, variantId : number, quantity : number)
-    {
+    : Promise<void> {
         // Check Variant
         const variant = await productRepository.getVariant(variantId)
         if (!variant)
@@ -81,6 +81,36 @@ class CartService {
 
         // Add Item
         await cartRepository.addItem(cart.id, variantId, quantity)
+        return
+    }
+
+    async changeQuantity (userId : number, variantId : number, quantity : number)
+    {
+        // Check Exists Item
+        const item = await cartRepository.findUserCartItem(userId, variantId)
+        if (!item)
+            throw new NotFoundError('Item Not Found')
+
+        // No Change
+        if (item.quantity === quantity)
+            return
+
+        // Check Variant
+        const variant = await productRepository.getVariant(variantId)
+        if (!variant)
+            throw new NotFoundError('Product Not Found')
+
+        // Stock
+        const stock = variant.inventory?.quantity
+        if ((stock === undefined || stock === null))
+            throw new InternalServerError('Error On Get Product Stock')
+
+        // Check New Quantity & Stock
+        if (quantity > stock)
+            throw new ConflictError('Insufficient stock')
+
+        // Change Quantity
+        await cartRepository.setItemQuantity(item.id, quantity)
         return
     }
 }

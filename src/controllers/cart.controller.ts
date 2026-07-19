@@ -22,12 +22,29 @@ class CartController {
         try {
             const { userId } = req.user!
             const { variantId, quantity } = req.validated.body
-            const result = await cartService.getCart(userId)
+            await cartService.addItem(userId, variantId, quantity)
 
             res.status(200).json({
                 success : true,
                 msg : 'Add CartItem',
-                data : result
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeQuantity (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const { variantId } = req.validated.params
+            const { quantity } = req.validated.body
+            await cartService.changeQuantity(userId, variantId, quantity)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Quantity',
+                data : {}
             })
         } catch (error) {
             next(error)
