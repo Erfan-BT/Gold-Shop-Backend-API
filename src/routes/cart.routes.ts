@@ -10,5 +10,7 @@ const router = express.Router()
 router.get('/', authMiddleware, cartController.getCart)
 router.post('/items', authMiddleware, validate({ body : addCartItemSchema }), cartController.addItem)
 router.patch('/items/:variantId', authMiddleware, validate({ params : variantId, body : quantitySchema }), cartController.changeQuantity)
+router.delete('/items/:variantId', authMiddleware, validate({ params : variantId }), cartController.deleteItem)
+router.delete('/', authMiddleware, cartController.clearCart)
 
 export default router

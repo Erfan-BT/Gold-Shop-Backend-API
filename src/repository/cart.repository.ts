@@ -75,6 +75,15 @@ class CartRepository {
         })
     }
 
+    async findCart (userId : number)
+    : Promise<Cart | null> {
+        return await Cart.findOne({
+            where : {
+                userId
+            }
+        })
+    }
+
     async findOrCreateCart (userId : number)
     : Promise<[Cart, boolean]> {
         return await Cart.findOrCreate({
@@ -125,6 +134,24 @@ class CartRepository {
             }
         })
         return rows
+    }
+
+    async deleteItem (itemId : number)
+    : Promise<number> {
+        return await CartItem.destroy({
+            where : {
+                id : itemId,
+            }
+        })
+    }
+
+    async clearCart (cartId : number)
+    : Promise<number> {
+        return await CartItem.destroy({
+            where : {
+                cartId
+            }
+        })
     }
 }
 

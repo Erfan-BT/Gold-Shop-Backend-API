@@ -85,7 +85,7 @@ class CartService {
     }
 
     async changeQuantity (userId : number, variantId : number, quantity : number)
-    {
+    : Promise<void> {
         // Check Exists Item
         const item = await cartRepository.findUserCartItem(userId, variantId)
         if (!item)
@@ -112,6 +112,28 @@ class CartService {
         // Change Quantity
         await cartRepository.setItemQuantity(item.id, quantity)
         return
+    }
+
+    async deleteItem (userId : number, variantId : number)
+    : Promise<void> {
+        // Check Exists Item
+        const item = await cartRepository.findUserCartItem(userId, variantId)
+        if (!item)
+            throw new NotFoundError('Item Not Found')
+
+        // Delete Item
+        await cartRepository.deleteItem(item.id)
+        return
+    }
+
+    async clearCart (userId : number)
+    : Promise<void> {
+        // Get Cart
+        const cart = await cartRepository.findCart(userId)
+        if (!cart)
+            return
+        // Clear Cart
+        await cartRepository.clearCart(cart.id)
     }
 }
 

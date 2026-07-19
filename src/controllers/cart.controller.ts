@@ -50,6 +50,37 @@ class CartController {
             next(error)
         }
     }
+
+    async deleteItem (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const { variantId } = req.validated.params
+            await cartService.deleteItem(userId, variantId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Item',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async clearCart (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            await cartService.clearCart(userId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Clear Cart',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new CartController()
