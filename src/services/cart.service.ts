@@ -31,7 +31,7 @@ class CartService {
             if (cartItem) {
                 items.push(cartItem.cartItemDto)
                 subtotal += cartItem.pricing.subtotal
-                discount += cartItem.pricing.discount
+                discount += cartItem.pricing.discountAmount
             }
         }
         // Total Item
@@ -46,7 +46,7 @@ class CartService {
             discount,
             total : subtotal - discount,
             items
-        }                                                                                                                                                      
+        }
     }
 
     async addItem (userId : number, variantId : number, quantity : number)

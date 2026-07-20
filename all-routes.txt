@@ -31,8 +31,11 @@ GET    | wishlist/                              |   Customer   |       -       |
 POST   | wishlist/                              |   Customer   |       -       | variantId
 DELETE | wishlist/:variantId                    |   Customer   |       -       |    -
 ________________________________________________________________________________________________________________
-GET    | cart/                                  |   Customer   |       -       |
+GET    | cart/                                  |   Customer   |       -       |    -
 POST   | cart/items/                            |   Customer   |       -       | variantId, quantity
 PATCH  | cart/items/:variantId                  |   Customer   |       -       | quantity
-DELETE | cart/items/:variantId                  |   Customer   |       -       |
-DELETE | cart/                                  |   Customer   |       -       |
+DELETE | cart/items/:variantId                  |   Customer   |       -       |    -
+DELETE | cart/                                  |   Customer   |       -       |    -
+________________________________________________________________________________________________________________
+POST   | orders/checkout/                       |   Customer   |       -       | coupon, addressId, shippingMethod
+POST   | payments/                              |   Customer   |       -       | checkoutToken

@@ -4,6 +4,12 @@ export enum ShippingMethod {
     TIPAX = 'tipax'
 }
 
+export enum ShippingCost {
+    INPERSON = 0,
+    POST = 50000,
+    TIPAX = 70000
+}
+
 export enum OrderStatus {
     PENDING_PAYMENT = 'pendingpayment',
     PAID = 'paid',

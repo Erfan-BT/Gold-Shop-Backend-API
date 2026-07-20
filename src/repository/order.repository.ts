@@ -1,6 +1,6 @@
-import { Op } from "sequelize"
+import { Op, Transaction } from "sequelize"
 import { Order, OrderItem } from "../models/order.model.js"
-import { OrderStatus } from "../types/order.enum.js"
+import { OrderPaymentStatus, OrderStatus, ShippingMethod } from "../types/order.enum.js"
 
 class OrderRepository {
     async hasUserPurchasedVariant(userId: number, variantId: number)
@@ -28,6 +28,31 @@ class OrderRepository {
                 }
             ]
         })) ? true : false
+    }
+
+    async createOrder (userId : number, ipAddress : string, orderNumber : string, addressId : number, subtotal : number, discountAmount : number,
+        shippingMethod : ShippingMethod, shippingCost : number, finalPrice : number, transaction : Transaction
+        ,couponId ?: number
+        
+    )
+    : Promise<Order> {
+        return await Order.create({
+            orderNumber,
+            userId,
+            addressId,
+            ipAddress ,
+            subtotal,
+            discountAmount,
+            finalPrice,
+            shippingMethod,
+            shippingCost,
+            couponId,
+            status : OrderStatus.PENDING_PAYMENT,
+            paymentStatus : OrderPaymentStatus.PENDING,
+        },
+        {
+            transaction
+        })
     }
 }
 

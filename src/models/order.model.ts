@@ -17,6 +17,7 @@ import {
     OrderStatus,
     ShippingMethod
 } from "../types/order.enum.js";
+import { ProductKarat } from "../types/product.enum.js";
 
 // Order
 export class Order extends Model<
@@ -32,7 +33,6 @@ export class Order extends Model<
     declare addressId: ForeignKey<Address["id"]>;
     declare couponId: ForeignKey<Coupon["id"]> | null;
 
-    declare altPhone: string;
     declare ipAddress: string;
 
     declare subtotal: number;
@@ -77,10 +77,6 @@ Order.init(
         },
         userId: {
             type: DataTypes.INTEGER,
-            allowNull: false
-        },
-        altPhone: {
-            type: DataTypes.STRING(15),
             allowNull: false
         },
         addressId: {
@@ -174,8 +170,17 @@ export class OrderItem extends Model<
     declare orderId: ForeignKey<Order["id"]>;
     declare variantId: ForeignKey<ProductVariant["id"]>;
 
+    declare productTitle : string;
+    declare sku : string;
+
+    declare weight : number;
+    declare karat : ProductKarat;
+    declare stoneType: CreationOptional<string | null>;
+    declare color: string;
+
     declare quantity: number;
     declare unitPrice: number;
+    declare discountAmount : number;
     declare finalPrice: number;
     declare goldPriceAtTime: number;
 
@@ -201,6 +206,30 @@ OrderItem.init(
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        productTitle : {
+            type : DataTypes.STRING(200),
+            allowNull : false
+        },
+        sku : {
+            type : DataTypes.STRING(50),
+            allowNull : false
+        },
+        weight: {
+            type: DataTypes.DECIMAL(8, 3),
+            allowNull: false
+        },
+        karat: {
+            type: DataTypes.ENUM(...Object.values(ProductKarat)),
+            allowNull: false
+        },
+        stoneType: {
+            type: DataTypes.STRING(50)
+        },
+
+        color: {
+            type: DataTypes.STRING(30),
+            allowNull: false
+        },
         quantity: {
             type: DataTypes.INTEGER,
             allowNull: false
@@ -208,6 +237,10 @@ OrderItem.init(
         unitPrice: {
             type: DataTypes.DECIMAL(15, 2),
             allowNull: false
+        },
+        discountAmount : {
+            type : DataTypes.DECIMAL(15, 2),
+            allowNull : false
         },
         finalPrice: {
             type: DataTypes.DECIMAL(15, 2),
