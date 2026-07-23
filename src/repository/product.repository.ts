@@ -106,6 +106,14 @@ class ProductRepository {
                     model : Inventory,
                     as : 'inventory',
                     attributes : ['quantity']
+                },
+                {
+                    model : Product,
+                    as : 'product',
+                    attributes : ['id', 'title'],
+                    where : {
+                        isActive : true
+                    }
                 }
             ]
         })

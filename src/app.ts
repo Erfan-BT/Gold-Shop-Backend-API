@@ -13,6 +13,7 @@ import ProductsRoutes from './routes/product.routes.js'
 import WishlistRoutes from './routes/wishlist.routes.js'
 import CartRoutes from './routes/cart.routes.js'
 import OrderRoutes from './routes/order.routes.js'
+import PaymentRoutes from './routes/payment.routes.js'
 
 const app = express()
 
@@ -54,6 +55,7 @@ app.use('/api/v1/products', ProductsRoutes)
 app.use('/api/v1/wishlist', WishlistRoutes)
 app.use('/api/v1/cart', CartRoutes)
 app.use('/api/v1/orders', OrderRoutes)
+app.use('/api/v1/payments', PaymentRoutes)
 
 // Error Handler
 app.use((req : Request , res : Response, next : NextFunction) => {

@@ -1,4 +1,4 @@
-import { Op } from "sequelize"
+import { Op, Transaction } from "sequelize"
 import { Cart, CartItem } from "../models/cart.model.js"
 import Inventory from "../models/inventory.model.js"
 import { Product, ProductDiscount, ProductImage, ProductVariant } from "../models/product.model.js"
@@ -145,12 +145,13 @@ class CartRepository {
         })
     }
 
-    async clearCart (cartId : number)
+    async clearCart (cartId : number, transaction : Transaction | null = null)
     : Promise<number> {
         return await CartItem.destroy({
             where : {
                 cartId
-            }
+            },
+            transaction
         })
     }
 }

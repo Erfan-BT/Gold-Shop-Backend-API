@@ -1,4 +1,4 @@
-import { Op, Transaction } from "sequelize"
+import { InferCreationAttributes, Op, Transaction } from "sequelize"
 import { Order, OrderItem } from "../models/order.model.js"
 import { OrderPaymentStatus, OrderStatus, ShippingMethod } from "../types/order.enum.js"
 
@@ -53,6 +53,11 @@ class OrderRepository {
         {
             transaction
         })
+    }
+
+    async createOrderItems (orderItems : any, transaction : Transaction)
+    : Promise<OrderItem[]> {
+        return await OrderItem.bulkCreate(orderItems, {transaction})
     }
 }
 
