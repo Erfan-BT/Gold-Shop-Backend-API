@@ -5,15 +5,18 @@ import productRepository from "../repository/product.repository.js";
 import { CheckoutSession } from "../types/order.type.js";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../utils/appError.js";
 import { RedisCache } from "../utils/cache.redis.js";
-import { PaymentSchema } from "../validation/payment.validation.js";
+import { PaymentSchemaDto } from "../validation/payment.validation.js";
 import { ProductVariant } from "../models/product.model.js";
 import inventoryRepository from "../repository/inventory.repository.js";
 import couponRepository from "../repository/coupon.repository.js";
 import cartRepository from "../repository/cart.repository.js";
 import zarinpalService from "./getaway/zarinpal.service.js";
+import { OrderPaymentStatus, OrderStatus } from "../types/order.enum.js";
+import orderService from "./order.service.js";
+import paymentRepository from "../repository/payment.repository.js";
 
 class PaymentService {
-    async payment (paymentData : PaymentSchema, userId : number, ipAddress : string)
+    async payment (paymentData : PaymentSchemaDto, userId : number, ipAddress : string)
     {
         const variants = new Map<number, ProductVariant>();
         // Validate Token
@@ -104,6 +107,71 @@ class PaymentService {
         return {
             orderNumber,
             bankresponse : response.data
+        }
+    }
+
+    async callback (authority : string, status : string, ipAddress : string)
+    {
+        // Get Order Number & User Id
+        const data = await RedisCache.get<{
+            orderNumber : string;
+            userId : number;
+        }>(`payment:authority:${authority}`)
+        if (!data)
+            throw new BadRequestError('Invalid Authority')
+        // ----- NOK -----
+        if (status === 'NOK') {
+            await orderService.cancelPendingOrder(data.orderNumber, data.userId, authority)
+            return {
+                success : false,
+                msg : 'Payment Canceled'
+            }
+        }
+            
+        // ----- OK -----
+        // Order
+        const order = await orderRepository.getOrderByOrderNumber(data.orderNumber, data.userId)
+        if (!order)
+            throw new NotFoundError('Order Not Found')
+        if (order.status === OrderStatus.PAID || order.paymentStatus === OrderPaymentStatus.PAID) {
+            await RedisCache.delete(`payment:authority:${authority}`);
+            return {
+                success : true,
+                msg : 'Success Payment'
+            }
+        }
+        if (order.status !== OrderStatus.PENDING_PAYMENT)
+            throw new BadRequestError()
+        // Verify Payment
+        const verifyResult = await zarinpalService.verifyPayment(authority, order.finalPrice)
+        if (!verifyResult || !verifyResult.success) {
+            await orderService.cancelPendingOrder(data.orderNumber, data.userId, authority)
+            return {
+                success : false,
+                msg : 'Payment Canceled'
+            }
+        }
+        // Change Order Statuses To PAID & Create Payment
+        await sequelize.transaction(async (t) => {
+            // Change Statuses
+            if (!(await orderRepository.completeOrderPayment(data.orderNumber, data.userId, t)))
+                throw new ConflictError("Order Is Already Processed")
+            // Create Payment
+            await paymentRepository.createPayment({
+                orderId : order.id,
+                amount : order.finalPrice,
+                transactionId : String(verifyResult.data!.ref_id),
+                authorityCode : authority,
+                referenceCode : String(verifyResult.data!.ref_id),
+                cardPan : verifyResult.data!.card_pan ?? 'null',
+                ipAddress,
+                bankResponse : JSON.stringify(verifyResult.data)
+            }, t)
+        })
+        await RedisCache.delete(`payment:authority:${authority}`);
+        return {
+            success : true,
+            msg : 'Success Payment'
         }
     }
 }

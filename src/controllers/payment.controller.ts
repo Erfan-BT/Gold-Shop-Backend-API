@@ -1,18 +1,33 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
-import { PaymentSchema } from "../validation/payment.validation.js";
+import { CallbackSchemaDto, PaymentSchemaDto } from "../validation/payment.validation.js";
 import paymentService from "../services/payment.service.js";
 
 class PaymentController {
-    async payment (req : AuthRequest, res : Response, next : NextFunction) {
+    async beforePayment (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const paymentData = req.validated.body as PaymentSchema
+            const paymentData = req.validated.body as PaymentSchemaDto
             const { userId } = req.user!
             const result = await paymentService.payment(paymentData, userId, req.ip ?? '-0-')
             
             res.status(200).json({
                 success : true,
-                msg : 'Payment',
+                msg : 'Before Payment',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async callback (req : Request, res : Response, next : NextFunction) {
+        try {
+            const { Authority, Status} = req.params as CallbackSchemaDto
+            const result = await paymentService.callback(Authority, Status, req.ip ?? '-0-')
+
+            res.status(200).json({
+                success : true,
+                msg : 'Callback',
                 data : result
             })
         } catch (error) {

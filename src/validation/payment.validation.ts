@@ -1,8 +1,13 @@
 import z from "zod";
-import { ShippingMethod } from "../types/order.enum.js";
 
 export const paymentSchema = z.object({
     checkoutToken : z.string().min(1),
 })
 
-export type PaymentSchema = z.infer<typeof paymentSchema>
+export const callbackSchema = z.object({
+    Authority : z.string().min(1),
+    Status : z.enum(['OK', 'NOK'])
+})
+
+export type PaymentSchemaDto = z.infer<typeof paymentSchema>
+export type CallbackSchemaDto = z.infer<typeof callbackSchema>

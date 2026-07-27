@@ -32,6 +32,27 @@ class CouponRepository {
 
         return rows === 1;
     }
+
+    async returnCoupon(couponId: number, transaction: Transaction)
+    : Promise<boolean> {
+        const [rows] = await Coupon.update(
+            {
+                usedCount: literal("usedCount - 1")
+            },
+            {
+                where: {
+                    id: couponId,
+                    isActive: true,
+                    usedCount: {
+                        [Op.gt]: 0
+                    }
+                },
+                transaction
+            }
+        );
+
+        return rows === 1;
+    }
 }
 
 export default new CouponRepository()

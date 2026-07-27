@@ -6,7 +6,8 @@ class InventoryRepository {
         variantId: number,
         quantity: number,
         transaction: Transaction
-    ): Promise<boolean> {
+    )
+    : Promise<boolean> {
         const [rows] = await Inventory.update(
             {
                 quantity : literal(`quantity - ${quantity}`)
@@ -17,6 +18,26 @@ class InventoryRepository {
                     quantity : {
                         [Op.gte] : quantity
                     }
+                },
+                transaction
+            }
+        )
+        return rows === 1;
+    }
+
+    async increaseStock(
+        variantId: number,
+        quantity: number,
+        transaction: Transaction
+    )
+    : Promise<boolean> {
+        const [rows] = await Inventory.update(
+            {
+                quantity : literal(`quantity + ${quantity}`)
+            },
+            {
+                where : {
+                    variantId,
                 },
                 transaction
             }
