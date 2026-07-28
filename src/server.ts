@@ -7,6 +7,7 @@ import { initializeRateLimiters } from './middleware/ratelimiter.middleware.js';
 import { initWorkers } from "./workers/index.js";
 import { env } from './configs/env.config.js';
 import { connectDB } from './configs/sequelize.config.js';
+import { initOrderScheduler } from './jobs/order.scheduler.js';
 
 const port = env.SERVER_PORT
 
@@ -23,6 +24,8 @@ async function startServer() {
         initializeRateLimiters()
         // Init Workers
         await initWorkers();
+        // Init Order Scheduler
+        await initOrderScheduler();
         // Start Server
         app.listen(port, () => {
             logger.info(`Server Run On Port ${port}`)

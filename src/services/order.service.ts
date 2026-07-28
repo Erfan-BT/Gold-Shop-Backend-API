@@ -124,6 +124,10 @@ class OrderService {
             throw new BadRequestError('Invalid Order Status')
         // Change Status And Return Inventory & Coupon
         await sequelize.transaction(async (t) => {
+            // Status
+            if (!(await orderRepository.cancelPendingOrder(orderNumber, userId, t)))
+                throw new InternalServerError('Order Not Canceled')
+            
             // Inventory
             const orderItems = await orderRepository.getOrderItems(order.id, t)
             for (let item of orderItems) {
@@ -134,13 +138,20 @@ class OrderService {
             if (order.couponId)
                 if (!(await couponRepository.returnCoupon(order.couponId, t)))
                     throw new InternalServerError('Coupon Not Return')
-            // Status
-            if (!(await orderRepository.cancelPendingOrder(orderNumber, userId, t)))
-                throw new InternalServerError('Order Not Canceled')
+            
         })
         // Remove Redis
         if (authority)
             await RedisCache.delete(`payment:authority:${authority}`)
+    }
+
+    async cancelExpiredOrders()
+    {
+        const orders = await orderRepository.getExpiredPendingOrders();
+
+        for (let order of orders) {
+            await this.cancelPendingOrder(order.orderNumber, order.userId, null)
+        }
     }
 }
 

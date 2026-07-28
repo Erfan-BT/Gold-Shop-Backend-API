@@ -119,6 +119,20 @@ class OrderRepository {
         )
         return rows === 1
     }
+
+    async getExpiredPendingOrders ()
+    : Promise<Order[]> {
+        return await Order.findAll({
+            where : {
+                status : OrderStatus.PENDING_PAYMENT,
+                paymentStatus : OrderPaymentStatus.PENDING,
+                createdAt: {
+                    [Op.lt] : new Date(Date.now() - 20 * 60 * 1000)
+                }
+            },
+            attributes : ['id', 'userId', 'orderNumber']
+        })
+    }
 }
 
 export default new OrderRepository()
