@@ -35,6 +35,22 @@ class OrderController {
             next(error)
         }
     }
+
+    async getOrder (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const { orderNumber } = req.validated.params
+            const result = await orderService.getOrder(userId, orderNumber)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Order',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new OrderController()

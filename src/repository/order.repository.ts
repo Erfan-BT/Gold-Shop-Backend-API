@@ -4,6 +4,10 @@ import { OrderPaymentStatus, OrderStatus, ShippingMethod } from "../types/order.
 import { Product, ProductVariant } from "../models/product.model.js"
 import Inventory from "../models/inventory.model.js"
 import { PaymentStatus } from "../types/payment.enum.js"
+import Address from "../models/address.model.js"
+import Coupon from "../models/coupon.model.js"
+import Payment from "../models/payment.model.js"
+import { ReturnItem, ReturnRequest } from "../models/return.model.js"
 
 class OrderRepository {
     async hasUserPurchasedVariant(userId: number, variantId: number)
@@ -155,6 +159,44 @@ class OrderRepository {
             order: [["createdAt", "DESC"]],
             limit,
             offset,
+        })
+    }
+
+    async getOrder (userId : number, orderNumber : string)
+    : Promise<Order | null> {
+        return await Order.findOne({
+            where : {
+                userId,
+                orderNumber
+            },
+            attributes : ['orderNumber', 'subtotal', 'discountAmount', 'shippingMethod',
+                'shippingCost', 'finalPrice', 'status', 'paymentStatus', 'shippedAt', 'trackingCode', 'deliveredAt', 'createdAt'],
+            include : [
+                {
+                    model : OrderItem,
+                    as : 'items',
+                    attributes: ["productTitle", "sku", "weight", "karat", "stoneType", "color", "quantity",
+                        "unitPrice", "discountAmount", "finalPrice", "goldPriceAtTime"
+                    ]
+                },
+                {
+                    model : Address,
+                    as : 'address',
+                    attributes : ['addressLine', 'city', 'postalCode']
+                },
+                {
+                    model : Coupon,
+                    as : 'coupon',
+                    attributes : ['code', 'type', 'value'],
+                    required : false
+                },
+                {
+                    model : Payment,
+                    as : 'payment',
+                    attributes : ['amount', 'cardPan', 'status', 'referenceCode'],
+                    required : false
+                }
+            ]
         })
     }
 }

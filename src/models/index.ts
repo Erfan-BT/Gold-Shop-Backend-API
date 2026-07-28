@@ -321,9 +321,9 @@ function associations() {
         onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
-    Order.hasMany(Payment, {
+    Order.hasOne(Payment, {
         foreignKey : 'orderId',
-        as : 'payments'
+        as : 'payment'
     })
     // Order - ReturnRequest - User(Admin)
     ReturnRequest.belongsTo(Order, {

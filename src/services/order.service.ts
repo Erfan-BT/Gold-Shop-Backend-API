@@ -162,6 +162,14 @@ class OrderService {
     }> {
         return await orderRepository.getUserOrders(userId, page, limit)
     }
+
+    async getOrder (userId : number, orderNumber : string)
+    : Promise<Order> {
+        const order = await orderRepository.getOrder(userId, orderNumber)
+        if (!order)
+            throw new NotFoundError('Order Not Found')
+        return order
+    }
 }
 
 export default new OrderService()
