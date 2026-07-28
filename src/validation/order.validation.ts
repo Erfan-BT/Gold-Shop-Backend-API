@@ -7,4 +7,10 @@ export const checkoutSchema = z.object({
     shippingMethod : z.enum(ShippingMethod)
 })
 
+export const orderQS = z.object({
+    page : z.coerce.number().int().positive().min(1).default(1),
+    limit : z.coerce.number().int().positive().min(1).max(50).default(20),
+})
+
 export type checkoutSchemaDto = z.infer<typeof checkoutSchema>
+export type orderQSDtp = z.infer<typeof orderQS>

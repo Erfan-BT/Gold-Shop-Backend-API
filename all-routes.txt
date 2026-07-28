@@ -38,4 +38,6 @@ DELETE | cart/items/:variantId                  |   Customer   |       -       |
 DELETE | cart/                                  |   Customer   |       -       |    -
 ________________________________________________________________________________________________________________
 POST   | orders/checkout/                       |   Customer   |       -       | coupon, addressId, shippingMethod
+GET    | orders/                                |   Customer   |       -       |    -
+GET    | orders/:orderNumber                    |   Customer   |       -       |    -
 POST   | payments/                              |   Customer   |       -       | checkoutToken

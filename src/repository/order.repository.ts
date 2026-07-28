@@ -133,6 +133,30 @@ class OrderRepository {
             attributes : ['id', 'userId', 'orderNumber']
         })
     }
+
+    async getUserOrders(userId : number, page : number, limit : number)
+    : Promise<{
+        rows : Order[]
+        count : number
+    }> {
+        const offset = (page - 1) * limit
+
+        return Order.findAndCountAll({
+            where: {
+                userId,
+            },
+            attributes: [
+                "orderNumber",
+                "status",
+                "paymentStatus",
+                "finalPrice",
+                "createdAt",
+            ],
+            order: [["createdAt", "DESC"]],
+            limit,
+            offset,
+        })
+    }
 }
 
 export default new OrderRepository()

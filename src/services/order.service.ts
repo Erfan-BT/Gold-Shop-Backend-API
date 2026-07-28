@@ -1,4 +1,5 @@
 import sequelize from "../configs/sequelize.config.js"
+import { Order } from "../models/order.model.js"
 import addressRepository from "../repository/address.repository.js"
 import cartRepository from "../repository/cart.repository.js"
 import couponRepository from "../repository/coupon.repository.js"
@@ -127,7 +128,7 @@ class OrderService {
             // Status
             if (!(await orderRepository.cancelPendingOrder(orderNumber, userId, t)))
                 throw new InternalServerError('Order Not Canceled')
-            
+
             // Inventory
             const orderItems = await orderRepository.getOrderItems(order.id, t)
             for (let item of orderItems) {
@@ -152,6 +153,14 @@ class OrderService {
         for (let order of orders) {
             await this.cancelPendingOrder(order.orderNumber, order.userId, null)
         }
+    }
+
+    async getUserOrders (userId : number, page : number, limit : number)
+    : Promise<{
+        rows: Order[];
+        count: number;
+    }> {
+        return await orderRepository.getUserOrders(userId, page, limit)
     }
 }
 
