@@ -20,8 +20,6 @@ export class ReturnRequest extends Model<
 
     declare orderId: ForeignKey<Order["id"]>;
 
-    declare reason: string;
-    declare description: string;
     declare status: ReturnStatus;
 
     declare reviewedBy: CreationOptional<ForeignKey<User["id"]> | null>;
@@ -29,9 +27,9 @@ export class ReturnRequest extends Model<
     declare adminNote: CreationOptional<string | null>;
 
     declare refundAmount: CreationOptional<number | null>;
-    declare refundStatus: CreationOptional<RefundStatus | null>;
+    declare refundStatus: RefundStatus;
 
-    declare trackingCode: CreationOptional<string | null>;
+    declare returnTrackingCode: CreationOptional<string | null>;
     declare resolvedAt: CreationOptional<Date | null>;
 
     declare createdAt: CreationOptional<Date>;
@@ -48,14 +46,6 @@ ReturnRequest.init(
         },
         orderId: {
             type: DataTypes.INTEGER,
-            allowNull: false
-        },
-        reason: {
-            type: DataTypes.STRING(50),
-            allowNull: false
-        },
-        description: {
-            type: DataTypes.TEXT,
             allowNull: false
         },
         status: {
@@ -77,7 +67,7 @@ ReturnRequest.init(
         refundStatus: {
             type: DataTypes.ENUM(...Object.values(RefundStatus))
         },
-        trackingCode: {
+        returnTrackingCode: {
             type: DataTypes.STRING(100)
         },
         resolvedAt: {
@@ -121,8 +111,11 @@ export class ReturnItem extends Model<
     declare returnRequestId: ForeignKey<ReturnRequest["id"]>;
     declare orderItemId: ForeignKey<OrderItem["id"]>;
 
+    declare reason: string;
+    declare description: CreationOptional<string | null>;
+
     declare quantity: number;
-    declare refundAmount: number;
+    declare refundAmount: CreationOptional<number | null>;
 
     declare createdAt: CreationOptional<Date>;
     declare deletedAt: CreationOptional<Date | null>;
@@ -143,13 +136,19 @@ ReturnItem.init(
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        reason: {
+            type: DataTypes.STRING(50),
+            allowNull: false
+        },
+        description: {
+            type: DataTypes.TEXT,
+        },
         quantity: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
         refundAmount: {
             type: DataTypes.DECIMAL(15, 2),
-            allowNull: false
         },
         createdAt: {
             type: DataTypes.DATE

@@ -1,12 +1,20 @@
 export enum ReturnStatus {
-    NOTCHECKED = 'Not Checked',
-    APPROVED = 'Approved',
-    NOTAPPROVED = 'Not Approved',
-    CANCELED = 'Canceled'
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    REJECTED = 'REJECTED',
+    CANCELED = 'CANCELED',
 }
 
 export enum RefundStatus {
-    WAITING = 'Waiting',
-    REFUNDED = 'Refunded',
-    CANCELED = 'Canceled'
+    PENDING = 'PENDING',
+    COMPLETED = 'COMPLETED',
+    CANCELED = 'CANCELED',
+}
+
+export type CreateReturnItemType = {
+    returnRequestId : number;
+    orderItemId : number;
+    reason : string;
+    description ?: string;
+    quantity : number;
 }

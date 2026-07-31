@@ -43,7 +43,14 @@ class OrderRepository {
             where : {
                 orderNumber,
                 userId
-            }
+            },
+            include : [
+                {
+                    model : OrderItem,
+                    as : 'items',
+                    attributes : ['id']
+                }
+            ]
         })
     }
 
