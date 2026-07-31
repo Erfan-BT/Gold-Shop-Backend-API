@@ -44,3 +44,4 @@ POST   | payments/                              |   Customer   |       -       |
 ________________________________________________________________________________________________________________
 POST   | returns/                               |   Customer   |       -       | orderNumber, items:{id, quantity, reason, description}[]
 GET    | returns/                               |   Customer   |       -       |    -
+GET    | returns/:returnId                      |   Customer   |       -       |    -

@@ -1,4 +1,5 @@
 import sequelize from "../configs/sequelize.config.js";
+import { ReturnRequest } from "../models/return.model.js";
 import orderRepository from "../repository/order.repository.js";
 import returnRepository from "../repository/return.repository.js";
 import { OrderStatus } from "../types/order.enum.js";
@@ -59,8 +60,17 @@ class ReturnService {
     }
 
     async getUserReturnRequests (userId : number)
-    {
+    : Promise<ReturnRequest[]> {
         return await returnRepository.getUserReturnRequests(userId)
+    }
+
+    async getReturnRequestData (userId : number, returnId : number)
+    : Promise<ReturnRequest> {
+        // Get Request
+        const request = await returnRepository.getReturnRequestById(returnId, userId)
+        if (!request)
+            throw new NotFoundError('Return Request Not Found')
+        return request
     }
 }
 

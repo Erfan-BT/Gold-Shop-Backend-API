@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
-import { ReturnRequestSchemaDto } from "../validation/return.validation.js";
+import { ReturnIdSchemaDto, ReturnRequestSchemaDto } from "../validation/return.validation.js";
 import returnService from "../services/return.service.js";
 
 class ReturnController {
@@ -29,6 +29,22 @@ class ReturnController {
             res.status(200).json({
                 success : true,
                 msg : 'Return Requests',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getReturnRequestData (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const result = await returnService.getReturnRequestData(userId, returnId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Return Request Data',
                 data : result
             })
         } catch (error) {

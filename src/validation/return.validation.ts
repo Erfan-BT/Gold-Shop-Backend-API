@@ -28,4 +28,9 @@ export const returnRequestSchema = z.object({
     })
 })
 
+export const returnIdSchema = z.object({
+    returnId : z.coerce.number().int().positive()
+})
+
 export type ReturnRequestSchemaDto = z.infer<typeof returnRequestSchema>
+export type ReturnIdSchemaDto = z.infer<typeof returnIdSchema>
