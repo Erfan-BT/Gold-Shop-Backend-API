@@ -20,6 +20,21 @@ class ReturnController {
             next(error)
         }
     }
+
+    async getUserReturnRequests (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const result = await returnService.getUserReturnRequests(userId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Return Requests',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new ReturnController()

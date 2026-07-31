@@ -8,7 +8,7 @@ import { ReturnRequestSchemaDto } from "../validation/return.validation.js";
 
 class ReturnService {
     async createReturnRequest (userId : number, returnRequestBody : ReturnRequestSchemaDto)
-    {
+    : Promise<number> {
         const now = new Date()
         // Get Order
         const order = await orderRepository.getOrderByOrderNumber(returnRequestBody.orderNumber, userId)
@@ -56,6 +56,11 @@ class ReturnService {
         })
 
         return request.id
+    }
+
+    async getUserReturnRequests (userId : number)
+    {
+        return await returnRepository.getUserReturnRequests(userId)
     }
 }
 

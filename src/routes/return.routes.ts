@@ -6,6 +6,7 @@ import { returnRequestSchema } from '../validation/return.validation.js'
 
 const router = express.Router()
 
+router.get('/', authMiddleware, returnController.getUserReturnRequests)
 router.post('/', authMiddleware, validate({ body : returnRequestSchema }), returnController.createReturnRequest)
 
 export default router

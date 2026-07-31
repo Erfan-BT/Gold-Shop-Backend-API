@@ -1,8 +1,28 @@
 import { Transaction } from "sequelize"
 import { ReturnItem, ReturnRequest } from "../models/return.model.js"
 import { CreateReturnItemType, RefundStatus, ReturnStatus } from "../types/return.enum.js"
+import { Order } from "../models/order.model.js"
 
 class ReturnRepository {
+    async getUserReturnRequests (userId : number)
+    : Promise<ReturnRequest[]> {
+        return await ReturnRequest.findAll({
+            include : [
+                {
+                    model : Order,
+                    as : 'order',
+                    attributes : [],
+                    required : true,
+                    where : {
+                        userId
+                    }
+                }
+            ],
+            attributes : ['id', 'orderNumber', 'status', 'refundStatus'],
+            order : ['createdAt', 'DESC']
+        })
+    }
+    
     async getOrderReturnRequest (orderId : number)
     : Promise<ReturnRequest | null> {
         return await ReturnRequest.findOne({
