@@ -5,8 +5,8 @@ export enum ProductKarat {
 }
 
 export enum ProductSort {
-    NEWEST = 'newest',
-    POPULAR = 'popular',
-    PRICE_ASC = 'priceAsc',
-    PRICE_DESC = 'priceDesc',
+    NEWEST = 'NEWEST',
+    POPULAR = 'POPULAR',
+    PRICE_ASC = 'PRICE_ASC',
+    PRICE_DESC = 'PRICE_DESC',
 }

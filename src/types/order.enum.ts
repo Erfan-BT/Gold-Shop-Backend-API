@@ -1,7 +1,7 @@
 export enum ShippingMethod {
-    INPERSON = 'inperson',
-    POST = 'post',
-    TIPAX = 'tipax'
+    INPERSON = 'INPERSON',
+    POST = 'POST',
+    TIPAX = 'TIPAX'
 }
 
 export enum ShippingCost {
@@ -11,19 +11,30 @@ export enum ShippingCost {
 }
 
 export enum OrderStatus {
-    PENDING_PAYMENT = 'pendingpayment',
-    PAID = 'paid',
-    CANCELED = 'canceled',
-    REFUNDED = 'refunded',
-    PROCESSING = 'processing',
-    SHIPPED = 'shipped',
-    DELIVERED = 'delivered',
-    COMPLETED = 'completed'
+    PENDING_PAYMENT = 'PENDING_PAYMENT',
+    PAID = 'PAID',
+    CANCELED = 'CANCELED',
+    REFUNDED = 'REFUNDED',
+    PROCESSING = 'PROCESSING',
+    SHIPPED = 'SHIPPED',
+    DELIVERED = 'DELIVERED',
+    COMPLETED = 'COMPLETED'
 }
 
 export enum OrderPaymentStatus {
-    PENDING = 'pending',
-    PAID = 'paid',
-    FAILED = 'failed',
-    REFUNDED = 'refunded'
+    PENDING = 'PENDING',
+    PAID = 'PAID',
+    FAILED = 'FAILED',
+    REFUNDED = 'REFUNDED'
+}
+
+export enum OrderSort {
+    NEWEST = 'NEWEST',
+    OLDEST = 'OLDEST',
+    PRICE_ASC = 'PRICE_ASC',
+    PRICE_DESC = 'PRICE_DESC',
+    DISCOUNT_ASC = 'DISCOUNT_ASC',
+    DISCOUNT_DESC = 'DISCOUNT_DESC',
+    TOTAL_ASC = "TOTAL_ASC",
+    TOTAL_DESC = "TOTAL_DESC",
 }

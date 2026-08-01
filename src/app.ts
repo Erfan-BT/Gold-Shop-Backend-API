@@ -15,6 +15,7 @@ import CartRoutes from './routes/cart.routes.js'
 import OrderRoutes from './routes/order.routes.js'
 import PaymentRoutes from './routes/payment.routes.js'
 import ReturnRoutes from './routes/return.routes.js'
+import AdminRoutes from './routes/admin/admin.router.js'
 
 const app = express()
 
@@ -58,6 +59,8 @@ app.use('/api/v1/cart', CartRoutes)
 app.use('/api/v1/orders', OrderRoutes)
 app.use('/api/v1/payments', PaymentRoutes)
 app.use('/api/v1/returns', ReturnRoutes)
+// Admin Route
+app.use('/api/v1/admin', AdminRoutes)
 
 // Error Handler
 app.use((req : Request , res : Response, next : NextFunction) => {

@@ -1,4 +1,4 @@
-import { InferCreationAttributes, Op, Transaction } from "sequelize"
+import { FindAndCountOptions, InferCreationAttributes, Op, Transaction } from "sequelize"
 import { Order, OrderItem } from "../models/order.model.js"
 import { OrderPaymentStatus, OrderStatus, ShippingMethod } from "../types/order.enum.js"
 import { Product, ProductVariant } from "../models/product.model.js"
@@ -205,6 +205,12 @@ class OrderRepository {
                 }
             ]
         })
+    }
+
+    // --------------- ADMIN ---------------
+    async getOrders (options: FindAndCountOptions<Order>)
+    {
+        return await Order.findAndCountAll(options)
     }
 }
 
