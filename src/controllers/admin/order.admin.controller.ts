@@ -66,6 +66,21 @@ class AdminOrderController {
         }
     }
 
+    async setOrderStatusDelivered (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { orderNumber } = req.validated.params as OrderNumberDto
+            await adminOrderService.setOrderStatusDelivered(orderNumber)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Order Status : Delivered',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminOrderController()

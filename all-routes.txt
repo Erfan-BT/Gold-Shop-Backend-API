@@ -52,3 +52,4 @@ GET    | admin/orders/                          |     Admin    | ............. |
 GET    | admin/orders/:orderNumber              |     Admin    |       -       |    -
 PATCH  | admin/orders/:orderNumber/process      |     Admin    |       -       |    -
 PATCH  | admin/orders/:orderNumber/ship         |     Admin    |       -       | trackingCode
+PATCH  | admin/orders/:orderNumber/deliver      |     Admin    |       -       |    -
