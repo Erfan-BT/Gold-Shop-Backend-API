@@ -25,6 +25,14 @@ class AdminOrderService {
             throw new ConflictError('Order Status Not Changed To Processing')
     }
 
+    async setOrderStatusShipped (orderNumber : string, trackingCode : string)
+    {
+        if (!(await orderRepository.changeOrderStatus(orderNumber, OrderStatus.PROCESSING, OrderStatus.SHIPPED, null, {
+            shippedAt : new Date(),
+            trackingCode
+        })))
+            throw new ConflictError('Order Status Not Changed To Shipped')
+    }
 }
 
 export default new AdminOrderService()

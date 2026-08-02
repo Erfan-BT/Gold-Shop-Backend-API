@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { OrderNumberDto, OrdersAdminDto } from "../../validation/order.validation.js";
+import { OrderNumberDto, OrdersAdminDto, TrackingCodeDto } from "../../validation/order.validation.js";
 import adminOrderService from "../../services/admin/order.admin.service.js";
 
 class AdminOrderController {
@@ -42,6 +42,23 @@ class AdminOrderController {
             res.status(200).json({
                 success : true,
                 msg : 'Change Order Status : Processing',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    
+    async setOrderStatusShipped (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { orderNumber } = req.validated.params as OrderNumberDto
+            const { trackingCode } = req.validated.body as TrackingCodeDto
+            await adminOrderService.setOrderStatusShipped(orderNumber, trackingCode)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Order Status : Shipped',
                 data : {}
             })
         } catch (error) {

@@ -16,6 +16,10 @@ export const orderNumberSchema = z.object({
     orderNumber : z.string().trim().min(1).max(50)
 })
 
+export const trackingCodeSchema = z.object({
+    trackingCode : z.string().trim().min(1).max(100)
+})
+
 export const ordersAdminQS = z.object({
     page : z.coerce.number().int().min(1).default(1),
     limit : z.coerce.number().int().min(1).max(50).default(20),
@@ -67,3 +71,4 @@ export type checkoutSchemaDto = z.infer<typeof checkoutSchema>
 export type orderQSDtp = z.infer<typeof orderQS>
 export type OrdersAdminDto = z.infer<typeof ordersAdminQS>
 export type OrderNumberDto = z.infer<typeof orderNumberSchema>
+export type TrackingCodeDto = z.infer<typeof trackingCodeSchema>
