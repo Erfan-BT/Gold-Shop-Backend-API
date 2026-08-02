@@ -1,12 +1,11 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { OrdersAdminDto } from "../../validation/order.validation.js";
+import { OrderNumberDto, OrdersAdminDto } from "../../validation/order.validation.js";
 import adminOrderService from "../../services/admin/order.admin.service.js";
 
 class AdminOrderController {
     async getOrders(req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { userId } = req.user!
             const qs = req.validated.query as OrdersAdminDto
             const result = await adminOrderService.getOrders(qs)
 
@@ -19,6 +18,37 @@ class AdminOrderController {
             next(error)
         }
     }
+
+    async getOrder(req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { orderNumber } = req.validated.params as OrderNumberDto
+            const result = await adminOrderService.getOrder(orderNumber)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Order',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async setOrderStatusProcess (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { orderNumber } = req.validated.params as OrderNumberDto
+            await adminOrderService.setOrderStatusProcess(orderNumber)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Order Status : Processing',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminOrderController()

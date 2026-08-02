@@ -66,3 +66,4 @@ export const ordersAdminQS = z.object({
 export type checkoutSchemaDto = z.infer<typeof checkoutSchema>
 export type orderQSDtp = z.infer<typeof orderQS>
 export type OrdersAdminDto = z.infer<typeof ordersAdminQS>
+export type OrderNumberDto = z.infer<typeof orderNumberSchema>

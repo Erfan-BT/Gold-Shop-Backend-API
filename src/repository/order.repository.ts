@@ -8,6 +8,7 @@ import Address from "../models/address.model.js"
 import Coupon from "../models/coupon.model.js"
 import Payment from "../models/payment.model.js"
 import { ReturnItem, ReturnRequest } from "../models/return.model.js"
+import User from "../models/user.model.js"
 
 class OrderRepository {
     async hasUserPurchasedVariant(userId: number, variantId: number)
@@ -211,6 +212,103 @@ class OrderRepository {
     async getOrders (options: FindAndCountOptions<Order>)
     {
         return await Order.findAndCountAll(options)
+    }
+
+    async getOrderAdmin (orderNumber : string)
+    {
+        return await Order.findOne({
+            where : {
+                orderNumber
+            },
+            attributes : [
+                'uuid',
+                'ipAddress',
+                'subtotal',
+                'discountAmount',
+                'shippingMethod',
+                'shippingCost',
+                'finalPrice',
+                'status',
+                'paymentStatus',
+                'shippedAt',
+                'trackingCode',
+                'deliveredAt',
+                'createdAt',
+            ],
+            include : [
+                {
+                    model : OrderItem,
+                    as : 'items',
+                    attributes : [
+                        'id',
+                        'variantId',
+                        'productTitle',
+                        'sku',
+                        'weight',
+                        'karat',
+                        'stoneType',
+                        'color',
+                        'quantity',
+                        'unitPrice',
+                        'discountAmount',
+                        'finalPrice',
+                        'goldPriceAtTime'
+                    ],
+                    required : true
+                },
+                {
+                    model : User,
+                    as : 'user',
+                    attributes : ['id' ,'name', 'email', 'phone', 'isEmailVerified'],
+                    required : true
+                },
+                {
+                    model : Address,
+                    as : 'address',
+                    attributes : ['id' ,'addressLine', 'city', 'postalCode'],
+                    required : true
+                },
+                {
+                    model : Payment,
+                    as : 'payment',
+                    attributes : ['id', 'amount', 'status', 'cardPan', 'referenceCode', 'authorityCode', 'paidAt'],
+                    required : false
+                },
+                {
+                    model : Coupon,
+                    as : 'coupon',
+                    attributes : ['code', 'type', 'value'],
+                    required : false
+                },
+                {
+                    model : ReturnRequest,
+                    as : 'returnRequest',
+                    attributes : ['id', 'status', 'refundStatus', 'reviewedAt'],
+                    required : false
+                }
+            ]
+        })
+    }
+
+    async changeOrderStatus (orderNumber : string, currentStatus : OrderStatus,status : OrderStatus, transaction : Transaction | null, extra?: Partial<Pick<
+        Order,
+        "trackingCode" |
+        "shippedAt" |
+        "deliveredAt"
+    >>)
+    {
+        const [rows] = await Order.update({
+            status,
+            ...(extra ?? {})
+        },
+        {  
+            where : {
+                orderNumber,
+                status : currentStatus
+            },
+            transaction
+        })
+        return rows === 1
     }
 }
 

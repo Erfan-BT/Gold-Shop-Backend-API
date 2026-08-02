@@ -338,9 +338,9 @@ function associations() {
         onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
-    Order.hasMany(ReturnRequest, {
+    Order.hasOne(ReturnRequest, {
         foreignKey : 'orderId',
-        as : 'returnRequests'
+        as : 'returnRequest'
     })
     User.hasMany(ReturnRequest, {
         foreignKey : 'reviewedBy',
