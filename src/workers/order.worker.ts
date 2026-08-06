@@ -6,7 +6,7 @@ import orderService from "../services/order.service.js";
 
 let orderWorker: Worker | null = null;
 
-export async function initorderWorker() {
+export async function initOrderWorker() {
     logger.info("Initializing Order Worker");
 
     if (orderWorker) {

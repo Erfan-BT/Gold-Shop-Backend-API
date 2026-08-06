@@ -10,6 +10,7 @@ router.get('/', roleMiddleware(['Admin', 'Owner']), validate({ query : ordersAdm
 router.get('/:orderNumber', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema }), adminOrderController.getOrders)
 router.patch('/:orderNumber/process', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema }), adminOrderController.setOrderStatusProcess)
 router.patch('/:orderNumber/ship', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema, body : trackingCodeSchema }), adminOrderController.setOrderStatusShipped)
-router.patch('/:orderNumber/deliver', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema }), adminOrderController.setOrderStatusShipped)
+router.patch('/:orderNumber/deliver', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema }), adminOrderController.setOrderStatusDelivered)
+router.patch('/:orderNumber/cancel', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema }), adminOrderController.cancelOrder)
 
 export default router

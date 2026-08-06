@@ -294,7 +294,8 @@ class OrderRepository {
         Order,
         "trackingCode" |
         "shippedAt" |
-        "deliveredAt"
+        "deliveredAt" |
+        "paymentStatus"
     >>)
     {
         const [rows] = await Order.update({

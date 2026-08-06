@@ -14,6 +14,7 @@ export enum OrderStatus {
     PENDING_PAYMENT = 'PENDING_PAYMENT',
     PAID = 'PAID',
     CANCELED = 'CANCELED',
+    REFUND_PENDING = 'REFUND_PENDING',
     REFUNDED = 'REFUNDED',
     PROCESSING = 'PROCESSING',
     SHIPPED = 'SHIPPED',
@@ -25,6 +26,7 @@ export enum OrderPaymentStatus {
     PENDING = 'PENDING',
     PAID = 'PAID',
     FAILED = 'FAILED',
+    REFUND_PENDING = 'REFUND_PENDING',
     REFUNDED = 'REFUNDED'
 }
 

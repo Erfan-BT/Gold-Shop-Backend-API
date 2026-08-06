@@ -29,7 +29,8 @@ class Payment extends Model<
 
     declare refundAmount: CreationOptional<number | null>;
     declare refundReason: CreationOptional<string | null>;
-    declare refundId: CreationOptional<number | null>;
+    declare terminal_id: CreationOptional<string | null>
+    declare refundId: CreationOptional<string | null>;
 
     declare bankResponse: string;
 
@@ -88,8 +89,11 @@ Payment.init(
         refundReason: {
             type: DataTypes.TEXT
         },
+        terminal_id : {
+            type : DataTypes.STRING()
+        },
         refundId: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING()
         },
         bankResponse: {
             type: DataTypes.STRING,

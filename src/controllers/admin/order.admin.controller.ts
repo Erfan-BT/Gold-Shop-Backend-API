@@ -81,6 +81,23 @@ class AdminOrderController {
         }
     }
 
+    async cancelOrder (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { orderNumber } = req.validated.params as OrderNumberDto
+            const { reason } = req.validated.body
+            const { userId } = req.user!
+            await adminOrderService.cancelOrder(orderNumber, reason, userId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Cancel Order',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminOrderController()

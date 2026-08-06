@@ -1,3 +1,4 @@
+import { logger } from "../configs/pino.config.js";
 import { orderQueue } from "../queue/order.queue.js";
 
 export async function initOrderScheduler() {
@@ -11,5 +12,7 @@ export async function initOrderScheduler() {
             name: "cancel-expired-orders",
         }
     )
+
+    logger.info('Init Order Scheduler')
 
 }

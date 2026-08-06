@@ -8,6 +8,7 @@ import { initWorkers } from "./workers/index.js";
 import { env } from './configs/env.config.js';
 import { connectDB } from './configs/sequelize.config.js';
 import { initOrderScheduler } from './jobs/order.scheduler.js';
+import { initRefundScheduler } from './jobs/refund.scheduler.js';
 
 const port = env.SERVER_PORT
 
@@ -26,6 +27,8 @@ async function startServer() {
         await initWorkers();
         // Init Order Scheduler
         await initOrderScheduler();
+        // Init Refund Scheduler
+        await initRefundScheduler()
         // Start Server
         app.listen(port, () => {
             logger.info(`Server Run On Port ${port}`)

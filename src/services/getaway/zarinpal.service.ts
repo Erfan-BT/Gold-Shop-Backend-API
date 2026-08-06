@@ -68,6 +68,29 @@ class ZarinpalService {
             }
         }
     }
+
+    async processRefund (sessionId : string, amount : number, description : string = 'Refund For Order') {
+        const refundResponse = await zarinpal.refunds.create({
+            sessionId,
+            amount,
+            description,
+            method: 'CARD',
+            reason: 'CUSTOMER_REQUEST',
+        });
+        return refundResponse as {
+            id : string;
+            terminal_id : string;
+            amount : number;
+            timeline : any;
+            refund_amount : number;
+            refund_time : string;
+            refund_status : string;
+        }
+
+        // const refundDetails = await zarinpal.refunds.retrieve(refundResponse.id);
+        // console.log('Refund Details:', refundDetails);
+    }
+
 }
 
 export default new ZarinpalService()
