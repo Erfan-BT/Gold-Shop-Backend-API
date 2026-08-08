@@ -9,6 +9,7 @@ import Coupon from "../models/coupon.model.js"
 import Payment from "../models/payment.model.js"
 import { ReturnItem, ReturnRequest } from "../models/return.model.js"
 import User from "../models/user.model.js"
+import sequelize from "../configs/sequelize.config.js"
 
 class OrderRepository {
     async hasUserPurchasedVariant(userId: number, variantId: number)
@@ -38,12 +39,12 @@ class OrderRepository {
         })) ? true : false
     }
 
-    async getOrderByOrderNumber (orderNumber : string, userId : number)
+    async getOrderByOrderNumber (orderNumber : string, userId ?: number)
     : Promise<Order | null> {
         return await Order.findOne({
             where : {
                 orderNumber,
-                userId
+                ...(userId ? {userId : userId} : {})
             },
             include : [
                 {
@@ -222,6 +223,7 @@ class OrderRepository {
             },
             attributes : [
                 'uuid',
+                'orderNumber',
                 'ipAddress',
                 'subtotal',
                 'discountAmount',
@@ -271,7 +273,14 @@ class OrderRepository {
                 {
                     model : Payment,
                     as : 'payment',
-                    attributes : ['id', 'amount', 'status', 'cardPan', 'referenceCode', 'authorityCode', 'paidAt'],
+                    attributes : ['id', 'amount', 'status', 'cardPan', 'referenceCode', 'authorityCode', 'paidAt',
+                        'refundAmount',
+                        'refundReason',
+                        'terminal_id',
+                        'refundId',
+                        'refundedAt',
+                        'bankResponse'
+                    ],
                     required : false
                 },
                 {
@@ -310,6 +319,120 @@ class OrderRepository {
             transaction
         })
         return rows === 1
+    }
+
+    async changeTrackingCode (orderNumber : string, trackingCode : string)
+    : Promise<boolean> {
+        const [rows] = await Order.update({
+            trackingCode
+        },{
+            where : {
+                orderNumber,
+                status : OrderStatus.SHIPPED
+            }
+        })
+        return rows === 1
+    }
+
+    async statsMain() {
+        const startOfToday = new Date()
+        startOfToday.setHours(0, 0, 0, 0)
+
+        const startOfMonth = new Date()
+        startOfMonth.setDate(1)
+        startOfMonth.setHours(0, 0, 0, 0)
+
+        const [
+            pendingOrderCount,
+            processingOrderCount,
+            shippingOrderCount,
+            deliveredOrderCount,
+            refundPendingOrderCount,
+            refundedOrderCount,
+            completedOrderCount,
+            canceledOrderCount,
+            todaySales,
+            monthlySales
+        ] = await Promise.all([
+            Order.count({
+                where: {
+                    status: OrderStatus.PENDING_PAYMENT
+                }
+            }),
+
+            Order.count({
+                where: {
+                    status: OrderStatus.PROCESSING
+                }
+            }),
+
+            Order.count({
+                where: {
+                    status: OrderStatus.SHIPPED
+                }
+            }),
+
+            Order.count({
+                where: {
+                    status: OrderStatus.DELIVERED
+                }
+            }),
+
+            Order.count({
+                where: {
+                    status: OrderStatus.REFUND_PENDING
+                }
+            }),
+
+            Order.count({
+                where: {
+                    status: OrderStatus.REFUNDED
+                }
+            }),
+
+            Order.count({
+                where: {
+                    status: OrderStatus.COMPLETED
+                }
+            }),
+
+            Order.count({
+                where: {
+                    status: OrderStatus.CANCELED
+                }
+            }),
+
+            Order.sum('finalPrice', {
+                where: {
+                    paymentStatus: OrderPaymentStatus.PAID,
+                    createdAt: {
+                        [Op.gte]: startOfToday
+                    }
+                }
+            }),
+
+            Order.sum('finalPrice', {
+                where: {
+                    paymentStatus: OrderPaymentStatus.PAID,
+                    createdAt: {
+                        [Op.gte]: startOfMonth
+                    }
+                }
+            })
+        ])
+
+        return {
+            pendingOrderCount,
+            processingOrderCount,
+            shippingOrderCount,
+            deliveredOrderCount,
+            refundPendingOrderCount,
+            refundedOrderCount,
+            completedOrderCount,
+            canceledOrderCount,
+            todaySales: todaySales ?? 0,
+            monthlySales: monthlySales ?? 0
+        }
     }
 }
 

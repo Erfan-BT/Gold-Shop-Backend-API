@@ -111,6 +111,29 @@ class AdminOrderService {
         }, "Admin Requested Order Refund")
         return
     }
+
+    async changeTrackingCode (orderNumber : string, trackingCode : string)
+    {
+        // Get Order
+        const order = await orderRepository.getOrderByOrderNumber(orderNumber)
+        if (!order)
+            throw new NotFoundError('Order Not Found')
+        if (order.status !== OrderStatus.SHIPPED)
+            throw new ConflictError('Can Not Change TrackingCode For This Order')
+        // Check Current Tracking Code
+        if (order.trackingCode === trackingCode)
+            return
+        // Change Tracking Code
+        if (!(await orderRepository.changeTrackingCode(orderNumber, trackingCode)))
+            throw new ConflictError('Tracking Code Not Changed')
+        return
+    }
+
+    async statsMain ()
+    {
+        const statsResult = await orderRepository.statsMain()
+        return statsResult
+    }
 }
 
 export default new AdminOrderService()

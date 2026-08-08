@@ -12,5 +12,8 @@ router.patch('/:orderNumber/process', roleMiddleware(['Admin', 'Owner']), valida
 router.patch('/:orderNumber/ship', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema, body : trackingCodeSchema }), adminOrderController.setOrderStatusShipped)
 router.patch('/:orderNumber/deliver', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema }), adminOrderController.setOrderStatusDelivered)
 router.patch('/:orderNumber/cancel', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema }), adminOrderController.cancelOrder)
+router.patch('/:orderNumber/tracking-code', roleMiddleware(['Admin', 'Owner']), validate({ params : orderNumberSchema, body : trackingCodeSchema }), adminOrderController.changeTrackingCode)
+
+router.get('/stats', roleMiddleware(['Admin', 'Owner']), adminOrderController.statsMain)
 
 export default router

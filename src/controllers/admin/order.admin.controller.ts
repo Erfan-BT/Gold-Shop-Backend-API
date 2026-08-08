@@ -49,7 +49,6 @@ class AdminOrderController {
         }
     }
 
-    
     async setOrderStatusShipped (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { orderNumber } = req.validated.params as OrderNumberDto
@@ -98,6 +97,35 @@ class AdminOrderController {
         }
     }
 
+    async changeTrackingCode (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { orderNumber } = req.validated.params as OrderNumberDto
+            const { trackingCode } = req.validated.body as TrackingCodeDto
+            await adminOrderService.changeTrackingCode(orderNumber, trackingCode)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Tracking Code',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async statsMain (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const result = await adminOrderService.statsMain()
+
+            res.status(200).json({
+                success : true,
+                msg : 'Orders Stats',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminOrderController()

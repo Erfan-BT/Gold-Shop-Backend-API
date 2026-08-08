@@ -54,3 +54,6 @@ PATCH  | admin/orders/:orderNumber/process      |     Admin    |       -       |
 PATCH  | admin/orders/:orderNumber/ship         |     Admin    |       -       | trackingCode
 PATCH  | admin/orders/:orderNumber/deliver      |     Admin    |       -       |    -
 PATCH  | admin/orders/:orderNumber/cancel       |     Admin    |       -       | reason
+PATCH  | admin/orders/:orderNumber/tracking-code|     Admin    |       -       | trackingCode
+GET    | admin/orders/stats                     |     Admin    |       -       |    -
+________________________________________________________________________________________________________________
