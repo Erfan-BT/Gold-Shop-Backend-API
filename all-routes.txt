@@ -58,3 +58,4 @@ PATCH  | admin/orders/:orderNumber/tracking-code|     Admin    |       -       |
 GET    | admin/orders/stats                     |     Admin    |       -       |    -
 ________________________________________________________________________________________________________________
 GET    | admin/users/                           |     Admin    | ............. |    -
+GET    | admin/users/:userId                    |     Admin    |       -       |    -

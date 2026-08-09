@@ -1,6 +1,10 @@
 import { FindAndCountOptions } from "sequelize"
 import Address from "../models/address.model.js"
 import User from "../models/user.model.js"
+import { Order } from "../models/order.model.js"
+import { Role, UserRole } from "../models/role.model.js"
+import { Cart, CartItem } from "../models/cart.model.js"
+import Wishlist from "../models/wishlist.model.js"
 
 class UserRepository {
     async userById (userId : number)
@@ -32,6 +36,69 @@ class UserRepository {
     async getAllUsers (options : FindAndCountOptions)
     {
         return await User.findAndCountAll(options)
+    }
+
+    async getUser (userId : number)
+    {
+        return await User.findOne({
+            where : {
+                id : userId
+            },
+            attributes : [
+                'id',
+                'name',
+                'email',
+                'phone',
+                'isEmailVerified',
+                'isActive',
+                'emailVerifiedAt',
+                'createdAt'
+            ],
+            include : [
+                {
+                    model : UserRole,
+                    as : 'roles',
+                    required : true,
+                    attributes : ['id'],
+                    include : [{
+                        model : Role,
+                        as : 'role',
+                        attributes : ['id', 'name']
+                    }]
+                },
+                {
+                    model : Address,
+                    as : 'addresses',
+                    required : false,
+                    attributes : [
+                        'id',
+                        'addressLine',
+                        'city',
+                        'postalCode',
+                        'isDefault',
+                        'createdAt'
+                    ]
+                },
+                {
+                    model : Order,
+                    as : 'orders',
+                    required : false,
+                    attributes : [
+                        'id',
+                        'orderNumber',
+                        'status',
+                        'paymentStatus',
+                        'finalPrice',
+                        'createdAt'
+                    ],
+                    limit: 3,
+                    separate: true,
+                    order: [
+                        ['createdAt', 'DESC']
+                    ]
+                },
+            ]
+        })
     }
 }
 
