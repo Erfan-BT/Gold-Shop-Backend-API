@@ -59,3 +59,4 @@ GET    | admin/orders/stats                     |     Admin    |       -       |
 ________________________________________________________________________________________________________________
 GET    | admin/users/                           |     Admin    | ............. |    -
 GET    | admin/users/:userId                    |     Admin    |       -       |    -
+PATCH  | admin/users/:userId/active             |     Admin    |       -       |    -

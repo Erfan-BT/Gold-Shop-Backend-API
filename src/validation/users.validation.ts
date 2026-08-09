@@ -5,6 +5,10 @@ export const userIdSchema = z.object({
     userId : z.coerce.number().int()
 })
 
+export const userCurrentStatus = z.object({
+    currentStatus : z.coerce.boolean()
+})
+
 export const changeUserInfoSchema = z.object({
     name: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(100),
     phone: z.string().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone'),
@@ -42,3 +46,4 @@ export const usersQS = z.object({
 export type ChangeUserDto = z.infer<typeof changeUserInfoSchema>
 export type UserQSDto = z.infer<typeof usersQS>
 export type UserIdDto = z.infer<typeof userIdSchema>
+export type UserCurrentStatusDto = z.infer<typeof userCurrentStatus>

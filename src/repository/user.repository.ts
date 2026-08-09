@@ -12,7 +12,22 @@ class UserRepository {
         return await User.findByPk(userId, {
             attributes : {
                 exclude : ['password']
-            }
+            },
+            include : [
+                {
+                    model : UserRole,
+                    as : 'roles',
+                    required : true,
+                    attributes : ['id'],
+                    include : [
+                        {
+                            model : Role,
+                            as : 'role',
+                            attributes : ['id', 'name']
+                        }
+                    ]
+                }
+            ]
         })
     }
 
@@ -99,6 +114,19 @@ class UserRepository {
                 },
             ]
         })
+    }
+
+    async changeUserStatus (userId : number, currentStatus : boolean)
+    {
+        const [rows] = await User.update({
+            isActive : !currentStatus
+        },{
+            where : {
+                id : userId,
+                isActive : currentStatus
+            }
+        })
+        return rows === 1
     }
 }
 
