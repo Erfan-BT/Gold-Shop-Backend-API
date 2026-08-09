@@ -96,9 +96,6 @@ export const roleMiddleware = (allowedRoles: string[]) => {
             const user = req.user
             if (!user)
                 throw new UnauthorizedError('Login First')
-            console.log(user.roles);
-            console.log(user.roles[0]);
-            
 
             const hasRole = user.roles?.some((role) =>
                 allowedRoles.includes(role.role?.name ?? 'NO')

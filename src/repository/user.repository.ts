@@ -1,3 +1,4 @@
+import { FindAndCountOptions } from "sequelize"
 import Address from "../models/address.model.js"
 import User from "../models/user.model.js"
 
@@ -25,6 +26,12 @@ class UserRepository {
     async deleteUser (userId : number)
     : Promise<number> {
         return await User.destroy({where : {id : userId}})
+    }
+
+    // ----- Admin -----
+    async getAllUsers (options : FindAndCountOptions)
+    {
+        return await User.findAndCountAll(options)
     }
 }
 

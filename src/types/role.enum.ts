@@ -7,3 +7,13 @@ export enum Roles {
     ORDERMANAGER = 6,
     FINANCE = 7,
 }
+
+export enum RolesTitle {
+    OWNER = 'OWNER',
+    ADMIN = 'ADMIN',
+    CUSTOMER = 'CUSTOMER',
+    SUPPORT = 'SUPPORT',
+    INVENTORY = 'INVENTORY',
+    ORDERMANAGER = 'ORDERMANAGER',
+    FINANCE = 'FINANCE',
+}
