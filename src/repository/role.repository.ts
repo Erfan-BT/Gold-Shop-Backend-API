@@ -16,8 +16,10 @@ class RoleRepository {
             },
             include: [{
                 model: Role,
-                as: 'role'
-            }]
+                as: 'role',
+                attributes : ['id', 'name']
+            }],
+            attributes : ['id']
         })
     }
 
@@ -25,6 +27,7 @@ class RoleRepository {
     : Promise<Role | null> {
         return await Role.findByPk(roleId)
     }
+
 }
 
 export default new RoleRepository()

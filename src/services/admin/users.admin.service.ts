@@ -1,4 +1,5 @@
 import { UserQueryBuilder } from "../../builders/userQuary.builder.js";
+import roleRepository from "../../repository/role.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
@@ -36,6 +37,11 @@ class AdminUsersService {
         if (!(await userRepository.changeUserStatus(userId, user.isActive)))
             throw new ConflictError('User Status Not Changed')
         return !user.isActive
+    }
+
+    async getUserRoles (userId : number)
+    {
+        return await roleRepository.getUserRoles(userId)
     }
 }
 

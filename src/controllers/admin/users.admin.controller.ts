@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { UserCurrentStatusDto, UserIdDto, UserQSDto } from "../../validation/users.validation.js";
+import { UserIdDto, UserQSDto } from "../../validation/users.validation.js";
 import adminUsersService from "../../services/admin/users.admin.service.js";
 
 class AdminUsersController {
@@ -46,6 +46,21 @@ class AdminUsersController {
                 data : {
                     newStatus : result
                 }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getUserRoles (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.validated.params as UserIdDto
+            const result = await adminUsersService.getUserRoles(userId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'User Roles',
+                data : result
             })
         } catch (error) {
             next(error)
