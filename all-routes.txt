@@ -65,4 +65,5 @@ POST   | admin/users/:userId/roles/:roleId      |     Admin    |       -       |
 DELETE | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -
 PATCH  | admin/users/:userId/change-password    |     Owner    |       -       | password
 PATCH  | admin/users/:userId/verify-email       |     Admin    |       -       |    -
+DELETE | admin/users/:userId/revoke-sessions    |     Admin    |       -       |    -
 GET    | admin/users/stats                      |     Owner    |       -       |    -

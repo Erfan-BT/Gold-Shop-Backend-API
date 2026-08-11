@@ -85,6 +85,12 @@ class AdminUsersService {
         return !currentStatus
     }
 
+    async revokeUserSessions (userId : number)
+    {
+        await tokenService.revokeRefreshToken(userId)
+        return
+    }
+
     // User - Role
     async getUserRoles (userId : number)
     {

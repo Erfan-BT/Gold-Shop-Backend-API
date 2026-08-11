@@ -11,6 +11,7 @@ router.get("/:userId", validate({ params : userIdSchema }), adminUsersController
 router.patch("/:userId/active", validate({ params : userIdSchema }), adminUsersController.getUser)
 router.patch('/:userId/change-password', validate({ params : userIdSchema, body : passwordSchema }), adminUsersController.adminResetUserPassword)
 router.patch('/:userId/verify-email', validate({ params : userIdSchema }), adminUsersController.adminChangeVerifiedUserEmail)
+router.delete('/:userId/revoke-sessions', validate({ params : userIdSchema }), adminUsersController.revokeUserSessions)
 // User-Role
 router.get('/:userId/roles', validate({ params : userIdSchema }), adminUsersController.getUserRoles)
 router.post('/:userId/roles/:roleId', validate({ params : changeUserRolesSchema }), adminUsersController.addRoleToUser)

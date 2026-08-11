@@ -88,6 +88,22 @@ class AdminUsersController {
         }
     }
 
+    async revokeUserSessions (req : AuthRequest, res : Response, next : NextFunction)
+    {
+        try {
+            const { userId } = req.validated.params as UserIdDto
+            await adminUsersService.revokeUserSessions(userId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Revoke User Sessions',
+                data : {}
+            })
+        } catch (error) {
+            
+        }
+    }
+
     // User - Role
     async getUserRoles (req : AuthRequest, res : Response, next : NextFunction) {
         try {
