@@ -10,5 +10,6 @@ router.get("/:userId", validate({ params : userIdSchema }), adminUsersController
 router.patch("/:userId/active", validate({ params : userIdSchema }), adminUsersController.getUser)
 router.get('/:userId/roles', validate({ params : userIdSchema }), adminUsersController.getUserRoles)
 router.post('/:userId/roles/:roleId', validate({ params : changeUserRolesSchema }), adminUsersController.addRoleToUser)
+router.delete('/:userId/roles/:roleId', validate({ params : changeUserRolesSchema }), adminUsersController.deleteUserRole)
 
 export default router

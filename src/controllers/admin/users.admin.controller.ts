@@ -82,6 +82,22 @@ class AdminUsersController {
             next(error)
         }
     }
+
+    async deleteUserRole (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId, roleId } = req.validated.params as ChangeUserRolesDto
+            const adminId = req.user!.userId
+            await adminUsersService.deleteUserRole(userId, roleId, adminId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete User Role',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminUsersController()

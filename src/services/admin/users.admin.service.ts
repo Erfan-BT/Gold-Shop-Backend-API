@@ -3,7 +3,7 @@ import { UserRole } from "../../models/role.model.js";
 import roleRepository from "../../repository/role.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
+import { ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
 import { UserQSDto } from "../../validation/users.validation.js";
 
 class AdminUsersService {
@@ -77,6 +77,39 @@ class AdminUsersService {
         // Add Role To User
         const addedRole = await roleRepository.setUserRole(userId, roleId, null)
         return addedRole
+    }
+
+    async deleteUserRole (userId : number, roleId : number, adminId : number)
+    {
+        // Get User
+        const user = await userRepository.userById(userId)
+        if (!user)
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+        // Get Admin
+        const admin = await userRepository.userById(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ID : ${adminId} }`)
+        const isOwner = admin.roles?.some(userRole => userRole.role?.name === RolesTitle.OWNER ) ?? false
+        // Get Role
+        const role = await roleRepository.getRoleById(roleId)
+        if (!role)
+            throw new NotFoundError('Role Not Found')
+        // Check Exists Role
+        const existsRole = user.roles?.some(userRole => userRole.roleId === roleId) ?? false
+        if (!existsRole)
+            throw new ConflictError('User Has Not This Role')
+        // Check Role
+        if (role.name === RolesTitle.OWNER)
+            throw new ForbiddenError('Owner Role Can Not Be Removed')
+        if (userId === adminId && !isOwner)
+            throw new ForbiddenError('You Can Not Change Your Own Roles')
+        if (role.name === RolesTitle.ADMIN && !isOwner)
+                throw new ForbiddenError('Not Access')
+        // Delete User Role
+        const isDelete = await roleRepository.deleteUserRole(userId, roleId, null)
+        if (!isDelete)
+            throw new InternalServerError('User Role Not Deleted')
+        return
     }
 }
 
