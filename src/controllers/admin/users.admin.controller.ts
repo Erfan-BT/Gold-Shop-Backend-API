@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { UserIdDto, UserQSDto } from "../../validation/users.validation.js";
+import { ChangeUserRolesDto, UserIdDto, UserQSDto } from "../../validation/users.validation.js";
 import adminUsersService from "../../services/admin/users.admin.service.js";
 
 class AdminUsersController {
@@ -60,6 +60,22 @@ class AdminUsersController {
             res.status(200).json({
                 success : true,
                 msg : 'User Roles',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async addRoleToUser (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId, roleId } = req.validated.params as ChangeUserRolesDto
+            const adminId = req.user!.userId
+            const result = await adminUsersService.addRoleToUser(userId, roleId, adminId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Add Role To User',
                 data : result
             })
         } catch (error) {

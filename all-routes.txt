@@ -61,3 +61,5 @@ GET    | admin/users/                           |     Admin    | ............. |
 GET    | admin/users/:userId                    |     Admin    |       -       |    -
 PATCH  | admin/users/:userId/active             |     Admin    |       -       |    -
 GET    | admin/users/:userId/roles              |     Admin    |       -       |    -
+POST   | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -
+DELETE | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -
