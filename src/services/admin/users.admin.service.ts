@@ -1,12 +1,16 @@
 import { UserQueryBuilder } from "../../builders/userQuary.builder.js";
-import { UserRole } from "../../models/role.model.js";
+import bcrypt from 'bcrypt'
 import roleRepository from "../../repository/role.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
 import { UserQSDto } from "../../validation/users.validation.js";
+import authRepository from "../../repository/auth.repository.js";
+import tokenService from "../token.service.js";
 
 class AdminUsersService {
+    private HASHROUNDS = 12;
+
     async getAllUsers (qs : UserQSDto)
     {
         const options = UserQueryBuilder.build(qs)
@@ -40,6 +44,48 @@ class AdminUsersService {
         return !user.isActive
     }
 
+    async adminResetUserPassword (userId : number, adminId : number, password : string)
+    {
+        // Get Admin & Check isOwner
+        const admin = await userRepository.getUser(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ID : ${adminId} }`)
+        const isOwner = admin.roles?.some(userRole => userRole.role?.name === RolesTitle.OWNER) ?? false
+        if (!isOwner)
+            throw new ForbiddenError('Not Access')
+        // Get User
+        const user = await userRepository.getUser(userId)
+        if (!user)
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+        // Hash Password
+        const hashedPassword = await bcrypt.hash(password, this.HASHROUNDS)
+        // Update Password
+        const rows = await authRepository.changeUserPassword(userId, hashedPassword)
+        if (rows === 0)
+            throw new InternalServerError('Password Not Changed, Please Try Again Later')
+        // Remove Refresh Token
+        await tokenService.revokeRefreshToken(userId)
+        return
+    }
+
+    async adminChangeVerifiedUserEmail (userId : number, adminId : number)
+    {
+        // Get Admin
+        const admin = await userRepository.getUser(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ID : ${adminId} }`)
+        // Get User
+        const user = await userRepository.getUser(userId)
+        if (!user)
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+        // Change Status
+        const currentStatus = user.isEmailVerified
+        if (!(await userRepository.changeVerifiedEmailStatus(userId, currentStatus)))
+            throw new InternalServerError('Email Verified Status Not Changed')
+        return !currentStatus
+    }
+
+    // User - Role
     async getUserRoles (userId : number)
     {
         // Get User

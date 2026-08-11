@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
 import { ChangeUserRolesDto, UserIdDto, UserQSDto } from "../../validation/users.validation.js";
 import adminUsersService from "../../services/admin/users.admin.service.js";
+import { PasswordDto } from "../../validation/auth.validation.js";
 
 class AdminUsersController {
     async getAllUsers (req : AuthRequest, res : Response, next : NextFunction) {
@@ -52,6 +53,42 @@ class AdminUsersController {
         }
     }
 
+    async adminResetUserPassword (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.validated.params as UserIdDto
+            const adminId = req.user!.userId
+            const { password } = req.validated.body as PasswordDto
+            await adminUsersService.adminResetUserPassword(userId, adminId, password)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Admin Reset User Password',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async adminChangeVerifiedUserEmail (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.validated.params as UserIdDto
+            const adminId = req.user!.userId
+            const result = await adminUsersService.adminChangeVerifiedUserEmail(userId, adminId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Admin Change Verified Email Status',
+                data : {
+                    newStatus : result
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    // User - Role
     async getUserRoles (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.validated.params as UserIdDto

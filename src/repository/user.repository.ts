@@ -128,6 +128,19 @@ class UserRepository {
         })
         return rows === 1
     }
+
+    async changeVerifiedEmailStatus (userId : number, currentStatus : boolean)
+    {
+        const [rows] = await User.update({
+            isEmailVerified : !currentStatus,
+            emailVerifiedAt : currentStatus ? null : new Date()
+        },{
+            where : {
+                id : userId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new UserRepository()
