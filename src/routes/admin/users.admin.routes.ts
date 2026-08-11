@@ -15,5 +15,7 @@ router.patch('/:userId/verify-email', validate({ params : userIdSchema }), admin
 router.get('/:userId/roles', validate({ params : userIdSchema }), adminUsersController.getUserRoles)
 router.post('/:userId/roles/:roleId', validate({ params : changeUserRolesSchema }), adminUsersController.addRoleToUser)
 router.delete('/:userId/roles/:roleId', validate({ params : changeUserRolesSchema }), adminUsersController.deleteUserRole)
+// Stats
+router.get('/stats', adminUsersController.stats)
 
 export default router

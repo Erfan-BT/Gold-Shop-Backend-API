@@ -135,6 +135,21 @@ class AdminUsersController {
             next(error)
         }
     }
+
+    // Stats
+    async stats (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const result = await adminUsersService.stats()
+
+            res.status(200).json({
+                success : true,
+                msg : 'User Stats',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminUsersController()

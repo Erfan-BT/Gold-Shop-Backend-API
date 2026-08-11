@@ -157,6 +157,12 @@ class AdminUsersService {
             throw new InternalServerError('User Role Not Deleted')
         return
     }
+
+    // Stats
+    async stats ()
+    {
+        return await userRepository.statsMain()
+    }
 }
 
 export default new AdminUsersService()

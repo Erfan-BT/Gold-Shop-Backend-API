@@ -1,10 +1,12 @@
-import { FindAndCountOptions } from "sequelize"
+import { FindAndCountOptions, Op } from "sequelize"
 import Address from "../models/address.model.js"
 import User from "../models/user.model.js"
 import { Order } from "../models/order.model.js"
 import { Role, UserRole } from "../models/role.model.js"
 import { Cart, CartItem } from "../models/cart.model.js"
 import Wishlist from "../models/wishlist.model.js"
+import { RolesTitle } from "../types/role.enum.js"
+import sequelize from "../configs/sequelize.config.js"
 
 class UserRepository {
     async userById (userId : number)
@@ -140,6 +142,78 @@ class UserRepository {
             }
         })
         return rows === 1
+    }
+
+    async statsMain() {
+        const startOfToday = new Date()
+        startOfToday.setHours(0, 0, 0, 0)
+
+        const startOfMonth = new Date()
+        startOfMonth.setDate(1)
+        startOfMonth.setHours(0, 0, 0, 0)
+
+        const [
+            allUsersCount,
+            activeUserCount,
+            verifiedUserCount,
+            newUsersTodayCount,
+            newUsersThisMonth,
+            [rolesCount],
+        ] = await Promise.all([
+            User.count(),
+
+            User.count({
+                where: {
+                    isActive : true
+                }
+            }),
+
+            User.count({
+                where: {
+                    isEmailVerified : true
+                }
+            }),
+
+            User.count({
+                where: {
+                    createdAt : {
+                        [Op.gte] : startOfToday
+                    }
+                }
+            }),
+
+            User.count({
+                where: {
+                    createdAt : {
+                        [Op.gte] : startOfMonth
+                    }
+                }
+            }),
+
+            sequelize.query(`
+                SELECT
+                    r.id,
+                    r.name,
+                    COUNT(DISTINCT ur.user_id) AS userCount
+                FROM roles r
+                LEFT JOIN userroles ur
+                    ON ur.role_id = r.id
+                GROUP BY
+                    r.id,
+                    r.name
+                ORDER BY
+                    userCount DESC
+            `)
+        ])
+
+        return {
+            allUsersCount,
+            activeUserCount,
+            verifiedUserCount,
+            newUsersTodayCount,
+            newUsersThisMonth,
+            rolesCount,
+        }
     }
 }
 

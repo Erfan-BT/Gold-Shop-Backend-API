@@ -64,4 +64,5 @@ GET    | admin/users/:userId/roles              |     Admin    |       -       |
 POST   | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -
 DELETE | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -
 PATCH  | admin/users/:userId/change-password    |     Owner    |       -       | password
-patch  | admin/users/:userId/verify-email       |     Admin    |       -       |    -
+PATCH  | admin/users/:userId/verify-email       |     Admin    |       -       |    -
+GET    | admin/users/stats                      |     Owner    |       -       |    -
