@@ -3,6 +3,7 @@ import { AuthRequest } from "../../middleware/auth.middleware.js";
 import { ChangeUserRolesDto, UserIdDto, UserQSDto } from "../../validation/users.validation.js";
 import adminUsersService from "../../services/admin/users.admin.service.js";
 import { PasswordDto } from "../../validation/auth.validation.js";
+import { OrdersAdminDto } from "../../validation/order.validation.js";
 
 class AdminUsersController {
     async getAllUsers (req : AuthRequest, res : Response, next : NextFunction) {
@@ -101,6 +102,22 @@ class AdminUsersController {
             })
         } catch (error) {
             
+        }
+    }
+
+    async getUserOrders (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.validated.params
+            const qs = req.validated.query as OrdersAdminDto
+            const result = await adminUsersService.getUserOrders(userId, qs)
+
+            res.status(200).json({
+                success : true,
+                msg : 'User Orders',
+                data : result
+            })
+        } catch (error) {
+            next(error)
         }
     }
 

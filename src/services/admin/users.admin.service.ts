@@ -7,6 +7,9 @@ import { ConflictError, ForbiddenError, InternalServerError, NotFoundError } fro
 import { UserQSDto } from "../../validation/users.validation.js";
 import authRepository from "../../repository/auth.repository.js";
 import tokenService from "../token.service.js";
+import { OrdersAdminDto } from "../../validation/order.validation.js";
+import { OrderQueryBuilder } from "../../builders/orderQuary.builder.js";
+import orderRepository from "../../repository/order.repository.js";
 
 class AdminUsersService {
     private HASHROUNDS = 12;
@@ -89,6 +92,17 @@ class AdminUsersService {
     {
         await tokenService.revokeRefreshToken(userId)
         return
+    }
+
+    async getUserOrders (userId : number, qs : OrdersAdminDto)
+    {
+        // Get User
+        const user = await userRepository.userById(userId)
+        if (!user)
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+        // Build Options
+        const options = OrderQueryBuilder.build(qs, userId)
+        return await orderRepository.getOrders(options)
     }
 
     // User - Role

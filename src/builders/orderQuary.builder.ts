@@ -11,9 +11,9 @@ import { OrderSort } from "../types/order.enum.js";
 
 export class OrderQueryBuilder {
 
-    static build(qs : OrdersAdminDto): FindAndCountOptions {
+    static build(qs : OrdersAdminDto, userId ?: number): FindAndCountOptions {
 
-        const where = this.buildOrderWhere(qs);
+        const where = this.buildOrderWhere(qs, userId);
 
         const itemsInclude = this.buildItemsInclude(qs);
 
@@ -33,7 +33,8 @@ export class OrderQueryBuilder {
     }
 
     private static buildOrderWhere(
-        qs: OrdersAdminDto
+        qs: OrdersAdminDto,
+        userId ?: number
     ): WhereOptions {
 
         const conditions: WhereOptions[] = []
@@ -120,6 +121,11 @@ export class OrderQueryBuilder {
                 shippingMethod : qs.shippingMethod
             })
         }
+
+        if (userId)
+            conditions.push({
+                userId
+            })
 
         if (!conditions.length)
             return {}
