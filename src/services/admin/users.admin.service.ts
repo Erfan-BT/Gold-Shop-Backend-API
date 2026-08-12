@@ -40,6 +40,22 @@ class AdminUsersService {
 
         if (!(await userRepository.changeUserInfo(userId, data)))
             throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+        return
+    }
+
+    async changeUserEmail (userId : number, adminId : number, email : string)
+    {
+        // Get Admin
+        const admin = await userRepository.userById(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ID : ${adminId} }`)
+        const isOwner = admin.roles?.some(userRole => userRole.role?.name === RolesTitle.OWNER) ?? false
+        if (!isOwner)
+            throw new ForbiddenError('Not Access')
+        // Change Email
+        if (!(await userRepository.changeUserEmail(userId, email)))
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+        return
     }
 
     async changeUserStatus (userId : number, adminId : number)

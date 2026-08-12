@@ -115,7 +115,7 @@ class UserRepository {
         })
     }
 
-    async changeUserInfo(userId : number, data : Partial<Pick<User, "name" |"phone">>)
+    async changeUserInfo(userId : number, data : Partial<Pick<User, "name" | "phone">>)
     : Promise<boolean> {
         const [rows] = await User.update(data,
             {
@@ -124,6 +124,20 @@ class UserRepository {
                 }
             }
         )
+        return rows === 1
+    }
+
+    async changeUserEmail (userId : number, email : string)
+    : Promise<boolean> {
+        const [rows] = await User.update({
+            email,
+            isEmailVerified : false,
+            emailVerifiedAt : null
+        },{
+            where : {
+                id : userId
+            }
+        })
         return rows === 1
     }
 

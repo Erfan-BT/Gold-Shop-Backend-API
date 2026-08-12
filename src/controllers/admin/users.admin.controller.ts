@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
 import { ChangeUserInfoDto, ChangeUserRolesDto, UserIdDto, UserQSDto } from "../../validation/users.validation.js";
 import adminUsersService from "../../services/admin/users.admin.service.js";
-import { PasswordDto } from "../../validation/auth.validation.js";
+import { EmailDto, PasswordDto } from "../../validation/auth.validation.js";
 import { OrdersAdminDto } from "../../validation/order.validation.js";
 
 class AdminUsersController {
@@ -45,6 +45,23 @@ class AdminUsersController {
             res.status(200).json({
                 success : true,
                 msg : 'Change User Info',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeUserEmail (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.validated.params as UserIdDto
+            const adminId = req.user!.userId
+            const { email } = req.validated.body as EmailDto
+            await adminUsersService.changeUserEmail(userId, adminId, email)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change User Email',
                 data : {}
             })
         } catch (error) {

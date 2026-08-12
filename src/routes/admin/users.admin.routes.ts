@@ -2,7 +2,7 @@ import express from 'express'
 import adminUsersController from '../../controllers/admin/users.admin.controller.js'
 import { validate } from '../../middleware/validation.js'
 import { adminChangeUserInfo, changeUserRolesSchema, userIdSchema, usersQS } from '../../validation/users.validation.js'
-import { passwordSchema } from '../../validation/auth.validation.js'
+import { emailSchema, passwordSchema } from '../../validation/auth.validation.js'
 import { ordersAdminQS } from '../../validation/order.validation.js'
 
 const router = express.Router()
@@ -10,6 +10,7 @@ const router = express.Router()
 router.get('/', validate({ query : usersQS }), adminUsersController.getAllUsers)
 router.get("/:userId", validate({ params : userIdSchema }), adminUsersController.getUser)
 router.patch("/:userId", validate({ params : userIdSchema, body : adminChangeUserInfo }), adminUsersController.changeUserInfo)
+router.patch("/:userId/email", validate({ params : userIdSchema, body : emailSchema }), adminUsersController.changeUserEmail)
 router.patch("/:userId/active", validate({ params : userIdSchema }), adminUsersController.changeUserStatus)
 router.patch('/:userId/change-password', validate({ params : userIdSchema, body : passwordSchema }), adminUsersController.adminResetUserPassword)
 router.patch('/:userId/verify-email', validate({ params : userIdSchema }), adminUsersController.adminChangeVerifiedUserEmail)
