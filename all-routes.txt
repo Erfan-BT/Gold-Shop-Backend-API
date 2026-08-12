@@ -70,3 +70,8 @@ PATCH  | admin/users/:userId/verify-email       |     Admin    |       -       |
 DELETE | admin/users/:userId/revoke-sessions    |     Admin    |       -       |    -
 GET    | admin/users/:userId/orders             |     Admin    | ............. |    -
 GET    | admin/users/stats                      |     Owner    |       -       |    -
+________________________________________________________________________________________________________________
+GET    | admin/addresses/                       |     Admin    | ............. |    -
+GET    | admin/addresses/:addressId             |     Admin    |       -       |    -
+PATCH  | admin/addresses/:addressId             |     Admin    |       -       | addressLine, city, postalCode
+DELETE | admin/addresses/:addressId             |     Owner    |       -       |    -

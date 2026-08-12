@@ -56,8 +56,8 @@ class UserController {
     async userAddressById (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { id } = req.params
-            const result = await addressService.userAddressById(userId, Number(id))
+            const { addressId } = req.params
+            const result = await addressService.userAddressById(userId, Number(addressId))
 
             res.status(200).json({
                 success : true,
@@ -89,8 +89,8 @@ class UserController {
         try {
             const { userId } = req.user!
             const addressData : AddressDto = req.body
-            const { id } = req.params
-            const result = await addressService.updateAddressInfo(userId, Number(id), addressData)
+            const { addressId } = req.params
+            const result = await addressService.updateAddressInfo(userId, Number(addressId), addressData)
             
             res.status(201).json({
                 success : true,
@@ -105,8 +105,8 @@ class UserController {
     async setDefaultAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { id } = req.params
-            await addressService.setDefaultAddress(userId, Number(id))
+            const { addressId } = req.params
+            await addressService.setDefaultAddress(userId, Number(addressId))
 
             res.status(200).json({
                 success : true,
@@ -121,8 +121,8 @@ class UserController {
     async deleteAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { id } = req.params
-            await addressService.deleteAddress(userId, Number(id))
+            const { addressId } = req.params
+            await addressService.deleteAddress(userId, Number(addressId))
 
             res.status(200).json({
                 success : true,

@@ -1,7 +1,9 @@
-import { Transaction } from "sequelize"
+import { FindAndCountOptions, Transaction } from "sequelize"
 import sequelize from "../configs/sequelize.config.js"
 import Address from "../models/address.model.js"
 import { AddressDto } from "../validation/address.validation.js"
+import User from "../models/user.model.js"
+import { Order } from "../models/order.model.js"
 
 class AddressRepository {
     async userAddresses (userId : number)
@@ -89,6 +91,45 @@ class AddressRepository {
                 userId,
                 id : addressId
             }
+        })
+    }
+
+    // ----- Admin -----
+    async getAllAddresses (options : FindAndCountOptions)
+    {
+        return await Address.findAndCountAll(options)
+    }
+
+    async getAddress (addressId : number)
+    {
+        return await Address.findOne({
+            where : {
+                id : addressId
+            },
+            attributes : ['id', 'addressLine', 'city', 'postalCode', 'isDefault', 'createdAt'],
+            include : [
+                {
+                    model : User,
+                    as : 'user',
+                    attributes : ['id', 'name', 'email', 'phone']
+                },
+                {
+                    model: Order,
+                    as: 'orders',
+                    attributes: [
+                        'orderNumber',
+                        'finalPrice',
+                        'status',
+                        'paymentStatus',
+                        'createdAt'
+                    ],
+                    limit: 5,
+                    separate: true,
+                    order: [
+                        ['createdAt', 'DESC']
+                    ]
+                }
+            ]
         })
     }
 }
