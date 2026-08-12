@@ -59,6 +59,7 @@ GET    | admin/orders/stats                     |     Admin    |       -       |
 ________________________________________________________________________________________________________________
 GET    | admin/users/                           |     Admin    | ............. |    -
 GET    | admin/users/:userId                    |     Admin    |       -       |    -
+PATCH  | admin/users/:userId                    |     Admin    |       -       | ?name , ?phone
 PATCH  | admin/users/:userId/active             |     Admin    |       -       |    -
 GET    | admin/users/:userId/roles              |     Admin    |       -       |    -
 POST   | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -

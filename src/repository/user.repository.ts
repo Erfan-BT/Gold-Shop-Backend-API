@@ -3,9 +3,6 @@ import Address from "../models/address.model.js"
 import User from "../models/user.model.js"
 import { Order } from "../models/order.model.js"
 import { Role, UserRole } from "../models/role.model.js"
-import { Cart, CartItem } from "../models/cart.model.js"
-import Wishlist from "../models/wishlist.model.js"
-import { RolesTitle } from "../types/role.enum.js"
 import sequelize from "../configs/sequelize.config.js"
 
 class UserRepository {
@@ -56,7 +53,7 @@ class UserRepository {
     }
 
     async getUser (userId : number)
-    {
+    : Promise<User | null> {
         return await User.findOne({
             where : {
                 id : userId
@@ -116,6 +113,18 @@ class UserRepository {
                 },
             ]
         })
+    }
+
+    async changeUserInfo(userId : number, data : Partial<Pick<User, "name" |"phone">>)
+    : Promise<boolean> {
+        const [rows] = await User.update(data,
+            {
+                where : {
+                    id : userId
+                }
+            }
+        )
+        return rows === 1
     }
 
     async changeUserStatus (userId : number, currentStatus : boolean)

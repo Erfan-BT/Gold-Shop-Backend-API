@@ -10,6 +10,19 @@ export const changeUserRolesSchema = z.object({
     roleId : z.coerce.number().int()
 })
 
+export const adminChangeUserInfo = z.object({
+    name: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(100).optional(),
+    phone: z.string().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone').optional()
+})
+.superRefine((data, ctx) => {
+    if (data.name === undefined && data.phone === undefined) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "At Least One Of The Fields Is Required"
+        })
+    }
+})
+
 export const changeUserInfoSchema = z.object({
     name: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(100),
     phone: z.string().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone'),
@@ -48,3 +61,4 @@ export type ChangeUserDto = z.infer<typeof changeUserInfoSchema>
 export type UserQSDto = z.infer<typeof usersQS>
 export type UserIdDto = z.infer<typeof userIdSchema>
 export type ChangeUserRolesDto = z.infer<typeof changeUserRolesSchema>
+export type ChangeUserInfoDto = z.infer<typeof adminChangeUserInfo>

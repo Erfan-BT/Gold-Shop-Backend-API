@@ -4,12 +4,13 @@ import roleRepository from "../../repository/role.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
-import { UserQSDto } from "../../validation/users.validation.js";
+import { ChangeUserInfoDto, UserQSDto } from "../../validation/users.validation.js";
 import authRepository from "../../repository/auth.repository.js";
 import tokenService from "../token.service.js";
 import { OrdersAdminDto } from "../../validation/order.validation.js";
 import { OrderQueryBuilder } from "../../builders/orderQuary.builder.js";
 import orderRepository from "../../repository/order.repository.js";
+import User from "../../models/user.model.js";
 
 class AdminUsersService {
     private HASHROUNDS = 12;
@@ -26,6 +27,19 @@ class AdminUsersService {
         if (!user)
             throw new NotFoundError(`User Not Found { ID : ${userId} }`)
         return user
+    }
+
+    async changeUserInfo (userId : number, info : ChangeUserInfoDto)
+    {
+        const data: Partial<Pick<User, "name" | "phone">> = {};
+        if (info.name !== undefined)
+            data.name = info.name
+
+        if (info.phone !== undefined)
+            data.phone = info.phone
+
+        if (!(await userRepository.changeUserInfo(userId, data)))
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
     }
 
     async changeUserStatus (userId : number, adminId : number)
