@@ -8,6 +8,6 @@ const router = express.Router()
 router.get('/', validate({ query : addressesQS }), adminAddressController.getAllAddresses)
 router.get("/:addressId", validate({ params : addressIdSchema }), adminAddressController.getAddress)
 router.patch("/:addressId", validate({ params : addressIdSchema, body : addressSchema }), adminAddressController.changeAddress)
-// router.delete('/:addressId', validate({ params :  }), adminAddressController.)
+router.delete('/:addressId', validate({ params : addressIdSchema }), adminAddressController.deleteAddress)
 
 export default router

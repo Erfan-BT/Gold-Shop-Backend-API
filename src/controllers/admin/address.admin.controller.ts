@@ -49,6 +49,21 @@ class AdminAddressController {
             next(error)
         }
     }
+
+    async deleteAddress (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { addressId } = req.validated.params as AddressIdDto
+            await adminAddressService.deleteAddress(addressId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Address',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminAddressController()

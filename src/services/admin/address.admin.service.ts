@@ -24,6 +24,13 @@ class AdminAddressService {
             throw new NotFoundError(`Address Not Found { ID : ${addressId} }`)
         return
     }
+
+    async deleteAddress (addressId : number)
+    {
+        if (!(await addressRepository.adminDeleteAddress(addressId)))
+            throw new NotFoundError(`Address Not Found { ID : ${addressId} }`)
+        return
+    }
 }
 
 export default new AdminAddressService()

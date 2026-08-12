@@ -141,6 +141,16 @@ class AddressRepository {
         })
         return rows === 1
     }
+
+    async adminDeleteAddress (addressId : number)
+    {
+        const rows = await Address.destroy({
+            where : {
+                id : addressId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new AddressRepository()
