@@ -1,5 +1,4 @@
 import { FindAndCountOptions, Transaction } from "sequelize"
-import sequelize from "../configs/sequelize.config.js"
 import Address from "../models/address.model.js"
 import { AddressDto } from "../validation/address.validation.js"
 import User from "../models/user.model.js"
@@ -131,6 +130,16 @@ class AddressRepository {
                 }
             ]
         })
+    }
+
+    async changeAddress (addressId : number, addressData : AddressDto)
+    {
+        const [rows] = await Address.update(addressData, {
+            where : {
+                id : addressId
+            }
+        })
+        return rows === 1
     }
 }
 
