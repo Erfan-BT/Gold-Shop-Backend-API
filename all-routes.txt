@@ -86,3 +86,4 @@ GET    | admin/categories/:categoryId/children  |     Admin    |       -       |
 DELETE | admin/categories/:categoryId           |     Owner    |       -       |    -
 ________________________________________________________________________________________________________________
 GET    | admin/coupons                          |     Admin    | ............. |    -
+GET    | admin/coupons/:couponId                |     Admin    |       -       |    -

@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { CouponsQSDto } from "../../validation/coupon.validation.js";
+import { CouponIdDto, CouponsQSDto } from "../../validation/coupon.validation.js";
 import couponAdminService from "../../services/admin/coupon.admin.service.js";
 
 class AdminCouponController {
@@ -12,6 +12,21 @@ class AdminCouponController {
             res.status(200).json({
                 success : true,
                 msg : 'Get All Coupons',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getCoupon (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { couponId } = req.validated.params as CouponIdDto
+            const result = await couponAdminService.getCoupon(couponId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Coupon',
                 data : result
             })
         } catch (error) {
