@@ -8,5 +8,6 @@ const router = express.Router()
 router.get('/', adminGoldPriceController.getPrice)
 router.patch('/', validate({ body : changePriceSchema }), adminGoldPriceController.adminChangePrice)
 router.patch('/auto-update', adminGoldPriceController.changeAutoUpdateStatus)
+router.post('/sync', adminGoldPriceController.syncPrice)
 
 export default router

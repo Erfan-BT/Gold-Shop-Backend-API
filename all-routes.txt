@@ -96,3 +96,4 @@ ________________________________________________________________________________
 GET    | admin/gold-prices                      |     Owner    |       -       |    -
 PATCH  | admin/gold-prices                      |     Owner    |       -       | pricePerGram18k
 PATCH  | admin/gold-prices/auto-update          |     Owner    |       -       |    -
+POST   | admin/gold-prices/sync                 |     Owner    |       -       |    -

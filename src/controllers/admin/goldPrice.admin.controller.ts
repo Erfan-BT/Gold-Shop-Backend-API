@@ -46,6 +46,20 @@ class AdminGoldPriceController {
             next(error)
         }
     }
+
+    async syncPrice (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const result = await adminGoldPriceService.syncPrice()
+            
+            res.status(200).json({
+                success : true,
+                msg : 'Sync Gold Price',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminGoldPriceController()
