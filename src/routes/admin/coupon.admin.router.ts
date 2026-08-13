@@ -10,5 +10,6 @@ router.get('/:couponId', validate({ params : couponIdSchema }), adminCouponContr
 router.post('/', validate({ body : couponSchema }), adminCouponController.createCoupon)
 router.patch('/:couponId', validate({ params : couponIdSchema , body : couponSchema }), adminCouponController.changeCoupon)
 router.patch('/:couponId/status', validate({ params : couponIdSchema }), adminCouponController.changeCouponStatus)
+router.delete('/:couponId', validate({ params : couponIdSchema }), adminCouponController.deleteCoupon)
 
 export default router

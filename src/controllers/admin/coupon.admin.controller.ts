@@ -79,6 +79,22 @@ class AdminCouponController {
             next(error)
         }
     }
+
+    async deleteCoupon (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { couponId } = req.validated.params as CouponIdDto
+            const adminId = req.user!.userId
+            await couponAdminService.deleteCoupon(couponId, adminId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Coupon',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminCouponController()

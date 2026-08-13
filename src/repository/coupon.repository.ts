@@ -103,6 +103,17 @@ class CouponRepository {
         })
         return rows === 1
     }
+
+    async deleteCoupon (couponId : number)
+    {
+        const rows = await Coupon.destroy({
+            where : {
+                id : couponId,
+                usedCount : 0
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new CouponRepository()
