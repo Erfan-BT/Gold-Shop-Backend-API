@@ -60,6 +60,16 @@ class CategoryRepository {
         return rows === 1
     }
 
+    async deleteCategory (categoryId : number)
+    {
+        const rows = await Category.destroy({
+            where : {
+                id : categoryId
+            }
+        })
+        return rows === 1
+    }
+
 }
 
 export default new CategoryRepository()

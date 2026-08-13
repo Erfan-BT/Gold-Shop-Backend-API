@@ -80,6 +80,22 @@ class AdminCategoryController {
         }
     }
 
+    async deleteCategory (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { categoryId } = req.validated.params as CategoryIdDto
+            const adminId = req.user!.userId
+            await adminCategoryService.deleteCategory(categoryId, adminId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Category',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminCategoryController()

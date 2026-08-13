@@ -1,6 +1,8 @@
 import { CategoryQueryBuilder } from "../../builders/categoryQuary.builder.js";
 import categoryRepository from "../../repository/category.repository.js";
-import { ConflictError, NotFoundError } from "../../utils/appError.js";
+import userRepository from "../../repository/user.repository.js";
+import { RolesTitle } from "../../types/role.enum.js";
+import { ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
 import { CategoryQSDto, CategorySchemaDto } from "../../validation/category.vallidation.js";
 
 class AdminCategoryService {
@@ -55,7 +57,24 @@ class AdminCategoryService {
 
         // Get Children
         return await categoryRepository.getCategoryChildren(categoryId)
+    }
 
+    async deleteCategory (categoryId : number, adminId : number)
+    {
+        // Get Admin
+        const admin = await userRepository.userById(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ID : ${adminId} }`)
+
+        const isOwner = admin.roles?.some(userRole => userRole.role?.name === RolesTitle.OWNER)
+        if (!isOwner)
+            throw new ForbiddenError('Not Access')
+
+        // Delete Category
+        if (!(await categoryRepository.deleteCategory(categoryId)))
+            throw new InternalServerError('Category Not Deleted')
+
+        return
     }
 }
 
