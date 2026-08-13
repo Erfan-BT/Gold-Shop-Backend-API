@@ -32,6 +32,19 @@ class AdminCategoryService {
             throw new NotFoundError(`Category Not Found { ID : ${categoryId} }`)
         return
     }
+
+    async changeCategoryStatus (categoryId : number)
+    {
+        // Get Category
+        const category = await categoryRepository.getCategory(categoryId)
+        if (!category)
+            throw new NotFoundError(`Category Not Found { ID : ${category} }`)
+
+        // Change Category Status
+        if (!(await categoryRepository.changeCategoryStatus(categoryId, category.isActive)))
+            throw new ConflictError('Category Status Not Changed')
+        return
+    }
 }
 
 export default new AdminCategoryService()

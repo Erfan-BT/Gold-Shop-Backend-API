@@ -36,6 +36,19 @@ class CategoryRepository {
         })
         return rows === 1
     }
+
+    async changeCategoryStatus (categoryId : number, currentStatus : boolean)
+    {
+        const [rows] = await Category.update({
+            isActive : !currentStatus
+        },{
+            where : {
+                id : categoryId,
+                isActive : currentStatus
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new CategoryRepository()

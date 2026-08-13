@@ -49,6 +49,21 @@ class AdminCategoryController {
             next(error)
         }
     }
+
+    async changeCategoryStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { categoryId } = req.validated.params as CategoryIdDto
+            await adminCategoryService.changeCategoryStatus(categoryId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Category Status',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminCategoryController()
