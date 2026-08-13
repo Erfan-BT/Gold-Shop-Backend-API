@@ -77,3 +77,6 @@ PATCH  | admin/addresses/:addressId             |     Admin    |       -       |
 DELETE | admin/addresses/:addressId             |     Owner    |       -       |    -
 ________________________________________________________________________________________________________________
 GET    | admin/roles/                           |     Admin    |       -       |    -
+________________________________________________________________________________________________________________
+GET    | admin/categories                       |     Admin    | ............. |    -
+POST   | admin/categories                       |     Admin    |       -       | title, slug, parentId
