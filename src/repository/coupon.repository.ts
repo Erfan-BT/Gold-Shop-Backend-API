@@ -1,4 +1,4 @@
-import { col, literal, Op, Transaction } from "sequelize"
+import { col, FindAndCountOptions, literal, Op, Transaction } from "sequelize"
 import Coupon from "../models/coupon.model.js"
 
 class CouponRepository {
@@ -52,6 +52,12 @@ class CouponRepository {
         );
 
         return rows === 1;
+    }
+
+    // ----- Admin -----
+    async getCoupons (options : FindAndCountOptions)
+    {
+        return await Coupon.findAndCountAll(options)
     }
 }
 

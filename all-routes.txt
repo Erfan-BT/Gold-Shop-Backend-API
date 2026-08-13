@@ -84,3 +84,5 @@ PATCH  | admin/categories/:categoryId           |     Admin    |       -       |
 PATCH  | admin/categories/:categoryId/active    |     Admin    |       -       |    -
 GET    | admin/categories/:categoryId/children  |     Admin    |       -       |    -
 DELETE | admin/categories/:categoryId           |     Owner    |       -       |    -
+________________________________________________________________________________________________________________
+GET    | admin/coupons                          |     Admin    | ............. |    -
