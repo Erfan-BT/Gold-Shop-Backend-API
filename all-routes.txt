@@ -82,3 +82,4 @@ GET    | admin/categories                       |     Admin    | ............. |
 POST   | admin/categories                       |     Admin    |       -       | title, slug, parentId
 PATCH  | admin/categories/:categoryId           |     Admin    |       -       | title, slug, parentId
 PATCH  | admin/categories/:categoryId/active    |     Admin    |       -       |    -
+GET    | admin/categories/:categoryId/children  |     Admin    |       -       |    -

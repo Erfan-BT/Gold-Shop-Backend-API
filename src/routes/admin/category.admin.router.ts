@@ -9,5 +9,6 @@ router.get('/', validate({ query : categoryQS }), adminCategoryController.getAll
 router.post('/', validate({ body : categorySchema }), adminCategoryController.createCategory)
 router.patch('/:categoryId', validate({ params : categoryIdSchema , body : categorySchema }), adminCategoryController.changeCategory)
 router.patch('/:categoryId/active', validate({ params : categoryIdSchema }), adminCategoryController.changeCategoryStatus)
+router.get('/:categoryId/children', validate({ params : categoryIdSchema }), adminCategoryController.getCategoryChildren)
 
 export default router

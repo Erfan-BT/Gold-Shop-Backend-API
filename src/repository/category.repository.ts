@@ -13,6 +13,16 @@ class CategoryRepository {
         return await Category.findByPk(categoryId)
     }
 
+    async getCategoryChildren (categoryId : number)
+    {
+        return await Category.findAll({
+            where : {
+                parentId : categoryId
+            }
+            
+        })
+    }
+
     async createCategory (categoryData : CategorySchemaDto)
     {
         return await Category.create({
@@ -49,6 +59,7 @@ class CategoryRepository {
         })
         return rows === 1
     }
+
 }
 
 export default new CategoryRepository()

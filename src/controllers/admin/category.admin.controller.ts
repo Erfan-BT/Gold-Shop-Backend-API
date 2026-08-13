@@ -64,6 +64,22 @@ class AdminCategoryController {
             next(error)
         }
     }
+
+    async getCategoryChildren (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { categoryId } = req.validated.params as CategoryIdDto
+            const result = await adminCategoryService.getCategoryChildren(categoryId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Category Children',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminCategoryController()
