@@ -81,7 +81,7 @@ class OrderService {
         const total =
             Math.max(lineTotal - (couponData?.couponDiscount ?? 0), 0)
             + shippingCost
-        const goldPriceAtTime = await goldPriceRepository.getPrice(ProductKarat.KARAT_18)
+        const goldPriceAtTime = await goldPriceRepository.getPrice()
         if (!goldPriceAtTime)
             throw new InternalServerError('GOLD PRICE ERROR')
         const checkoutSession : CheckoutSession = {
@@ -97,7 +97,7 @@ class OrderService {
             total,
 
             createdAt : now,
-            goldPriceAtTime : goldPriceAtTime.pricePerGram,
+            goldPrice18kAtTime : goldPriceAtTime.pricePerGram18k,
             expiresAt : new Date(now.getTime() + 10 * 60 * 1000)
         }
         // Set On Redis

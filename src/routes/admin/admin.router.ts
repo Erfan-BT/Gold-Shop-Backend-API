@@ -6,6 +6,7 @@ import AddressAdminRoutes from './address.admin.routes.js'
 import RoleAdminRoutes from './role.admin.router.js'
 import CategoryAdminRoutes from './category.admin.router.js'
 import CouponAdminRoutes from './coupon.admin.router.js'
+import PricesAdminRoutes from './goldPrice.admin.router.js'
 import { authMiddleware, roleMiddleware } from '../../middleware/auth.middleware.js'
 import { RolesTitle } from '../../types/role.enum.js'
 
@@ -17,5 +18,6 @@ router.use('/addresses', authMiddleware, roleMiddleware([RolesTitle.OWNER, Roles
 router.use('/roles', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), RoleAdminRoutes)
 router.use('/categories', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), CategoryAdminRoutes)
 router.use('/coupons', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), CouponAdminRoutes)
+router.use('/gold-prices', authMiddleware, roleMiddleware([RolesTitle.OWNER]), PricesAdminRoutes)
 
 export default router

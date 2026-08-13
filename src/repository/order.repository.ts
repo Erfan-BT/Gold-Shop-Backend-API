@@ -185,7 +185,7 @@ class OrderRepository {
                     model : OrderItem,
                     as : 'items',
                     attributes: ["productTitle", "sku", "weight", "karat", "stoneType", "color", "quantity",
-                        "unitPrice", "discountAmount", "finalPrice", "goldPriceAtTime"
+                        "unitPrice", "discountAmount", "finalPrice", "goldPrice18kAtTime"
                     ]
                 },
                 {
@@ -254,7 +254,7 @@ class OrderRepository {
                         'unitPrice',
                         'discountAmount',
                         'finalPrice',
-                        'goldPriceAtTime'
+                        'goldPrice18kAtTime'
                     ],
                     required : true
                 },

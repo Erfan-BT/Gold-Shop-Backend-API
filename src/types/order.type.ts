@@ -45,7 +45,7 @@ export type CheckoutSession = {
     shippingCost : number;
     total : number;
 
-    goldPriceAtTime : number;
+    goldPrice18kAtTime : number;
     createdAt: Date;
     expiresAt: Date;
 }

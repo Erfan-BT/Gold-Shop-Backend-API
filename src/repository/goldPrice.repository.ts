@@ -2,15 +2,14 @@ import GoldPrice from "../models/goldPrice.model.js";
 import { ProductKarat } from "../types/product.enum.js";
 
 class GoldPriceRepository {
-    async getPrice (karat : ProductKarat)
+    async getPrice ()
     {
-        return await GoldPrice.findOne({
-            where : {
-                karat,
+        return await GoldPrice.findOne()
+    }
 
-            },
-            order : ['effectiveDate']
-        })
+    async createPrice (priceData : any)
+    {
+        return await GoldPrice.create(priceData)
     }
 }
 

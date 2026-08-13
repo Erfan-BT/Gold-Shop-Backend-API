@@ -13,10 +13,9 @@ class GoldPrice extends Model<
     InferCreationAttributes<GoldPrice>
 > {
     declare id: CreationOptional<number>;
-    declare karat: ProductKarat;
-    declare pricePerGram: number;
-    declare currency: string;
+    declare pricePerGram18k: number;
     declare effectiveDate: CreationOptional<Date>;
+    declare source: CreationOptional<string>;
 }
 
 GoldPrice.init(
@@ -26,20 +25,16 @@ GoldPrice.init(
             primaryKey: true,
             autoIncrement: true
         },
-        karat: {
-            type: DataTypes.ENUM(...Object.values(ProductKarat)),
-            allowNull: false
-        },
-        pricePerGram: {
+        pricePerGram18k: {
             type: DataTypes.DECIMAL(15, 2),
-            allowNull: false
-        },
-        currency: {
-            type: DataTypes.CHAR(3),
             allowNull: false
         },
         effectiveDate: {
             type: DataTypes.DATE
+        },
+        source : {
+            type : DataTypes.STRING(),
+            defaultValue: "external-api"
         }
     },
     {

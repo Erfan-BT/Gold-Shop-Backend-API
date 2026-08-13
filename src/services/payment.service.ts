@@ -86,7 +86,7 @@ class PaymentService {
                     discountAmount: item.pricing.discountAmount,
                     finalPrice: item.pricing.finalPrice,
 
-                    goldPriceAtTime: checkoutSession.goldPriceAtTime
+                    goldPrice18kAtTime: checkoutSession.goldPrice18kAtTime
                 }
             })
             await orderRepository.createOrderItems(orderItems, t)

@@ -92,3 +92,6 @@ PATCH  | admin/coupons/:couponId                |     Admin    |       -       |
 PATCH  | admin/coupons/:couponId/status         |     Admin    |       -       |    -
 DELETE | admin/coupons/:couponId                |     Owner    |       -       |    -
 GET    | admin/coupons/stats                    |     Owner    |       -       |    -
+________________________________________________________________________________________________________________
+GET    | admin/gold-prices                      |     Owner    |       -       |    -
+POST   | admin.gold-prices                      |     Owner    |       -       | karat, pricePerGran, currency

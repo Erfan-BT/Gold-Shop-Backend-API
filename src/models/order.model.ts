@@ -182,7 +182,7 @@ export class OrderItem extends Model<
     declare unitPrice: number;
     declare discountAmount : number;
     declare finalPrice: number;
-    declare goldPriceAtTime: number;
+    declare goldPrice18kAtTime: number;
 
     declare deletedAt: CreationOptional<Date | null>;
 
@@ -246,7 +246,7 @@ OrderItem.init(
             type: DataTypes.DECIMAL(15, 2),
             allowNull: false
         },
-        goldPriceAtTime: {
+        goldPrice18kAtTime: {
             type: DataTypes.DECIMAL(15, 2),
             allowNull: false
         },
