@@ -95,6 +95,20 @@ class AdminCouponController {
             next(error)
         }
     }
+
+    async stats (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const result = await couponAdminService.stats()
+
+            res.status(200).json({
+                success : true,
+                msg : 'Coupon Stats',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminCouponController()

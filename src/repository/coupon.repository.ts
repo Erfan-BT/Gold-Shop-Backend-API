@@ -1,4 +1,4 @@
-import { col, FindAndCountOptions, literal, Op, Transaction } from "sequelize"
+import { col, FindAndCountOptions, literal, Op, Sequelize, Transaction } from "sequelize"
 import Coupon from "../models/coupon.model.js"
 import { CouponSchemaDto } from "../validation/coupon.validation.js";
 
@@ -113,6 +113,65 @@ class CouponRepository {
             }
         })
         return rows === 1
+    }
+
+    async statsMain() {
+        const [
+            allCouponCount,
+            activeCouponCount,
+            noActiveCouponCount,
+            fixedTypeCount,
+            percentTypeCount,
+            exhaustedCouponCount,
+            sumFixedCouponValue,
+        ] = await Promise.all([
+            Coupon.count(),
+    
+            Coupon.count({
+                where: {
+                    isActive : true
+                }
+            }),
+    
+            Coupon.count({
+                where: {
+                    isActive : false
+                }
+            }),
+    
+            Coupon.count({
+                where: {
+                    type : "fixed"
+                }
+            }),
+    
+            Coupon.count({
+                where: {
+                    type : "percent"
+                }
+            }),
+    
+            Coupon.count({
+                where: Sequelize.literal('usedCount >= usageLimit')
+            }),
+    
+    
+            Coupon.sum('value', {
+                where: {
+                    type : "fixed"
+                }
+            })
+        ])
+    
+        return {
+            allCouponCount,
+            activeCouponCount,
+            noActiveCouponCount,
+            fixedTypeCount,
+            percentTypeCount,
+            exhaustedCouponCount,
+            sumFixedCouponValue : sumFixedCouponValue ?? 0,
+        }
     }
 }
 

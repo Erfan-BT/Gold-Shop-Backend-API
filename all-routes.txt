@@ -91,3 +91,4 @@ POST   | admin/coupons/                         |     Admin    |       -       |
 PATCH  | admin/coupons/:couponId                |     Admin    |       -       | code, type, value, usageLimit, expiresAt
 PATCH  | admin/coupons/:couponId/status         |     Admin    |       -       |    -
 DELETE | admin/coupons/:couponId                |     Owner    |       -       |    -
+GET    | admin/coupons/stats                    |     Owner    |       -       |    -

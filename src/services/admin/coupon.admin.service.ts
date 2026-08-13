@@ -71,6 +71,11 @@ class AdminCouponService {
             throw new ConflictError('Coupon Not Deleted')
         return
     }
+
+    async stats ()
+    {
+        return await couponRepository.statsMain()
+    }
 }
 
 export default new AdminCouponService()

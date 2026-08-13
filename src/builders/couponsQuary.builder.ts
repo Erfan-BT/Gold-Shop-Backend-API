@@ -7,9 +7,6 @@ import {
     WhereOptions
 } from "sequelize";
 
-import { AddressesQSDto } from "../validation/address.validation.js";
-import { AddressSort } from "../types/address.enum.js";
-import User from "../models/user.model.js";
 import { CouponsQSDto } from "../validation/coupon.validation.js";
 import { CouponSort } from "../types/coupon.enum.js";
 
@@ -111,8 +108,8 @@ export class CouponQueryBuilder {
         if (qs.isExhausted !== undefined && qs.isExhausted !== null) {
             conditions.push(
                 qs.isExhausted
-                    ? Sequelize.literal("usageCount >= usageLimit")
-                    : Sequelize.literal("usageCount < usageLimit")
+                    ? Sequelize.literal("usedCount >= usageLimit")
+                    : Sequelize.literal("usedCount < usageLimit")
             )
         }
 

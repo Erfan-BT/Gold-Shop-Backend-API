@@ -8,6 +8,7 @@ import { ordersAdminQS } from '../../validation/order.validation.js'
 const router = express.Router()
 
 router.get('/', validate({ query : usersQS }), adminUsersController.getAllUsers)
+router.get('/stats', adminUsersController.stats)
 router.get("/:userId", validate({ params : userIdSchema }), adminUsersController.getUser)
 router.patch("/:userId", validate({ params : userIdSchema, body : adminChangeUserInfo }), adminUsersController.changeUserInfo)
 router.patch("/:userId/email", validate({ params : userIdSchema, body : emailSchema }), adminUsersController.changeUserEmail)
@@ -20,7 +21,5 @@ router.get('/:userId/orders', validate({ params : userIdSchema, query : ordersAd
 router.get('/:userId/roles', validate({ params : userIdSchema }), adminUsersController.getUserRoles)
 router.post('/:userId/roles/:roleId', validate({ params : changeUserRolesSchema }), adminUsersController.addRoleToUser)
 router.delete('/:userId/roles/:roleId', validate({ params : changeUserRolesSchema }), adminUsersController.deleteUserRole)
-// Stats
-router.get('/stats', adminUsersController.stats)
 
 export default router
