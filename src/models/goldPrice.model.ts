@@ -14,6 +14,7 @@ class GoldPrice extends Model<
     declare id: CreationOptional<number>;
     declare pricePerGram18k: number;
     declare effectiveDate: CreationOptional<Date>;
+    declare isAutoUpdateEnabled: boolean;
     declare source: CreationOptional<string>;
 }
 
@@ -30,6 +31,10 @@ GoldPrice.init(
         },
         effectiveDate: {
             type: DataTypes.DATE
+        },
+        isAutoUpdateEnabled : {
+            type : DataTypes.BOOLEAN,
+            defaultValue : true
         },
         source : {
             type : DataTypes.STRING(),

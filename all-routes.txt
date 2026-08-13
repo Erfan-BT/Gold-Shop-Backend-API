@@ -95,3 +95,4 @@ GET    | admin/coupons/stats                    |     Owner    |       -       |
 ________________________________________________________________________________________________________________
 GET    | admin/gold-prices                      |     Owner    |       -       |    -
 PATCH  | admin/gold-prices                      |     Owner    |       -       | pricePerGram18k
+PATCH  | admin/gold-prices/auto-update          |     Owner    |       -       |    -

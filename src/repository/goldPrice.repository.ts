@@ -19,6 +19,19 @@ class GoldPriceRepository {
         })
         return rows === 1
     }
+
+    async changeAutoUpdateStatus (currentStatus : boolean)
+    {
+        const [rows] = await GoldPrice.update({
+            isAutoUpdateEnabled : !currentStatus
+        },{
+            where : {
+                id : 1,
+                isAutoUpdateEnabled : currentStatus
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new GoldPriceRepository()

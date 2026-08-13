@@ -1,5 +1,5 @@
 import goldPriceRepository from "../../repository/goldPrice.repository.js"
-import { InternalServerError } from "../../utils/appError.js"
+import { ConflictError, InternalServerError } from "../../utils/appError.js"
 
 class AdminGoldPriceService {
     async getPrice ()
@@ -11,6 +11,14 @@ class AdminGoldPriceService {
     {
         if (!(await goldPriceRepository.changePrice(pricePerGram18k, 'admin')))
             throw new InternalServerError('Gold Price Not Changed !!!')
+        return
+    }
+
+    async changeAutoUpdateStatus ()
+    {
+        const price = await goldPriceRepository.getPrice()
+        if (!(await goldPriceRepository.changeAutoUpdateStatus(price!.isAutoUpdateEnabled)))
+            throw new ConflictError('Gold Price Auto Update Status Not Changed')
         return
     }
 }

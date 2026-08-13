@@ -32,6 +32,20 @@ class AdminGoldPriceController {
             next(error)
         }
     }
+
+    async changeAutoUpdateStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            await adminGoldPriceService.changeAutoUpdateStatus()
+            
+            res.status(200).json({
+                success : true,
+                msg : 'Change Auto Update Price Status',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminGoldPriceController()

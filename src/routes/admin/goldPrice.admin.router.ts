@@ -7,5 +7,6 @@ const router = express.Router()
 
 router.get('/', adminGoldPriceController.getPrice)
 router.patch('/', validate({ body : changePriceSchema }), adminGoldPriceController.adminChangePrice)
+router.patch('/auto-update', adminGoldPriceController.changeAutoUpdateStatus)
 
 export default router
