@@ -1,5 +1,4 @@
 import GoldPrice from "../models/goldPrice.model.js";
-import { ProductKarat } from "../types/product.enum.js";
 
 class GoldPriceRepository {
     async getPrice ()
@@ -7,9 +6,18 @@ class GoldPriceRepository {
         return await GoldPrice.findOne()
     }
 
-    async createPrice (priceData : any)
+    async changePrice (pricePerGram18k : number, source : 'system' | 'admin')
     {
-        return await GoldPrice.create(priceData)
+        const [rows] = await GoldPrice.update({
+            pricePerGram18k,
+            effectiveDate : new Date(),
+            source
+        },{
+            where : {
+                id : 1
+            }
+        })
+        return rows === 1
     }
 }
 

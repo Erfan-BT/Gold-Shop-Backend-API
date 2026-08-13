@@ -94,4 +94,4 @@ DELETE | admin/coupons/:couponId                |     Owner    |       -       |
 GET    | admin/coupons/stats                    |     Owner    |       -       |    -
 ________________________________________________________________________________________________________________
 GET    | admin/gold-prices                      |     Owner    |       -       |    -
-POST   | admin.gold-prices                      |     Owner    |       -       | karat, pricePerGran, currency
+PATCH  | admin/gold-prices                      |     Owner    |       -       | pricePerGram18k

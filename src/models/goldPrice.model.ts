@@ -6,7 +6,6 @@ import {
     Model
 } from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
-import { ProductKarat } from "../types/product.enum.js";
 
 class GoldPrice extends Model<
     InferAttributes<GoldPrice>,
