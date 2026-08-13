@@ -40,8 +40,13 @@ export const categoryQS = z.object({
 export const categorySchema = z.object({
     title : z.string().trim().min(1).max(100),
     slug : z.string().trim().min(1).max(100),
-    parentId : z.coerce.number().int().min(1).nullable().default(null)
+    parentId : z.coerce.number().int().min(1).nullable().optional()
+})
+
+export const categoryIdSchema = z.object({
+    categoryId : z.coerce.number().int().min(1)
 })
 
 export type CategoryQSDto = z.infer<typeof categoryQS>
 export type CategorySchemaDto = z.infer<typeof categorySchema>
+export type CategoryIdDto = z.infer<typeof categoryIdSchema>

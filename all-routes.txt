@@ -80,3 +80,5 @@ GET    | admin/roles/                           |     Admin    |       -       |
 ________________________________________________________________________________________________________________
 GET    | admin/categories                       |     Admin    | ............. |    -
 POST   | admin/categories                       |     Admin    |       -       | title, slug, parentId
+PATCH  | admin/categories/:categoryId           |     Admin    |       -       | title, slug, parentId
+PATCH  | admin/categories/:categoryId/status    |     Admin    |       -       |    -

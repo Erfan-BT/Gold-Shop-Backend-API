@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { CategoryQSDto, CategorySchemaDto } from "../../validation/category.vallidation.js";
+import { CategoryIdDto, CategoryQSDto, CategorySchemaDto } from "../../validation/category.vallidation.js";
 import adminCategoryService from "../../services/admin/category.admin.service.js";
 
 class AdminCategoryController {
@@ -28,6 +28,22 @@ class AdminCategoryController {
                 success : true,
                 msg : 'Create Category',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeCategory (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const categoryData = req.validated.body as CategorySchemaDto
+            const { categoryId } = req.validated.params as CategoryIdDto
+            await adminCategoryService.changeCategory(categoryId, categoryData)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Category',
+                data : {}
             })
         } catch (error) {
             next(error)
