@@ -78,6 +78,31 @@ class CouponRepository {
             isActive : false
         })
     }
+
+    async changeCoupon (couponId : number, couponData : CouponSchemaDto)
+    {
+        const [rows] = await Coupon.update(couponData,{
+            where : {
+                id : couponId,
+                isActive : false,
+                usedCount : 0
+            }
+        })
+        return rows === 1
+    }
+
+    async changeCouponStatus (couponId : number, currentStatus : boolean)
+    {
+        const [rows] = await Coupon.update({
+            isActive : !currentStatus
+        },{
+            where : {
+                id : couponId,
+                isActive : currentStatus
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new CouponRepository()

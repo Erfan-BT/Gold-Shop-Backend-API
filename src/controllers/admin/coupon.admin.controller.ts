@@ -48,6 +48,37 @@ class AdminCouponController {
             next(error)
         }
     }
+
+    async changeCoupon (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const couponData = req.validated.body as CouponSchemaDto
+            const { couponId } = req.validated.params as CouponIdDto
+            await couponAdminService.changeCoupon(couponId, couponData)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Coupon',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeCouponStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { couponId } = req.validated.params as CouponIdDto
+            await couponAdminService.changeCouponStatus(couponId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Coupon Status',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminCouponController()
