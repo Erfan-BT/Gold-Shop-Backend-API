@@ -87,3 +87,4 @@ DELETE | admin/categories/:categoryId           |     Owner    |       -       |
 ________________________________________________________________________________________________________________
 GET    | admin/coupons                          |     Admin    | ............. |    -
 GET    | admin/coupons/:couponId                |     Admin    |       -       |    -
+POST   | admin/coupons/                         |     Admin    |       -       | code, type, value, usageLimit, expiresAt

@@ -1,5 +1,6 @@
 import { col, FindAndCountOptions, literal, Op, Transaction } from "sequelize"
 import Coupon from "../models/coupon.model.js"
+import { CouponSchemaDto } from "../validation/coupon.validation.js";
 
 class CouponRepository {
     async getCoupon (code : string)
@@ -58,6 +59,24 @@ class CouponRepository {
     async getCoupons (options : FindAndCountOptions)
     {
         return await Coupon.findAndCountAll(options)
+    }
+
+    async adminGetCoupon (couponId : number)
+    {
+        return await Coupon.findOne({
+            where : {
+                id : couponId
+            }
+        })
+    }
+
+    async createCoupon (couponData : CouponSchemaDto)
+    {
+        return await Coupon.create({
+            ...couponData,
+            usedCount : 0,
+            isActive : false
+        })
     }
 }
 

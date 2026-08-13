@@ -1,7 +1,7 @@
 import { CouponQueryBuilder } from "../../builders/couponsQuary.builder.js";
 import couponRepository from "../../repository/coupon.repository.js";
 import { NotFoundError } from "../../utils/appError.js";
-import { CouponsQSDto } from "../../validation/coupon.validation.js";
+import { CouponSchemaDto, CouponsQSDto } from "../../validation/coupon.validation.js";
 
 class AdminCouponService {
     async getAllCoupons (qs : CouponsQSDto)
@@ -16,6 +16,11 @@ class AdminCouponService {
         if (!coupon)
             throw new NotFoundError(`Coupon Not Found { ID : ${couponId} }`)
         return coupon
+    }
+
+    async createCoupon (couponData : CouponSchemaDto)
+    {
+        return await couponRepository.createCoupon(couponData)
     }
 }
 

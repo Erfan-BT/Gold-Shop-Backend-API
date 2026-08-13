@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { CouponIdDto, CouponsQSDto } from "../../validation/coupon.validation.js";
+import { CouponIdDto, CouponSchemaDto, CouponsQSDto } from "../../validation/coupon.validation.js";
 import couponAdminService from "../../services/admin/coupon.admin.service.js";
 
 class AdminCouponController {
@@ -27,6 +27,21 @@ class AdminCouponController {
             res.status(200).json({
                 success : true,
                 msg : 'Get Coupon',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async createCoupon (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const couponData = req.validated.body as CouponSchemaDto
+            const result = await couponAdminService.createCoupon(couponData)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Craete Coupon',
                 data : result
             })
         } catch (error) {

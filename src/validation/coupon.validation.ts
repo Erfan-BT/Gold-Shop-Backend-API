@@ -2,9 +2,11 @@ import z from "zod"
 import { CouponSort } from "../types/coupon.enum.js";
 
 export const couponSchema = z.object({
-    // addressLine : z.string().trim().min(3, 'At Least 3 Characters Are Required'),
-    // city : z.string().trim().min(1, 'At Least A Characters Are Required').max(50),
-    // postalCode : z.string().trim().min(1, 'At Least A Characters Are Required').max(20),
+    code : z.string().trim().min(3, 'At Least 3 Characters Are Required').max(50),
+    type : z.enum(["fixed", "percent"]),
+    value : z.coerce.number().int().min(1),
+    usageLimit : z.coerce.number().int().min(1),
+    expiresAt : z.coerce.date()
 })
 
 export const couponIdSchema = z.object({
@@ -70,5 +72,5 @@ export const couponsQS = z.object({
 })
 
 export type CouponIdDto = z.infer<typeof couponIdSchema>
-// export type AddressDto = z.infer<typeof addressSchema>
+export type CouponSchemaDto = z.infer<typeof couponSchema>
 export type CouponsQSDto = z.infer<typeof couponsQS>
