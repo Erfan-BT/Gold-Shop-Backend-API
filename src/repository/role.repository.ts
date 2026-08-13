@@ -40,6 +40,11 @@ class RoleRepository {
         return await Role.findByPk(roleId)
     }
 
+    // ----- Admin -----
+    async getRoles ()
+    : Promise<Role[]> {
+        return await Role.findAll()
+    }
 }
 
 export default new RoleRepository()

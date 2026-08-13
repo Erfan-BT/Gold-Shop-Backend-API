@@ -75,3 +75,5 @@ GET    | admin/addresses/                       |     Admin    | ............. |
 GET    | admin/addresses/:addressId             |     Admin    |       -       |    -
 PATCH  | admin/addresses/:addressId             |     Admin    |       -       | addressLine, city, postalCode
 DELETE | admin/addresses/:addressId             |     Owner    |       -       |    -
+________________________________________________________________________________________________________________
+GET    | admin/roles/                           |     Admin    |       -       |    -
