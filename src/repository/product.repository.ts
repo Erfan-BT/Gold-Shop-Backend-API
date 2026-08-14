@@ -127,6 +127,14 @@ class ProductRepository {
         return await Product.findOne({
             where : {
                 id : productId
+            }
+        })
+    }
+    async getProductAdmin (productId : number)
+    {
+        return await Product.findOne({
+            where : {
+                id : productId
             },
             include : [
                 {
@@ -224,6 +232,19 @@ class ProductRepository {
         },{
             where : {
                 id : productId
+            }
+        })
+        return rows === 1 
+    }
+
+    async changeProductStatus (productId : number, currentStatus : boolean)
+    {
+        const [rows] = await Product.update({
+            isActive : !currentStatus
+        },{
+            where : {
+                id : productId,
+                isActive : currentStatus
             }
         })
         return rows === 1 

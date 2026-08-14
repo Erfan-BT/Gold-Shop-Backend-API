@@ -64,6 +64,21 @@ class AdminProductController {
             next(error)
         }
     }
+
+    async changeProductStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId } = req.validated.params as ProductIdDto
+            const result = await adminProductService.changeProductStatus(productId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Product Status',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminProductController()

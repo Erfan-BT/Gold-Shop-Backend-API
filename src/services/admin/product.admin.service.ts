@@ -1,7 +1,7 @@
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
 import { Product } from "../../models/product.model.js";
 import productRepository from "../../repository/product.repository.js";
-import { NotFoundError } from "../../utils/appError.js";
+import { ConflictError, NotFoundError } from "../../utils/appError.js";
 import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto } from "../../validation/product.validation.js";
 
 class AdminProductService {
@@ -13,7 +13,7 @@ class AdminProductService {
 
     async getProduct (productId : number)
     {
-        const product = await productRepository.getProduct(productId)
+        const product = await productRepository.getProductAdmin(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
         return product
@@ -37,6 +37,18 @@ class AdminProductService {
         if (!(await productRepository.changeProduct(productId, data)))
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
         return
+    }
+
+    async changeProductStatus (productId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Change Product Status
+        if (!(await productRepository.changeProductStatus(productId, product.isActive)))
+            throw new ConflictError('Product Status Not Changed')
+        return !product.isActive
     }
 }
 
