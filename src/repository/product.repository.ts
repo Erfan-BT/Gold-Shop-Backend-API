@@ -118,6 +118,9 @@ class ProductRepository {
             ]
         })
     }
+
+    // ----- Admin -----
+    
 }
 
 export default new ProductRepository()

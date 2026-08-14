@@ -6,12 +6,12 @@ export const productQS = z.object({
     limit : z.coerce.number().int().positive().min(1).max(50).default(20),
     sort : z.enum(ProductSort).optional(),
 
-    q : z.string().max(200).optional(),
+    q : z.string().trim().max(200).optional(),
 
     category : z.string().max(100).optional(),
     karat : z.enum(ProductKarat).optional(),
-    color : z.string().max(30).optional(),
-    stone : z.string().max(50).optional(),
+    color : z.array(z.string().trim().max(30)).optional(),
+    stone : z.array(z.string().trim().max(50)).optional(),
 
     minWeight : z.coerce.number().nonnegative().optional(),
     maxWeight : z.coerce.number().nonnegative().optional(),
@@ -23,6 +23,88 @@ export const productQS = z.object({
     inStock : z.coerce.boolean().optional(),
 })
 
+export const adminProductQS = z.object({
+    page : z.coerce.number().int().positive().min(1).default(1),
+    limit : z.coerce.number().int().positive().min(1).max(50).default(20),
+    sort : z.enum(ProductSort).optional(),
+
+    q : z.string().trim().max(200).optional(),
+
+    category : z.array(z.string().trim().max(100)).optional(),
+    karat : z.array(z.enum(ProductKarat)).optional(),
+    color : z.string().trim().max(30).optional(),
+    stone : z.string().trim().max(50).optional(),
+
+    minWeight : z.coerce.number().nonnegative().min(0).optional(),
+    maxWeight : z.coerce.number().nonnegative().max(5).optional(),
+
+    minPrice : z.coerce.number().nonnegative().optional(),
+    maxPrice : z.coerce.number().nonnegative().optional(),
+
+    minAverageRating : z.coerce.number().nonnegative().optional(),
+    maxAverageRating : z.coerce.number().nonnegative().optional(),
+
+    from : z.coerce.date().optional(),
+    to : z.coerce.date().optional(),
+
+    discount : z.coerce.boolean().optional(),
+    inStock : z.coerce.boolean().optional(),
+    isActive : z.coerce.boolean().optional(),
+})
+.superRefine ((data, ctx) => {
+    if (
+        data.minWeight !== undefined &&
+        data.maxWeight !== undefined &&
+        data.minWeight > data.maxWeight
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["maxWeight"],
+            message: "MaxWeight Must Be Greater Than Or Equal To MinWeight"
+
+        })
+    }
+
+    if (
+        data.minPrice !== undefined &&
+        data.maxPrice !== undefined &&
+        data.minPrice > data.maxPrice
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["maxPrice"],
+            message: "MaxPrice Must Be Greater Than Or Equal To MinPrice"
+
+        })
+    }
+
+    if (
+        data.minAverageRating !== undefined &&
+        data.maxAverageRating !== undefined &&
+        data.minAverageRating > data.maxAverageRating
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["maxAverageRating"],
+            message: "MaxAverageRating Must Be Greater Than Or Equal To MinAverageRating"
+
+        })
+    }
+
+    if (
+        data.from !== undefined &&
+        data.to !== undefined &&
+        data.from.getTime() > data.to.getTime()
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["to"],
+            message: "To Date Must Be Greater Than Or Equal To From Date"
+
+        })
+    }
+})
+
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
 })
@@ -32,4 +114,5 @@ export const productSlug = z.object({
 })
 
 export type ProductQSDto = z.infer<typeof productQS>
+export type AdminProductQSDto = z.infer<typeof adminProductQS>
 export type ProductSlugDto = z.infer<typeof productSlug>

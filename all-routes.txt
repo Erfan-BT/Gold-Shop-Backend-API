@@ -99,3 +99,10 @@ GET    | admin/gold-prices                      |     Owner    |       -       |
 PATCH  | admin/gold-prices                      |     Owner    |       -       | pricePerGram18k
 PATCH  | admin/gold-prices/auto-update          |     Owner    |       -       |    -
 POST   | admin/gold-prices/sync                 |     Owner    |       -       |    -
+________________________________________________________________________________________________________________
+GET    | admin/products                         |     Admin    | ............. |    -
+GET    | admin/products/:productId              |     Admin    |       -       |    -
+POST   | admin/products                         |     Admin    |       -       | title, slug, description, isActive
+PATCH  | admin/products/:productId              |     Admin    |       -       | title, slug, description
+PATCH  | admin/products/:productId/status       |     Admin    |       -       |    -
+DELETE | admin/products/:productId              |     Owner    |       -       |    -
