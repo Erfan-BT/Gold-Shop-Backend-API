@@ -216,6 +216,18 @@ class ProductRepository {
             soldCount : 0,
         })
     }
+
+    async changeProduct (productId : number, data : Partial<Pick<Product, "title" | "slug" | "description">>)
+    {
+        const [rows] = await Product.update({
+            ...data
+        },{
+            where : {
+                id : productId
+            }
+        })
+        return rows === 1 
+    }
 }
 
 export default new ProductRepository()

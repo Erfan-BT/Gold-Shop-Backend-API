@@ -112,6 +112,24 @@ export const createProductSchema = z.object({
     isActive : z.coerce.boolean()
 })
 
+export const changeProductSchema = z.object({
+    title : z.string().trim().min(1).max(200).optional(),
+    slug : z.string().trim().min(1).max(200).optional(),
+    description : z.string().trim().min(1).max(500).optional(),
+})
+.superRefine((data, ctx) => {
+    if (
+        data.title === undefined &&
+        data.slug === undefined &&
+        data.description === undefined
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            message : "All Params Can Not Empty"
+        })
+    }
+})
+
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
 })
@@ -129,3 +147,4 @@ export type AdminProductQSDto = z.infer<typeof adminProductQS>
 export type ProductSlugDto = z.infer<typeof productSlug>
 export type ProductIdDto = z.infer<typeof productId>
 export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
+export type ChangeProductSchemaDto = z.infer<typeof changeProductSchema>
