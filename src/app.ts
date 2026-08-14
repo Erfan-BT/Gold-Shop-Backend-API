@@ -8,14 +8,15 @@ import { NotFoundError } from './utils/appError.js'
 import { loggerMiddleware } from './middleware/logger.middleware.js'
 // Routes Files
 import AuthRoutes from './routes/auth.routes.js'
-import UsersRoutes from './routes/users.route.js'
+import UsersRoutes from './routes/users.routes.js'
 import ProductsRoutes from './routes/product.routes.js'
 import WishlistRoutes from './routes/wishlist.routes.js'
 import CartRoutes from './routes/cart.routes.js'
 import OrderRoutes from './routes/order.routes.js'
 import PaymentRoutes from './routes/payment.routes.js'
 import ReturnRoutes from './routes/return.routes.js'
-import AdminRoutes from './routes/admin/admin.router.js'
+import GoldPriceRoutes from './routes/goldPrice.routes.js'
+import AdminRoutes from './routes/admin/admin.routes.js'
 
 const app = express()
 
@@ -59,6 +60,7 @@ app.use('/api/v1/cart', CartRoutes)
 app.use('/api/v1/orders', OrderRoutes)
 app.use('/api/v1/payments', PaymentRoutes)
 app.use('/api/v1/returns', ReturnRoutes)
+app.use('/api/v1/gold-prices', GoldPriceRoutes)
 // Admin Route
 app.use('/api/v1/admin', AdminRoutes)
 
