@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ProductIdDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, CreateProductSchemaDto, ProductIdDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -27,6 +27,21 @@ class AdminProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Get Product',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async createProduct (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const productData = req.validated.body as CreateProductSchemaDto
+            const result = await adminProductService.createProduct(productData)
+
+            res.status(201).json({
+                success : true,
+                msg : 'Create Product',
                 data : result
             })
         } catch (error) {

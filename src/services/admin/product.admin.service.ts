@@ -1,7 +1,7 @@
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
 import productRepository from "../../repository/product.repository.js";
 import { NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, CreateProductSchemaDto } from "../../validation/product.validation.js";
 
 class AdminProductService {
     async getAllProducts (qs : AdminProductQSDto)
@@ -16,6 +16,11 @@ class AdminProductService {
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
         return product
+    }
+
+    async createProduct (productData : CreateProductSchemaDto)
+    {
+        return await productRepository.createProduct(productData)
     }
 }
 

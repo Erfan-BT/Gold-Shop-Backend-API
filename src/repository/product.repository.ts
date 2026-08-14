@@ -2,6 +2,7 @@ import { FindAndCountOptions, Op } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
+import { CreateProductSchemaDto } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)
@@ -202,6 +203,17 @@ class ProductRepository {
                     ]
                 }
             ]
+        })
+    }
+
+    async createProduct (productData : CreateProductSchemaDto)
+    {
+        return await Product.create({
+            ...productData,
+            lowestPrice : 0,
+            reviewCount : 0,
+            averageRating : 0,
+            soldCount : 0,
         })
     }
 }

@@ -105,6 +105,13 @@ export const adminProductQS = z.object({
     }
 })
 
+export const createProductSchema = z.object({
+    title : z.string().trim().min(1).max(200),
+    slug : z.string().trim().min(1).max(200),
+    description : z.string().trim().min(1).max(500),
+    isActive : z.coerce.boolean()
+})
+
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
 })
@@ -121,3 +128,4 @@ export type ProductQSDto = z.infer<typeof productQS>
 export type AdminProductQSDto = z.infer<typeof adminProductQS>
 export type ProductSlugDto = z.infer<typeof productSlug>
 export type ProductIdDto = z.infer<typeof productId>
+export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
