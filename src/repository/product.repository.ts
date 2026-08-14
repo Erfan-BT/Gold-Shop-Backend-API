@@ -1,6 +1,7 @@
 import { FindAndCountOptions, Op } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
+import { Category, ProductCategory } from "../models/category.model.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)
@@ -120,7 +121,89 @@ class ProductRepository {
     }
 
     // ----- Admin -----
-    
+    async getProduct (productId : number)
+    {
+        return await Product.findOne({
+            where : {
+                id : productId
+            },
+            include : [
+                {
+                    model : ProductVariant,
+                    as : 'variants',
+                    required : false,
+                    attributes: [
+                        'id',
+                        'sku',
+                        'weight',
+                        'karat',
+                        'stoneType',
+                        'color',
+                        'soldCount',
+                        'currentPrice',
+                        'isActive',
+                        'createdAt'
+                    ],
+                    include : [
+                        {
+                            model : ProductImage,
+                            as : 'images',
+                            attributes : ['id', 'imageUrl', 'altText', 'isPrimary', 'fileName', 'sortOrder'],
+                            order: [['sortOrder', 'ASC']],
+                            separate : true
+                        },
+                        {
+                            model : ProductPricing,
+                            as : 'pricing',
+                            attributes : [
+                                'id',
+                                'wageType',
+                                'wageValue',
+                                'profitType',
+                                'profitValue',
+                                'taxPercent',
+                                'priority',
+                                'validFrom',
+                                'validTo',
+                                'isActive'
+                            ],
+                            separate: true,
+                            order: [
+                                ['priority', 'ASC'],
+                                ['validFrom', 'DESC']
+                            ]
+                        },
+                        {
+                            model : ProductDiscount,
+                            as : 'discounts',
+                            attributes : ['id', 'type', 'value', 'startDate', 'endDate', 'isActive'],
+                            separate: true,
+                            order: [
+                                ['createdAt', 'DESC']
+                            ]
+                        },
+                        {
+                            model : Inventory,
+                            as : 'inventory',
+                            attributes : ['id', 'quantity', 'minThreshold']
+                        }
+                    ]
+                },
+                {
+                    model : ProductCategory,
+                    as : 'categories',
+                    attributes : ['id'],
+                    include : [
+                        {
+                            model : Category,
+                            as : 'category',
+                            attributes : ['id', 'title', 'slug', 'parentId', 'isActive']
+                        }
+                    ]
+                }
+            ]
+        })
+    }
 }
 
 export default new ProductRepository()

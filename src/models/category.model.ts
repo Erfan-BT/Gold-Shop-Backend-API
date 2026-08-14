@@ -3,9 +3,11 @@ import {
     InferAttributes,
     InferCreationAttributes,
     CreationOptional,
-    Model
+    Model,
+    NonAttribute
 } from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
+import { Product } from "./product.model.js";
 
 // Category
 export class Category extends Model<
@@ -74,6 +76,10 @@ export class ProductCategory extends Model<
 
     declare productId: number;
     declare categoryId: number;
+
+    // Associations
+    declare product?: NonAttribute<Product>;
+    declare category?: NonAttribute<Category>;
 }
 
 ProductCategory.init(

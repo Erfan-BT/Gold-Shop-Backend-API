@@ -9,7 +9,7 @@ import {
 } from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
 import { ProductKarat } from "../types/product.enum.js";
-import { Category } from "./category.model.js";
+import { Category, ProductCategory } from "./category.model.js";
 import Inventory from "./inventory.model.js";
 
 // Product
@@ -44,6 +44,8 @@ export class Product extends Model<
 
     // Associations
     declare variants?: NonAttribute<ProductVariant[]>;
+    declare categories?: NonAttribute<ProductCategory[]>;
+    declare mainImage?: NonAttribute<ProductImage>;
 }
 
 Product.init(
