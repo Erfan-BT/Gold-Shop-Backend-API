@@ -1,7 +1,9 @@
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
 import { Product } from "../../models/product.model.js";
 import productRepository from "../../repository/product.repository.js";
-import { ConflictError, NotFoundError } from "../../utils/appError.js";
+import userRepository from "../../repository/user.repository.js";
+import { RolesTitle } from "../../types/role.enum.js";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
 import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto } from "../../validation/product.validation.js";
 
 class AdminProductService {
@@ -49,6 +51,25 @@ class AdminProductService {
         if (!(await productRepository.changeProductStatus(productId, product.isActive)))
             throw new ConflictError('Product Status Not Changed')
         return !product.isActive
+    }
+
+    async deleteProduct (productId : number, adminId : number)
+    {
+        // Get Admin
+        const admin = await userRepository.userById(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ID : ${adminId} }`)
+        const isOwner = admin.roles?.some(userRole => userRole.role?.name === RolesTitle.OWNER) ?? false
+        if (!isOwner)
+            throw new ForbiddenError('Not Access')
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Delete Product
+        if (!(await productRepository.deleteProduct(productId)))
+            throw new ConflictError('Can Not Delete This Product')
+        return
     }
 }
 

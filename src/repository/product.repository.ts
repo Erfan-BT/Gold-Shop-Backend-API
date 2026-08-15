@@ -249,6 +249,16 @@ class ProductRepository {
         })
         return rows === 1 
     }
+
+    async deleteProduct (productId : number)
+    {
+        const rows = await Product.destroy({
+            where : {
+                id : productId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ProductRepository()
