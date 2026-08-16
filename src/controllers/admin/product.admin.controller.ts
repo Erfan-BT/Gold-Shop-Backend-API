@@ -95,6 +95,22 @@ class AdminProductController {
             next(error)
         }
     }
+
+    // ---------- Categories ----------
+    async getProductCategories (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId } = req.validated.params as ProductIdDto
+            const result = await adminProductService.getProductCategories(productId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Product Categories',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminProductController()

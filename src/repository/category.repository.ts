@@ -1,5 +1,5 @@
 import { FindAndCountOptions } from "sequelize";
-import { Category } from "../models/category.model.js";
+import { Category, ProductCategory } from "../models/category.model.js";
 import { CategorySchemaDto } from "../validation/category.vallidation.js";
 
 class CategoryRepository {
@@ -20,6 +20,28 @@ class CategoryRepository {
                 parentId : categoryId
             }
             
+        })
+    }
+
+    async getProductCategories (productId : number)
+    {
+        return await ProductCategory.findAll({
+            where: {
+                productId
+            },
+            attributes: ['id'],
+            include: [
+                {
+                    model: Category,
+                    as: 'category',
+                    attributes: [
+                        'id',
+                        'title',
+                        'slug',
+                        'parentId'
+                    ]
+                }
+            ]
         })
     }
 

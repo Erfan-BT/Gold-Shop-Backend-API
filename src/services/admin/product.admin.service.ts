@@ -1,5 +1,6 @@
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
 import { Product } from "../../models/product.model.js";
+import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
@@ -70,6 +71,17 @@ class AdminProductService {
         if (!(await productRepository.deleteProduct(productId)))
             throw new ConflictError('Can Not Delete This Product')
         return
+    }
+
+    // ---------- Categories ----------
+    async getProductCategories (productId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get P-Categories
+        return await categoryRepository.getProductCategories(productId)
     }
 }
 

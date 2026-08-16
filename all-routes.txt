@@ -106,3 +106,8 @@ POST   | admin/products                         |     Admin    |       -       |
 PATCH  | admin/products/:productId              |     Admin    |       -       | title, slug, description
 PATCH  | admin/products/:productId/status       |     Admin    |       -       |    -
 DELETE | admin/products/:productId              |     Owner    |       -       |    -
+----------------------------------------------------------------------------------------------------------------
+...... | admin/products/:productId/
+GET    | ./categories                           |     Admin    |       -       |    -
+POST   | ./categories/:categoryId               |     Admin    |       -       |    -
+DELETE | ./categories/:categoryId               |     Admin    |       -       |    -

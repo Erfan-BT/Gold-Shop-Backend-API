@@ -11,5 +11,7 @@ router.post('/', validate({ body : createProductSchema }), adminProductControlle
 router.patch('/:productId', validate({ params : productId, body : changeProductSchema }), adminProductController.changeProduct)
 router.patch('/:productId/status', validate({ params : productId }), adminProductController.changeProductStatus)
 router.delete('/:productId', validate({ params : productId }), adminProductController.deleteProduct)
+// ----- Categories -----
+router.get('/:productId/categories', validate({ params : productId }), adminProductController.getProductCategories)
 
 export default router
