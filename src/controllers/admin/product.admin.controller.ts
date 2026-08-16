@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductIdDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductCategoryIdsDto, ProductIdDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -105,6 +105,21 @@ class AdminProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Product Categories',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async setCategoryForProduct (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId, categoryId } = req.validated.params as ProductCategoryIdsDto
+            const result = await adminProductService.setCategoryForProduct(productId, categoryId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Set Category For Product',
                 data : result
             })
         } catch (error) {

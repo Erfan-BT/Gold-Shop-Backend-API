@@ -38,11 +38,22 @@ class CategoryRepository {
                         'id',
                         'title',
                         'slug',
-                        'parentId'
+                        'parentId',
+                        'isActive'
                     ]
                 }
             ]
         })
+    }
+
+    async checkExists (productId : number, categoryId : number)
+    {
+        return await ProductCategory.findOne({
+            where : {
+                productId,
+                categoryId
+            }
+        }) !== null
     }
 
     async createCategory (categoryData : CategorySchemaDto)
@@ -90,6 +101,14 @@ class CategoryRepository {
             }
         })
         return rows === 1
+    }
+
+    async setProductCategory (productId : number, categoryId : number)
+    {
+        return await ProductCategory.create({
+            productId,
+            categoryId
+        })
     }
 
 }

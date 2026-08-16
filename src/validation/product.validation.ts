@@ -138,6 +138,11 @@ export const productId = z.object({
     productId : z.coerce.number().int().positive()
 })
 
+export const productCategoryIds = z.object({
+    productId : z.coerce.number().int().positive(),
+    categoryId : z.coerce.number().int().positive(),
+})
+
 export const productSlug = z.object({
     slug : z.string().min(1).max(200)
 })
@@ -146,5 +151,6 @@ export type ProductQSDto = z.infer<typeof productQS>
 export type AdminProductQSDto = z.infer<typeof adminProductQS>
 export type ProductSlugDto = z.infer<typeof productSlug>
 export type ProductIdDto = z.infer<typeof productId>
+export type ProductCategoryIdsDto = z.infer<typeof productCategoryIds>
 export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
 export type ChangeProductSchemaDto = z.infer<typeof changeProductSchema>
