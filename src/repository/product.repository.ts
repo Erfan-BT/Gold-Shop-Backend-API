@@ -163,7 +163,7 @@ class ProductRepository {
                         },
                         {
                             model : ProductPricing,
-                            as : 'pricing',
+                            as : 'prices',
                             attributes : [
                                 'id',
                                 'wageType',
@@ -276,6 +276,63 @@ class ProductRepository {
             ],
             order: [
                 ['id', 'ASC']
+            ]
+        })
+    }
+
+    async getProductVariant (productId : number, variantId : number)
+    {
+        return await ProductVariant.findOne({
+            where : {
+                productId,
+                id : variantId
+            },
+            attributes : ['id' ,'weight', 'karat', 'stoneType', 'color', 'sku', 'soldCount', 'currentPrice', 'isActive', 'createdAt'],
+            include : [
+                {
+                    model : ProductImage,
+                    as : 'images',
+                    attributes : ['id' ,'imageUrl', 'altText', 'isPrimary', 'sortOrder', 'fileName', 'createdAt'],
+                    separate: true,
+                    order : [
+                        ['sortOrder', 'ASC']
+                    ]
+                },
+                {
+                    model : ProductPricing,
+                    as : 'prices',
+                    attributes : [
+                        'id',
+                        'wageType',
+                        'wageValue',
+                        'profitType',
+                        'profitValue',
+                        'taxPercent',
+                        'priority',
+                        'validFrom',
+                        'validTo',
+                        'isActive'
+                    ],
+                    separate: true,
+                    order: [
+                        ['priority', 'ASC'],
+                        ['validFrom', 'DESC']
+                    ]
+                },
+                {
+                    model : ProductDiscount,
+                    as : 'discounts',
+                    attributes : ['id', 'type', 'value', 'startDate', 'endDate', 'isActive'],
+                    separate: true,
+                    order: [
+                        ['createdAt', 'DESC']
+                    ]
+                },
+                {
+                    model : Inventory,
+                    as : 'inventory',
+                    attributes : ['quantity', 'minThreshold']
+                }
             ]
         })
     }

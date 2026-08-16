@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductCategoryIdsDto, ProductIdDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -157,6 +157,22 @@ class AdminProductController {
             next(error)
         }
     }
+
+    async getVariant (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId, variantId } = req.validated.params as ProductVariantIdsDto
+            const result = await adminProductService.getVariant(productId, variantId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Product Variant',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminProductController()

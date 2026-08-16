@@ -118,6 +118,19 @@ class AdminProductService {
         // Get Variants
         return await productRepository.getProductVariants(productId)
     }
+
+    async getVariant (productId : number, variantId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.getProductVariant(productId, variantId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        return variant
+    }
 }
 
 export default new AdminProductService()
