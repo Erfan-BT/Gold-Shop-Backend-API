@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -179,10 +179,26 @@ class AdminProductController {
             const variantData = req.validated.body as CreateVariantSchemaDto
             const result = await adminProductService.createVariant(productId, variantData)
 
-            res.status(200).json({
+            res.status(201).json({
                 success : true,
                 msg : 'Create Product Variant',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeVariant (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            const variantData = req.validated.body as ChangeVariantSchemaDto
+            await adminProductService.changeVariant(productId, variantId, variantData)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Product Variant',
+                data : {}
             })
         } catch (error) {
             next(error)

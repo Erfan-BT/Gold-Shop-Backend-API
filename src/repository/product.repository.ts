@@ -2,7 +2,7 @@ import { FindAndCountOptions, Op } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { CreateProductSchemaDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
+import { ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)
@@ -337,12 +337,14 @@ class ProductRepository {
         })
     }
 
-    async checkExistsSku (sku : string)
+    async checkExistsSku (sku : string, excludeVariantId ?: number)
     {
         return await ProductVariant.findOne({
             where : {
-                sku
-            }
+                sku,
+                ...(excludeVariantId !== undefined ? { id : {[Op.ne] : excludeVariantId} } : {})
+            },
+            attributes : ['id']
         }) !== null
     }
 
@@ -354,6 +356,17 @@ class ProductRepository {
             soldCount : 0,
             productId,
         })
+    }
+
+    async changeVariant (productId : number, variantId : number, variantData : Partial<Pick<ProductVariant, 'weight' | 'karat' | 'stoneType' | 'color' | 'sku' >>)
+    {
+        const [rows] = await ProductVariant.update(variantData ,{
+            where : {
+                productId,
+                id : variantId
+            }
+        })
+        return rows === 1
     }
 }
 

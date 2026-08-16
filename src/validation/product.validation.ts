@@ -139,6 +139,28 @@ export const createVariantSchema = z.object({
     isActive : z.coerce.boolean().default(true),
 })
 
+export const changeVariantSchema = z.object({
+    weight : z.coerce.number().positive().optional(),
+    karat : z.enum(ProductKarat).optional(),
+    stoneType : z.string().trim().min(1).max(50).optional(),
+    color : z.string().trim().min(1).max(30).optional(),
+    sku : z.string().trim().min(1).max(50).optional(),
+})
+.superRefine((data, ctx) => {
+    if (
+        data.weight === undefined &&
+        data.karat === undefined &&
+        data.stoneType === undefined &&
+        data.color === undefined &&
+        data.sku === undefined
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            message : "All Params Can Not Empty"
+        })
+    }
+})
+
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
 })
@@ -170,3 +192,4 @@ export type ProductVariantIdsDto = z.infer<typeof productVariantIds>
 export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
 export type ChangeProductSchemaDto = z.infer<typeof changeProductSchema>
 export type CreateVariantSchemaDto = z.infer<typeof createVariantSchema>
+export type ChangeVariantSchemaDto = z.infer<typeof changeVariantSchema>

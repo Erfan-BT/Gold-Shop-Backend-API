@@ -1,11 +1,11 @@
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
-import { Product } from "../../models/product.model.js";
+import { Product, ProductVariant } from "../../models/product.model.js";
 import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, variantId } from "../../validation/product.validation.js";
 
 class AdminProductService {
     async getAllProducts (qs : AdminProductQSDto)
@@ -143,6 +143,43 @@ class AdminProductService {
             throw new ConflictError('This Sku Already Exists')
         // Create Varinat
         return await productRepository.createVariant(productId, variantData)
+    }
+
+    async changeVariant (productId : number, variantId : number, variantData : ChangeVariantSchemaDto)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.getVariant(variantId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Create Data
+        const data : Partial<Pick<ProductVariant, 'weight' | 'karat' | 'stoneType' | 'color' | 'sku' >> = {}
+
+        if (variantData.weight !== undefined)
+            data.weight = variantData.weight
+
+        if (variantData.karat !== undefined)
+            data.karat = variantData.karat
+
+        if (variantData.stoneType !== undefined)
+            data.stoneType = variantData.stoneType
+
+        if (variantData.color !== undefined)
+            data.color = variantData.color
+
+        if (variantData.sku !== undefined)
+            data.sku = variantData.sku
+
+        // Check Exists Sku
+        if (variantData.sku !== undefined && await productRepository.checkExistsSku(variantData.sku, variantId))
+            throw new ConflictError('This Sku Already Exists')
+        // Change Varinat
+        if (!(await productRepository.changeVariant(productId, variantId, data)))
+            throw new ConflictError('Product Variant Data Not Changed')
+        return
     }
 }
 
