@@ -2,7 +2,7 @@ import { FindAndCountOptions, Op } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { CreateProductSchemaDto } from "../validation/product.validation.js";
+import { CreateProductSchemaDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)
@@ -334,6 +334,25 @@ class ProductRepository {
                     attributes : ['quantity', 'minThreshold']
                 }
             ]
+        })
+    }
+
+    async checkExistsSku (sku : string)
+    {
+        return await ProductVariant.findOne({
+            where : {
+                sku
+            }
+        }) !== null
+    }
+
+    async createVariant (productId : number, variantData : CreateVariantSchemaDto)
+    {
+        return await ProductVariant.create({
+            ...variantData,
+            currentPrice : 0,
+            soldCount : 0,
+            productId,
         })
     }
 }

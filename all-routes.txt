@@ -114,7 +114,7 @@ DELETE | ./categories/:categoryId               |     Admin    |       -       |
 ----------------------------------------------------------------------------------------------------------------
 GET    | ./variants                             |     Admin    |       -       |    -
 GET    | ./variants/:variantId                  |     Admin    |       -       |    -
-POST   | ./variants                             |     Admin    |       -       | weight, karat, stoneType, color, sku, currentPrice, isActive
-PATCH  | ./variants/:variantId                  |     Admin    |       -       | weight, karat, stoneType, color, sku, currentPrice
+POST   | ./variants                             |     Admin    |       -       | weight, karat, stoneType, color, sku, isActive
+PATCH  | ./variants/:variantId                  |     Admin    |       -       | weight, karat, stoneType, color, sku
 PATCH  | ./variants/:variantId/status           |     Admin    |       -       |    -
 DELETE | ./variants/:variantId                  |     Owner    |       -       |    -

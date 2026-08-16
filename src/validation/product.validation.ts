@@ -130,6 +130,15 @@ export const changeProductSchema = z.object({
     }
 })
 
+export const createVariantSchema = z.object({
+    weight : z.coerce.number().positive(),
+    karat : z.enum(ProductKarat),
+    stoneType : z.string().trim().min(1).max(50),
+    color : z.string().trim().min(1).max(30),
+    sku : z.string().trim().min(1).max(50),
+    isActive : z.coerce.boolean().default(true),
+})
+
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
 })
@@ -160,3 +169,4 @@ export type ProductCategoryIdsDto = z.infer<typeof productCategoryIds>
 export type ProductVariantIdsDto = z.infer<typeof productVariantIds>
 export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
 export type ChangeProductSchemaDto = z.infer<typeof changeProductSchema>
+export type CreateVariantSchemaDto = z.infer<typeof createVariantSchema>

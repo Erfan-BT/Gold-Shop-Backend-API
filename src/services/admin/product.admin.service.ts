@@ -5,7 +5,7 @@ import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto } from "../../validation/product.validation.js";
 
 class AdminProductService {
     async getAllProducts (qs : AdminProductQSDto)
@@ -130,6 +130,19 @@ class AdminProductService {
         if (!variant)
             throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
         return variant
+    }
+
+    async createVariant (productId : number, variantData : CreateVariantSchemaDto)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Check Exists Sku
+        if (await productRepository.checkExistsSku(variantData.sku))
+            throw new ConflictError('This Sku Already Exists')
+        // Create Varinat
+        return await productRepository.createVariant(productId, variantData)
     }
 }
 
