@@ -382,6 +382,17 @@ class ProductRepository {
         })
         return rows === 1
     }
+
+    async deleteVariant (productId : number, variantId : number)
+    {
+        const rows = await ProductVariant.destroy({
+            where : {
+                id : variantId,
+                productId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ProductRepository()

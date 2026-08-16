@@ -197,6 +197,21 @@ class AdminProductService {
             throw new ConflictError('Product Variant Status Not Changed')
         return
     }
+
+    async deleteVariant (adminId : number, productId : number, variantId : number)
+    {
+        // Get Admin
+        const admin = await userRepository.userById(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ${adminId} }`)
+        const isOwner = admin.roles?.some(userRole => userRole.role?.name === RolesTitle.OWNER) ?? false
+        if (!isOwner)
+            throw new ForbiddenError('Not Access')
+        // Delete
+        if (!(await productRepository.deleteVariant(productId, variantId)))
+            throw new NotFoundError(`Product Or Variant Not Found { P-ID : ${productId}, V-ID : ${variantId} }`)
+        return
+    }
 }
 
 export default new AdminProductService()

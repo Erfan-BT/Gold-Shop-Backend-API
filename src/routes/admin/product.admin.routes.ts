@@ -19,7 +19,8 @@ router.delete('/:productId/categories/:categoryId', validate({ params : productC
 router.get('/:productId/variants', validate({ params : productId }), adminProductController.getProductVariants)
 router.get('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.getVariant)
 router.post('/:productId/variants', validate({ params : productId, body : createVariantSchema }), adminProductController.createVariant)
-router.patch('/productId/variants/:variantId', validate({ params : productVariantIds, body : changeVariantSchema }), adminProductController.changeVariant)
-router.patch('/productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.changeVariantStatus)
+router.patch('/:productId/variants/:variantId', validate({ params : productVariantIds, body : changeVariantSchema }), adminProductController.changeVariant)
+router.patch('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.changeVariantStatus)
+router.delete('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.deleteVariant)
 
 export default router

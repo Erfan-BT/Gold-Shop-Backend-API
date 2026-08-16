@@ -220,6 +220,22 @@ class AdminProductController {
         }
     }
 
+    async deleteVariant (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            const adminId = req.user!.userId
+            await adminProductService.deleteVariant(adminId, productId, variantId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Product Variant',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 
 }
 
