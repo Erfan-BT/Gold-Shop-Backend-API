@@ -141,6 +141,22 @@ class AdminProductController {
             next(error)
         }
     }
+
+    // ---------- Variants ----------
+    async getProductVariants (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId } = req.validated.params as ProductIdDto
+            const result = await adminProductService.getProductVariants(productId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Product Variants',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminProductController()

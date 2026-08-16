@@ -107,6 +107,17 @@ class AdminProductService {
             throw new NotFoundError('Category Not Found In Product')
         return
     }
+
+    // ---------- Varinats ----------
+    async getProductVariants (productId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variants
+        return await productRepository.getProductVariants(productId)
+    }
 }
 
 export default new AdminProductService()

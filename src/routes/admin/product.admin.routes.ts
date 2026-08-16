@@ -15,5 +15,7 @@ router.delete('/:productId', validate({ params : productId }), adminProductContr
 router.get('/:productId/categories', validate({ params : productId }), adminProductController.getProductCategories)
 router.post('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminProductController.setCategoryForProduct)
 router.delete('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminProductController.deleteCategoryFromProduct)
+// ----- Variants -----
+router.get('/:productId/variants', validate({ params : productId }), adminProductController.getProductVariants)
 
 export default router

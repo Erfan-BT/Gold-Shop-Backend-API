@@ -259,6 +259,26 @@ class ProductRepository {
         })
         return rows === 1
     }
+    // --- Variants ---
+    async getProductVariants (productId : number)
+    {
+        return await ProductVariant.findAll({
+            where : {
+                productId
+            },
+            attributes : ['id' ,'weight', 'karat', 'stoneType', 'color', 'sku', 'soldCount', 'currentPrice', 'isActive'],
+            include : [
+                {
+                    model : Inventory,
+                    as : 'inventory',
+                    attributes : ['quantity', 'minThreshold']
+                }
+            ],
+            order: [
+                ['id', 'ASC']
+            ]
+        })
+    }
 }
 
 export default new ProductRepository()

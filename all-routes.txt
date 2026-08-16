@@ -111,3 +111,10 @@ DELETE | admin/products/:productId              |     Owner    |       -       |
 GET    | ./categories                           |     Admin    |       -       |    -
 POST   | ./categories/:categoryId               |     Admin    |       -       |    -
 DELETE | ./categories/:categoryId               |     Admin    |       -       |    -
+----------------------------------------------------------------------------------------------------------------
+GET    | ./variants                             |     Admin    |       -       |    -
+GET    | ./variants/:variantId                  |     Admin    |       -       |    -
+POST   | ./variants                             |     Admin    |       -       | weight, karat, stoneType, color, sku, currentPrice, isActive
+PATCH  | ./variants/:variantId                  |     Admin    |       -       | weight, karat, stoneType, color, sku, currentPrice
+PATCH  | ./variants/:variantId/status           |     Admin    |       -       |    -
+DELETE | ./variants/:variantId                  |     Owner    |       -       |    -
