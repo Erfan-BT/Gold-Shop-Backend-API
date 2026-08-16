@@ -205,6 +205,22 @@ class AdminProductController {
         }
     }
 
+    async changeVariantStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            await adminProductService.changeVariantStatus(productId, variantId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Product Variant Status',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+
 }
 
 export default new AdminProductController()

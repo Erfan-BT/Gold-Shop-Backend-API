@@ -2,7 +2,7 @@ import { FindAndCountOptions, Op } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
+import { ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, variantId } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)
@@ -364,6 +364,20 @@ class ProductRepository {
             where : {
                 productId,
                 id : variantId
+            }
+        })
+        return rows === 1
+    }
+
+    async changeVariantStatus (productId : number, variantdId : number, currentStatus : boolean)
+    {
+        const [rows] = await ProductVariant.update({
+            isActive : !currentStatus,
+        },{
+            where : {
+                id : variantId,
+                productId,
+                isActive : currentStatus
             }
         })
         return rows === 1

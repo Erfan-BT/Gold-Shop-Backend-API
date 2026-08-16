@@ -181,6 +181,22 @@ class AdminProductService {
             throw new ConflictError('Product Variant Data Not Changed')
         return
     }
+
+    async changeVariantStatus (productId : number, variantId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.getVariant(variantId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Change Status
+        if (!(await productRepository.changeVariantStatus(productId, variantId, variant.isActive)))
+            throw new ConflictError('Product Variant Status Not Changed')
+        return
+    }
 }
 
 export default new AdminProductService()

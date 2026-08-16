@@ -20,5 +20,6 @@ router.get('/:productId/variants', validate({ params : productId }), adminProduc
 router.get('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.getVariant)
 router.post('/:productId/variants', validate({ params : productId, body : createVariantSchema }), adminProductController.createVariant)
 router.patch('/productId/variants/:variantId', validate({ params : productVariantIds, body : changeVariantSchema }), adminProductController.changeVariant)
+router.patch('/productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.changeVariantStatus)
 
 export default router
