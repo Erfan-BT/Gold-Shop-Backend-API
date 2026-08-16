@@ -100,6 +100,13 @@ class AdminProductService {
         // Set
         return await categoryRepository.setProductCategory(productId, categoryId)
     }
+
+    async deleteCategoryFromProduct (productId : number, categoryId : number)
+    {
+        if (!(await categoryRepository.deleteProductCategory(productId, categoryId)))
+            throw new NotFoundError('Category Not Found In Product')
+        return
+    }
 }
 
 export default new AdminProductService()

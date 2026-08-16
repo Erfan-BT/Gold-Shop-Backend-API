@@ -126,6 +126,21 @@ class AdminProductController {
             next(error)
         }
     }
+
+    async deleteCategoryFromProduct (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId, categoryId } = req.validated.params as ProductCategoryIdsDto
+            await adminProductService.deleteCategoryFromProduct(productId, categoryId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Category From Product',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminProductController()
