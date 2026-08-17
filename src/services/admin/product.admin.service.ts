@@ -4,8 +4,9 @@ import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
+import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
 import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, variantId } from "../../validation/product.validation.js";
+import { ImageService } from "../image.service.js";
 
 class AdminProductService {
     async getAllProducts (qs : AdminProductQSDto)
@@ -152,7 +153,7 @@ class AdminProductService {
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
         // Get Variant
-        const variant = await productRepository.getVariant(variantId)
+        const variant = await productRepository.findVariant(variantId, productId)
         if (!variant)
             throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
         // Create Data
@@ -189,7 +190,7 @@ class AdminProductService {
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
         // Get Variant
-        const variant = await productRepository.getVariant(variantId)
+        const variant = await productRepository.findVariant(variantId, productId)
         if (!variant)
             throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
         // Change Status
@@ -211,6 +212,90 @@ class AdminProductService {
         if (!(await productRepository.deleteVariant(productId, variantId)))
             throw new NotFoundError(`Product Or Variant Not Found { P-ID : ${productId}, V-ID : ${variantId} }`)
         return
+    }
+
+    // ---------- Images ----------
+    async getVariantImages (productId : number, variantId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Images
+        return await productRepository.getVariantImages(variantId)
+    }
+
+    async addVariantImages(productId: number, variantId: number, files: Express.Multer.File[])
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Check Images
+        if (files.length === 0) {
+            throw new BadRequestError('At Least One Image Is Required');
+        }
+
+        const processedImages : {
+            filename: string;
+            path: string;
+            url: string;
+        }[] = [];
+
+        try {
+            // Process all files
+            for (const file of files) {
+                const image =
+                    await ImageService.processVariantImage(file)
+                processedImages.push(image);
+            }
+            // Insert DB
+            const images = [];
+            try {
+                for (let i = 0; i < processedImages.length; i++) {
+                    const image =
+                        await productRepository.createVariantImage(
+                            variantId,
+                            processedImages[i]!.url,
+                            processedImages[i]!.filename,
+                            processedImages[i]!.filename,
+                            i,
+                            i === 0 && !(await productRepository.hasPrimaryImage(variantId)),
+                        )
+                    images.push(image);
+                }
+            } catch (error) {
+                // Remove Generated Files
+                await Promise.all(
+                    processedImages.map(
+                        image =>
+                            ImageService.deleteImage(image.path)
+                    )
+                )
+                throw error;
+            }
+            return images;
+        } catch (error) {
+            // Processing failed
+            // Remove Already Generated Files
+
+            await Promise.all(
+                processedImages.map(
+                    image =>
+                        ImageService.deleteImage(image.path)
+                )
+            )
+            throw error;
+        }
+
     }
 }
 

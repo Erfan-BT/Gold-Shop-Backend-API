@@ -118,3 +118,6 @@ POST   | ./variants                             |     Admin    |       -       |
 PATCH  | ./variants/:variantId                  |     Admin    |       -       | weight, karat, stoneType, color, sku
 PATCH  | ./variants/:variantId/status           |     Admin    |       -       |    -
 DELETE | ./variants/:variantId                  |     Owner    |       -       |    -
+----------------------------------------------------------------------------------------------------------------
+GET    | ./variants/:variantId/images           |     Admin    |       -       |    -
+POST   | ./variants/:variantId/images           |     Admin    |       -       |    -

@@ -236,6 +236,37 @@ class AdminProductController {
         }
     }
 
+    // ---------- Images ----------
+    async getVariantImages (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            const result = await adminProductService.getVariantImages(productId, variantId)
+            
+            res.status(200).json({
+                success : true,
+                msg : 'Get Variant Images',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async addVariantImages (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            const files: Express.Multer.File[] = Array.isArray(req.files) ? req.files : [];
+            const result = await adminProductService.addVariantImages(productId, variantId, files)
+            
+            res.status(201).json({
+                success : true,
+                msg : 'Add Variant Images',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 
 }
 

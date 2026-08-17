@@ -17,6 +17,7 @@ import PaymentRoutes from './routes/payment.routes.js'
 import ReturnRoutes from './routes/return.routes.js'
 import GoldPriceRoutes from './routes/goldPrice.routes.js'
 import AdminRoutes from './routes/admin/admin.routes.js'
+import path from 'node:path'
 
 const app = express()
 
@@ -39,6 +40,17 @@ app.use(express.urlencoded({
     extended:true
 }))
 app.use(loggerMiddleware)
+
+// Static
+app.use('/uploads/variant-images',
+    express.static(
+        path.join(
+            process.cwd(),
+            'uploads',
+            'variant-images'
+        )
+    )
+)
 
 // ---------- Routes ----------
 // Health

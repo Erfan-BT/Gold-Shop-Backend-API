@@ -260,6 +260,16 @@ class ProductRepository {
         return rows === 1
     }
     // --- Variants ---
+    async findVariant (variantId : number, productId ?: number)
+    {
+        return await ProductVariant.findOne({
+            where : {
+                id : variantId,
+                ...(productId ? {productId} : {})
+            }
+        })
+    }
+
     async getProductVariants (productId : number)
     {
         return await ProductVariant.findAll({
@@ -369,7 +379,7 @@ class ProductRepository {
         return rows === 1
     }
 
-    async changeVariantStatus (productId : number, variantdId : number, currentStatus : boolean)
+    async changeVariantStatus (productId : number, variantId : number, currentStatus : boolean)
     {
         const [rows] = await ProductVariant.update({
             isActive : !currentStatus,
@@ -392,6 +402,41 @@ class ProductRepository {
             }
         })
         return rows === 1
+    }
+    // --- Images ---
+    async getVariantImages (variantId : number)
+    {
+        return await ProductImage.findAll({
+            where : {
+                variantId
+            },
+            order : [
+                ['orderSort', 'ASC']
+            ],
+            attributes : ['id', 'imageUrl', 'altText', 'isPrimary', 'fileName', 'sortOrder', 'createdAt']
+        })
+    }
+
+    async createVariantImage (variantId : number, imageUrl : string, fileName : string, altText : string, sortOrder : number, isPrimary : boolean = false)
+    {
+        return await ProductImage.create({
+            variantId,
+            altText,
+            fileName,
+            imageUrl,
+            sortOrder,
+            isPrimary
+        })
+    }
+
+    async hasPrimaryImage (variantId : number)
+    {
+        return await ProductImage.findOne({
+            where : {
+                variantId,
+                isPrimary : true
+            }
+        }) !== null
     }
 }
 
