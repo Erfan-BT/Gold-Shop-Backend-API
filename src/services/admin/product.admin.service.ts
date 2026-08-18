@@ -6,8 +6,8 @@ import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
-import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, variantId } from "../../validation/product.validation.js";
+import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
 import { ImageService } from "../image.service.js";
 
 class AdminProductService {
@@ -344,6 +344,43 @@ class AdminProductService {
             // Set Image Primary
             if (!(await productRepository.setVariantImagePrimary(variantId, imageId, t)))
                 throw new ConflictError(`Primary Image Not Changed`)
+        })
+        return
+    }
+
+    async changeVariantImagesOrder (productId : number, variantId : number, imageIds : number[])
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Images
+        const images = await productRepository.getVariantImages(variantId)
+        if (images.length < 1)
+            throw new ConflictError('Sorting Is Not Possible')
+        if (images.length !== imageIds.length)
+            throw new BadRequestError('All Variant Images Must Be Included')
+        // Check Ids
+        const existingIds = new Set(images.map(image => image.id))
+
+        const hasInvalidImage = imageIds.some(id => !existingIds.has(id))
+        if (hasInvalidImage)
+            throw new BadRequestError('Invalid Variant Image Ids')
+        
+        const uniqueIds = new Set(imageIds);
+        if (uniqueIds.size !== imageIds.length)
+            throw new BadRequestError('Duplicate Image IDs Are Not Allowed');
+
+        // ReOrder
+        await sequelize.transaction(async t => {
+            for (let i = 0; i < imageIds.length; i++) {
+                if (!(await productRepository.changeImageSortOrder(variantId, imageIds[i]!, i + 1, t)))
+                    throw new InternalServerError('Error In Change Images Order')
+            }
         })
         return
     }

@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ImageAltTextDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto, ProductVariantImageIdsDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ImageAltTextDto, ImageIdsSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto, ProductVariantImageIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -292,6 +292,22 @@ class AdminProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Change Variant Image Primary',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeVariantImagesOrder (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            const { imageIds } = req.validated.body as ImageIdsSchemaDto
+            await adminProductService.changeVariantImagesOrder(productId, variantId, imageIds)
+            
+            res.status(200).json({
+                success : true,
+                msg : 'Change Variant Images Order',
                 data : {}
             })
         } catch (error) {

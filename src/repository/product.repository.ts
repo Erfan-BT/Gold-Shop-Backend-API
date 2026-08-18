@@ -490,6 +490,23 @@ class ProductRepository {
         })
         return rows === 1
     }
+
+    async changeImageSortOrder(variantId: number, imageId: number, sortOrder: number, transaction: Transaction)
+    {
+        const [rows] = await ProductImage.update(
+            {
+                sortOrder
+            },
+            {
+                where: {
+                    id: imageId,
+                    variantId
+                },
+                transaction
+            }
+        )
+        return rows === 1;
+    }
 }
 
 export default new ProductRepository()

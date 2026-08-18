@@ -1,6 +1,6 @@
 import express from 'express'
 import { validate } from '../../middleware/validation.js'
-import { adminProductQS, changeProductSchema, changeVariantSchema, createProductSchema, createVariantSchema, imageAltText, productCategoryIds, productId, productVariantIds, productVariantImageIds } from '../../validation/product.validation.js'
+import { adminProductQS, changeProductSchema, changeVariantSchema, createProductSchema, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantIds, productVariantImageIds } from '../../validation/product.validation.js'
 import adminProductController from '../../controllers/admin/product.admin.controller.js'
 
 const router = express.Router()
@@ -27,5 +27,6 @@ router.get('/:productId/variants/:variantId/images', validate({ params : product
 router.post('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.addVariantImages)
 router.patch('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds, body : imageAltText }), adminProductController.changeImageAltText)
 router.patch('/:productId/variants/:variantId/images/:imageId/primary', validate({ params : productVariantImageIds }), adminProductController.changeVariantImagePrimary)
+router.patch('/:productId/variants/:variantId/images/reorder', validate({ params : productVariantIds, body : imageIdsSchema }), adminProductController.changeVariantImagesOrder)
 
 export default router
