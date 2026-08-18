@@ -384,6 +384,30 @@ class AdminProductService {
         })
         return
     }
+
+    async deleteImage (productId : number, variantId : number, imageId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Image
+        const image = await productRepository.getVariantImage(variantId, imageId)
+        if (!image)
+            throw new NotFoundError(`Image Not Found { ID : ${imageId} }`)
+        if (image.isPrimary)
+            throw new ConflictError('Primary Image Can Not Be Deleted')
+        // Delete From DB
+        if (!(await productRepository.deleteImage(variantId, imageId)))
+            throw new ConflictError('Image Not Deleted')
+        // Delete Physical
+        await ImageService.deleteImage(image.fileName)
+        return
+    }
 }
 
 export default new AdminProductService()

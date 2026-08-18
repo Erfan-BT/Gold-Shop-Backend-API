@@ -123,4 +123,5 @@ GET    | ./variants/:variantId/images           |     Admin    |       -       |
 POST   | ./variants/:variantId/images           |     Admin    |       -       |    -
 PATCH  | ./variants/:variantId/images/:ImageId  |     Admin    |       -       | altText
 PATCH  | ././images/:ImageId/primary            |     Admin    |       -       |    -
-PATCH  | ././images/:ImageId/reorder            |     Admin    |       -       | imageIds
+PATCH  | ././images/reorder                     |     Admin    |       -       | imageIds
+DELETE | ./images/:imageId                      |     Admin    |       -       |    -

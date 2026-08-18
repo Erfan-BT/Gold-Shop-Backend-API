@@ -25,8 +25,9 @@ router.delete('/:productId/variants/:variantId', validate({ params : productVari
 // ----- Images -----
 router.get('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.getVariantImages)
 router.post('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.addVariantImages)
+router.patch('/:productId/variants/:variantId/images/reorder', validate({ params : productVariantIds, body : imageIdsSchema }), adminProductController.changeVariantImagesOrder)
 router.patch('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds, body : imageAltText }), adminProductController.changeImageAltText)
 router.patch('/:productId/variants/:variantId/images/:imageId/primary', validate({ params : productVariantImageIds }), adminProductController.changeVariantImagePrimary)
-router.patch('/:productId/variants/:variantId/images/reorder', validate({ params : productVariantIds, body : imageIdsSchema }), adminProductController.changeVariantImagesOrder)
+router.delete('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds }), adminProductController.deleteImage)
 
 export default router

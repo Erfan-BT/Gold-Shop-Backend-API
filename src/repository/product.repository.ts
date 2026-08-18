@@ -404,6 +404,15 @@ class ProductRepository {
         return rows === 1
     }
     // --- Images ---
+    async getVariantImage (variantId : number, imageId : number)
+    {
+        return ProductImage.findOne({
+            where : {
+                variantId,
+                id : imageId
+            }
+        })
+    }
     async getVariantImages (variantId : number)
     {
         return await ProductImage.findAll({
@@ -506,6 +515,18 @@ class ProductRepository {
             }
         )
         return rows === 1;
+    }
+
+    async deleteImage (variantId : number, imageId : number)
+    {
+        const rows = await ProductImage.destroy({
+            where : {
+                variantId,
+                id : imageId,
+                isPrimary : false
+            }
+        })
+        return rows === 1
     }
 }
 

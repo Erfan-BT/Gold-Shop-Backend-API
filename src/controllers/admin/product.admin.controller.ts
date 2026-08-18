@@ -315,6 +315,21 @@ class AdminProductController {
         }
     }
 
+    async deleteImage (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
+            await adminProductService.deleteImage(productId, variantId, imageId)
+            
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Variant Image',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminProductController()
