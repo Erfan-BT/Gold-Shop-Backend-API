@@ -284,6 +284,21 @@ class AdminProductController {
         }
     }
 
+    async changeVariantImagePrimary (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
+            await adminProductService.changeVariantImagePrimary(productId, variantId, imageId)
+            
+            res.status(200).json({
+                success : true,
+                msg : 'Change Variant Image Primary',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminProductController()

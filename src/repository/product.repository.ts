@@ -1,4 +1,4 @@
-import { FindAndCountOptions, Op } from "sequelize";
+import { FindAndCountOptions, Op, Transaction } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
@@ -448,6 +448,45 @@ class ProductRepository {
                 id : imageId,
                 variantId
             }
+        })
+        return rows === 1
+    }
+
+    async isPrimaryImage (variantId : number, imageId : number, transaction ?: Transaction)
+    {
+        return await ProductImage.findOne({
+            where : {
+                variantId,
+                id : imageId,
+                isPrimary : true
+            },
+            transaction : transaction ?? null
+        }) !== null
+    }
+
+    async setVariantImagesPrimaryFalse (variantId : number, transaction : Transaction)
+    {
+        const [rows] = await ProductImage.update({
+            isPrimary : false
+        },{
+            where : {
+                variantId
+            },
+            transaction
+        })
+        return rows
+    }
+    
+    async setVariantImagePrimary (variantId : number, imageId : number, transaction : Transaction)
+    {
+        const [rows] = await ProductImage.update({
+            isPrimary : true
+        },{
+            where : {
+                variantId,
+                id : imageId
+            },
+            transaction
         })
         return rows === 1
     }

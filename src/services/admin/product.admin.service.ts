@@ -1,4 +1,6 @@
+import { is } from "zod/locales";
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
+import sequelize from "../../configs/sequelize.config.js";
 import { Product, ProductVariant } from "../../models/product.model.js";
 import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
@@ -311,6 +313,38 @@ class AdminProductService {
         // Change Image AltText
         if (!(await productRepository.changeImageAltText(variantId, imageId, altText)))
             throw new NotFoundError(`Image Not Found { ID : ${imageId} }`)
+        return
+    }
+
+    async changeVariantImagePrimary (productId: number, variantId: number, imageId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Images
+        const images = await productRepository.getVariantImages(variantId)
+        if (images.length === 0)
+            throw new NotFoundError(`Image Not Found { ID : ${imageId} }`)
+        const imageExists = images.some(image => image.id === imageId)
+        if (!imageExists)
+            throw new NotFoundError(`Image Not Found { ID : ${imageId} }`)
+        // Check Is Primary
+        const isPrimary = await productRepository.isPrimaryImage(variantId, imageId)
+        if (isPrimary)
+                return
+        // Change
+        await sequelize.transaction(async t => {
+            // Set Variant Images Primary False
+            await productRepository.setVariantImagesPrimaryFalse(variantId, t)
+            // Set Image Primary
+            if (!(await productRepository.setVariantImagePrimary(variantId, imageId, t)))
+                throw new ConflictError(`Primary Image Not Changed`)
+        })
         return
     }
 }
