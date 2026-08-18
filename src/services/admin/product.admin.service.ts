@@ -229,7 +229,7 @@ class AdminProductService {
         return await productRepository.getVariantImages(variantId)
     }
 
-    async addVariantImages(productId: number, variantId: number, files: Express.Multer.File[])
+    async addVariantImages (productId: number, variantId: number, files: Express.Multer.File[])
     {
         // Get Product
         const product = await productRepository.getProduct(productId)
@@ -296,6 +296,22 @@ class AdminProductService {
             throw error;
         }
 
+    }
+
+    async changeImageAltText (productId: number, variantId: number, imageId : number, altText : string)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Change Image AltText
+        if (!(await productRepository.changeImageAltText(variantId, imageId, altText)))
+            throw new NotFoundError(`Image Not Found { ID : ${imageId} }`)
+        return
     }
 }
 

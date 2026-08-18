@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ImageAltTextDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto, ProductVariantImageIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -262,6 +262,22 @@ class AdminProductController {
                 success : true,
                 msg : 'Add Variant Images',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeImageAltText (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
+            const { altText } = req.validated.body as ImageAltTextDto
+            await adminProductService.changeImageAltText(productId, variantId, imageId, altText)
+            
+            res.status(200).json({
+                success : true,
+                msg : 'Change Image Alt Text',
+                data : {}
             })
         } catch (error) {
             next(error)

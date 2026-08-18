@@ -438,6 +438,19 @@ class ProductRepository {
             }
         }) !== null
     }
+
+    async changeImageAltText (variantId : number, imageId : number, altText : string)
+    {
+        const [rows] = await ProductImage.update({
+            altText,
+        },{
+            where : {
+                id : imageId,
+                variantId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ProductRepository()

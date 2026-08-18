@@ -179,6 +179,16 @@ export const productVariantIds = z.object({
     variantId : z.coerce.number().int().positive(),
 })
 
+export const productVariantImageIds = z.object({
+    productId : z.coerce.number().int().positive(),
+    variantId : z.coerce.number().int().positive(),
+    imageId : z.coerce.number().int().positive(),
+})
+
+export const imageAltText = z.object({
+    altText : z.string().trim().min(1).max(200)
+})
+
 export const productSlug = z.object({
     slug : z.string().min(1).max(200)
 })
@@ -189,6 +199,8 @@ export type ProductSlugDto = z.infer<typeof productSlug>
 export type ProductIdDto = z.infer<typeof productId>
 export type ProductCategoryIdsDto = z.infer<typeof productCategoryIds>
 export type ProductVariantIdsDto = z.infer<typeof productVariantIds>
+export type ProductVariantImageIdsDto = z.infer<typeof productVariantImageIds>
+export type ImageAltTextDto = z.infer<typeof imageAltText>
 export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
 export type ChangeProductSchemaDto = z.infer<typeof changeProductSchema>
 export type CreateVariantSchemaDto = z.infer<typeof createVariantSchema>

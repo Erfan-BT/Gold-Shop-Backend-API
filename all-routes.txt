@@ -121,3 +121,5 @@ DELETE | ./variants/:variantId                  |     Owner    |       -       |
 ----------------------------------------------------------------------------------------------------------------
 GET    | ./variants/:variantId/images           |     Admin    |       -       |    -
 POST   | ./variants/:variantId/images           |     Admin    |       -       |    -
+PATCH  | ./variants/:variantId/images/:ImageId  |     Admin    |       -       | altText
+PATCH  | ././images/:ImageId/Primary            |     Admin    |       -       |    -
