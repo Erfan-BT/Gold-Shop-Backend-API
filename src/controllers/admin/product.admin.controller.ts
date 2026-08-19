@@ -330,6 +330,22 @@ class AdminProductController {
         }
     }
 
+    // ---------- Pricing ----------
+    async getVariantPricing (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            const result = await adminProductService.getVariantPricing(productId, variantId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Variant Pricing',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminProductController()

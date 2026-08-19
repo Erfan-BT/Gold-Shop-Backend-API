@@ -408,6 +408,22 @@ class AdminProductService {
         await ImageService.deleteImage(image.fileName)
         return
     }
+
+    // ---------- Pricing ----------
+    async getVariantPricing (productId : number, variantId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Pricing
+        return await productRepository.getVariantPricing(variantId)
+    }
+    
 }
 
 export default new AdminProductService()

@@ -528,6 +528,19 @@ class ProductRepository {
         })
         return rows === 1
     }
+
+    // --- Pricing ---
+    async getVariantPricing (variantId : number)
+    {
+        return await ProductPricing.findAll({
+            where : {
+                variantId
+            },
+            order : [
+                ['priority', 'ASC']
+            ]
+        })
+    }
 }
 
 export default new ProductRepository()

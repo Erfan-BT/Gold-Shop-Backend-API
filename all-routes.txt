@@ -124,4 +124,11 @@ POST   | ./variants/:variantId/images           |     Admin    |       -       |
 PATCH  | ./variants/:variantId/images/:ImageId  |     Admin    |       -       | altText
 PATCH  | ././images/:ImageId/primary            |     Admin    |       -       |    -
 PATCH  | ././images/reorder                     |     Admin    |       -       | imageIds
-DELETE | ./images/:imageId                      |     Admin    |       -       |    -
+DELETE | ././images/:imageId                    |     Admin    |       -       |    -
+----------------------------------------------------------------------------------------------------------------
+...... | admin/products/:productId/variants/:variantId/
+GET    | ./pricing                              |     Admin    |       -        |   -
+POST   | ./pricing                              |     Admin    |       -        |   -
+PATCH  | ./pricing/:pricingId                   |     Admin    |       -        |   -
+PATCH  | ./pricing/:pricingId/status            |     Admin    |       -        |   -
+DELETE | ./pricing/:pricingId                   |     Admin    |       -        |   -

@@ -346,8 +346,6 @@ export class ProductPricing extends Model<
 
     declare variantId: ForeignKey<ProductVariant["id"]>;
 
-    declare categoryId: ForeignKey<Category["id"]>;
-
     declare wageType: "fixed" | "percent";
 
     declare wageValue: number;
@@ -362,7 +360,7 @@ export class ProductPricing extends Model<
 
     declare validFrom: Date;
 
-    declare validTo: Date;
+    declare validTo: Date | null;
 
     declare isActive: boolean;
 
@@ -385,11 +383,6 @@ ProductPricing.init(
         },
 
         variantId: {
-            type: DataTypes.INTEGER,
-            allowNull: false
-        },
-
-        categoryId: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -430,7 +423,7 @@ ProductPricing.init(
 
         validTo: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         },
 
         isActive: {

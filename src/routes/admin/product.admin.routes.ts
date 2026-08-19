@@ -29,5 +29,7 @@ router.patch('/:productId/variants/:variantId/images/reorder', validate({ params
 router.patch('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds, body : imageAltText }), adminProductController.changeImageAltText)
 router.patch('/:productId/variants/:variantId/images/:imageId/primary', validate({ params : productVariantImageIds }), adminProductController.changeVariantImagePrimary)
 router.delete('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds }), adminProductController.deleteImage)
+// ----- Pricing -----
+router.get('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds }), adminProductController.getVariantPricing)
 
 export default router
