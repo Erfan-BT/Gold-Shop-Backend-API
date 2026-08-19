@@ -129,6 +129,6 @@ DELETE | ././images/:imageId                    |     Admin    |       -       |
 ...... | admin/products/:productId/variants/:variantId/
 GET    | ./pricing                              |     Admin    |       -        |   -
 POST   | ./pricing                              |     Admin    |       -        | pricingData
-PATCH  | ./pricing/:pricingId                   |     Admin    |       -        |   -
+PATCH  | ./pricing/:pricingId                   |     Admin    |       -        | pricingData
 PATCH  | ./pricing/:pricingId/status            |     Admin    |       -        |   -
 DELETE | ./pricing/:pricingId                   |     Admin    |       -        |   -

@@ -1,13 +1,13 @@
 import { is } from "zod/locales";
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
 import sequelize from "../../configs/sequelize.config.js";
-import { Product, ProductVariant } from "../../models/product.model.js";
+import { Product, ProductPricing, ProductVariant } from "../../models/product.model.js";
 import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
 import { ImageService } from "../image.service.js";
 import { Op } from "sequelize";
 
@@ -470,6 +470,118 @@ class AdminProductService {
         }
         // Create
         return await productRepository.createVariantPricing(variantId, pricingData)
+    }
+
+    async changeVariantPricing (productId : number, variantId : number, pricingId : number, pricingData : ChangeVariantPricing)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get This Pricing
+        const [pricing] = await productRepository.getVariantPricing(variantId, {id : pricingId})
+        if (!pricing)
+            throw new NotFoundError(`Pricing Not Found { ID : ${pricingId} }`)
+        // Check Data
+        const finalWageType = pricingData.wageType ?? pricing.wageType
+        const finalWageValue = pricingData.wageValue ?? pricing.wageValue
+        const finalProfitType = pricingData.profitType ?? pricing.profitType
+        const finalProfitValue = pricingData.profitValue ?? pricing.profitValue
+
+        if (finalWageType === 'percent' && finalWageValue > 100)
+            throw new BadRequestError('Wage Percent Must Be Between 0 And 100')
+
+        if (finalProfitType === 'percent' && finalProfitValue > 100)
+            throw new BadRequestError('Profit Percent Must Be Between 0 And 100')
+
+        const finalValidFrom = pricingData.validFrom ?? pricing.validFrom;
+        const finalValidTo = pricingData.validTo !== undefined ? pricingData.validTo : pricing.validTo;
+
+        if (finalValidTo !== null && finalValidFrom.getTime() > finalValidTo.getTime())
+            throw new BadRequestError('Valid To Date Must Be Greater Than Or Equal To Valid From Date')
+
+        const finalPriority = pricingData.priority ?? pricing.priority;
+        // Get Variant Pricing && Overlap
+        if (pricing.isActive) {
+            const now = new Date()
+            const allPricing = await productRepository.getVariantPricing(variantId,
+                {
+                    id : {
+                        [Op.ne] : pricingId
+                    },
+                    isActive : true,
+                    [Op.or] : [
+                        {
+                            validTo : {
+                                [Op.gte]: now
+                            }
+                        },
+                        {
+                            validTo : {
+                                [Op.is]: null
+                            }
+                        }
+                    ]
+                })
+            if (allPricing.length > 0) {
+            const hasPriorityOverlap = allPricing.some(
+                existingPricing =>
+                    existingPricing.priority === finalPriority &&
+                    (
+                        (existingPricing.validTo === null || existingPricing.validTo.getTime() >= finalValidFrom.getTime()) &&
+                        (finalValidTo === null || finalValidTo.getTime() >= existingPricing.validFrom.getTime())
+                    )
+            )
+            if (hasPriorityOverlap)
+                throw new ConflictError('Another Pricing With The Same Priority Has An Overlapping Date Range')
+            }
+        }
+        
+        // Change
+        const data: Partial<Pick<
+            ProductPricing,
+            | 'wageType'
+            | 'wageValue'
+            | 'profitType'
+            | 'profitValue'
+            | 'taxPercent'
+            | 'priority'
+            | 'validFrom'
+            | 'validTo'
+        >> = {};
+
+        if (pricingData.wageType !== undefined)
+            data.wageType = pricingData.wageType;
+
+        if (pricingData.wageValue !== undefined)
+            data.wageValue = pricingData.wageValue;
+
+        if (pricingData.profitType !== undefined)
+            data.profitType = pricingData.profitType;
+
+        if (pricingData.profitValue !== undefined)
+            data.profitValue = pricingData.profitValue;
+
+        if (pricingData.taxPercent !== undefined)
+            data.taxPercent = pricingData.taxPercent;
+
+        if (pricingData.priority !== undefined)
+            data.priority = pricingData.priority;
+
+        if (pricingData.validFrom !== undefined)
+            data.validFrom = pricingData.validFrom;
+
+        if (pricingData.validTo !== undefined)
+            data.validTo = pricingData.validTo;
+
+
+        if (!(await productRepository.changeVariantPricing(variantId, pricingId, data)))
+            throw new ConflictError(`Variant Pricing NoT Changed`)
+        return
     }
     
 }

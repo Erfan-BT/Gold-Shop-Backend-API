@@ -2,7 +2,7 @@ import { FindAndCountOptions, Op, Transaction, WhereOptions } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, variantId } from "../validation/product.validation.js";
+import { ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, variantId } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)
@@ -549,6 +549,27 @@ class ProductRepository {
             variantId,
             ...pricingData,
         })
+    }
+
+    async changeVariantPricing (variantId : number, pricingId : number, pricingData : Partial<Pick<
+            ProductPricing,
+            | 'wageType'
+            | 'wageValue'
+            | 'profitType'
+            | 'profitValue'
+            | 'taxPercent'
+            | 'priority'
+            | 'validFrom'
+            | 'validTo'
+        >>)
+    {
+        const [rows] = await ProductPricing.update(pricingData ,{
+            where : {
+                variantId,
+                id : pricingId
+            }
+        })
+        return rows === 1
     }
 }
 

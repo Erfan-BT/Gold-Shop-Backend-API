@@ -1,6 +1,6 @@
 import express from 'express'
 import { validate } from '../../middleware/validation.js'
-import { adminProductQS, changeProductSchema, changeVariantSchema, createProductSchema, createVariantPricing, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantIds, productVariantImageIds } from '../../validation/product.validation.js'
+import { adminProductQS, changeProductSchema, changeVariantPricing, changeVariantSchema, createProductSchema, createVariantPricing, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantIds, productVariantImageIds, productVariantPricingIds } from '../../validation/product.validation.js'
 import adminProductController from '../../controllers/admin/product.admin.controller.js'
 
 const router = express.Router()
@@ -32,5 +32,6 @@ router.delete('/:productId/variants/:variantId/images/:imageId', validate({ para
 // ----- Pricing -----
 router.get('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds }), adminProductController.getVariantPricing)
 router.post('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds, body : createVariantPricing }), adminProductController.createVariantPricing)
+router.patch('/:productId/variants/:variantId/pricing/:pricingId', validate({ params : productVariantPricingIds , body : changeVariantPricing }), adminProductController.changeVariantPricing)
 
 export default router
