@@ -161,6 +161,54 @@ export const changeVariantSchema = z.object({
     }
 })
 
+export const createVariantPricing = z.object({
+    wageType : z.enum(["fixed" , "percent"]),
+    wageValue : z.coerce.number().nonnegative(),
+    profitType : z.enum(["fixed" , "percent"]),
+    profitValue : z.coerce.number().nonnegative(),
+    taxPercent : z.coerce.number().min(0).max(100),
+    priority : z.coerce.number().int().min(1).max(10),
+    validFrom : z.coerce.date(),    
+    validTo : z.coerce.date().nullable(),
+    isActive : z.coerce.boolean().default(true)
+})
+.superRefine((data, ctx) => {
+    if (
+        data.validTo !== null &&
+        data.validFrom.getTime() > data.validTo.getTime()
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['validTo'],
+            message : 'Valid To Date Must Be Greater Than Or Equal To Valid From Date'
+        })
+    }
+
+    if (
+        data.wageType === 'percent' &&
+        data.wageValue > 100
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['wageValue'],
+            message:
+                'Wage Percent Must Be Between 0 And 100'
+        });
+    }
+
+    if (
+        data.profitType === 'percent' &&
+        data.profitValue > 100
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['profitValue'],
+            message:
+                'Profit Percent Must Be Between 0 And 100'
+        });
+    }
+})
+
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
 })
@@ -210,3 +258,4 @@ export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
 export type ChangeProductSchemaDto = z.infer<typeof changeProductSchema>
 export type CreateVariantSchemaDto = z.infer<typeof createVariantSchema>
 export type ChangeVariantSchemaDto = z.infer<typeof changeVariantSchema>
+export type CreateVariantPricing = z.infer<typeof createVariantPricing>

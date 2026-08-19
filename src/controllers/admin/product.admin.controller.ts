@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ImageAltTextDto, ImageIdsSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto, ProductVariantImageIdsDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, ImageAltTextDto, ImageIdsSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto, ProductVariantImageIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -339,6 +339,22 @@ class AdminProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Get Variant Pricing',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async createVariantPricing (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
+            const pricingData = req.validated.body as CreateVariantPricing
+            const result = await adminProductService.createVariantPricing(productId, variantId, pricingData)
+
+            res.status(201).json({
+                success : true,
+                msg : 'Create Variant Pricing',
                 data : result
             })
         } catch (error) {

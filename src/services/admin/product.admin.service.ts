@@ -7,8 +7,9 @@ import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
 import { ImageService } from "../image.service.js";
+import { Op } from "sequelize";
 
 class AdminProductService {
     async getAllProducts (qs : AdminProductQSDto)
@@ -422,6 +423,53 @@ class AdminProductService {
             throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
         // Get Pricing
         return await productRepository.getVariantPricing(variantId)
+    }
+
+    async createVariantPricing (productId : number, variantId : number, pricingData : CreateVariantPricing)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Variant Pricing
+        const now = new Date()
+        const pricing = await productRepository.getVariantPricing(variantId,
+            {
+                isActive : true,
+                [Op.or] : [
+                    {
+                        validTo : {
+                            [Op.gte]: now
+                        }
+                    },
+                    {
+                        validTo : {
+                            [Op.is]: null
+                        }
+                    }
+                ]
+            })
+        // Check Pricing
+        if (pricingData.isActive) {
+            if (pricing.length > 0) {
+            const hasPriorityOverlap = pricing.some(
+                existingPricing =>
+                    existingPricing.priority === pricingData.priority &&
+                    (
+                        (existingPricing.validTo === null || existingPricing.validTo.getTime() >= pricingData.validFrom.getTime()) &&
+                        (pricingData.validTo === null || pricingData.validTo.getTime() >= existingPricing.validFrom.getTime())
+                    )
+            )
+            if (hasPriorityOverlap)
+                throw new ConflictError('Another Pricing With The Same Priority Has An Overlapping Date Range')
+            }
+        }
+        // Create
+        return await productRepository.createVariantPricing(variantId, pricingData)
     }
     
 }

@@ -1,8 +1,8 @@
-import { FindAndCountOptions, Op, Transaction } from "sequelize";
+import { FindAndCountOptions, Op, Transaction, WhereOptions } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantSchemaDto, variantId } from "../validation/product.validation.js";
+import { ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, variantId } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getProducts(options: FindAndCountOptions<Product>)
@@ -530,15 +530,24 @@ class ProductRepository {
     }
 
     // --- Pricing ---
-    async getVariantPricing (variantId : number)
+    async getVariantPricing (variantId : number, where?: WhereOptions<ProductPricing>)
     {
         return await ProductPricing.findAll({
             where : {
-                variantId
+                variantId,
+                ...(where ?? {})
             },
             order : [
                 ['priority', 'ASC']
             ]
+        })
+    }
+
+    async createVariantPricing (variantId : number, pricingData : CreateVariantPricing)
+    {
+        return await ProductPricing.create({
+            variantId,
+            ...pricingData,
         })
     }
 }
