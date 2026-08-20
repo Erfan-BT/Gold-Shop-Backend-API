@@ -132,3 +132,14 @@ POST   | ./pricing                              |     Admin    |       -        
 PATCH  | ./pricing/:pricingId                   |     Admin    |       -        | pricingData
 PATCH  | ./pricing/:pricingId/status            |     Admin    |       -        |   -
 DELETE | ./pricing/:pricingId                   |     Admin    |       -        |   -
+----------------------------------------------------------------------------------------------------------------
+GET    | ./discounts                            |     Admin    |       -        |   -
+POST   | ./discounts                            |     Admin    |       -        |   -
+PATCH  | ./discounts/:discountId                |     Admin    |       -        |   -
+PATCH  | ./discounts/:discountId/status         |     Admin    |       -        |   -
+DELETE | ./discounts/:discountId                |     Admin    |       -        |   -
+----------------------------------------------------------------------------------------------------------------
+GET    | ./reviews                              |     Admin    |       -        |   -
+GET    | ./reviews/:reviewId                    |     Admin    |       -        |   -
+PATCH  | ./reviews/:reviewId/status             |     Admin    |       -        |   -
+DELETE | ./reviews/:reviewId                    |     Owner    |       -        |   -

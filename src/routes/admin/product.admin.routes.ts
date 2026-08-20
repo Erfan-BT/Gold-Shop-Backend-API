@@ -35,5 +35,7 @@ router.post('/:productId/variants/:variantId/pricing', validate({ params : produ
 router.patch('/:productId/variants/:variantId/pricing/:pricingId', validate({ params : productVariantPricingIds , body : changeVariantPricing }), adminProductController.changeVariantPricing)
 router.patch('/:productId/variants/:variantId/pricing/:pricingId/status', validate({ params : productVariantPricingIds }), adminProductController.changeVariantPricingStatus)
 router.delete('/:productId/variants/:variantId/pricing/:pricingId/', validate({ params : productVariantPricingIds }), adminProductController.deleteVariantPricing)
+// ----- Discount -----
+router.get('/:productId/variants/:variantId/discount', validate({ params : productVariantIds }), adminProductController.getVariantDiscounts)
 
 export default router

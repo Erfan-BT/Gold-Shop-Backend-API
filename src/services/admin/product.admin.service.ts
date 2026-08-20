@@ -702,6 +702,21 @@ class AdminProductService {
             throw new ConflictError('Product Variant Pricing Not Deleted')     
         return   
     }
+
+    // ---------- Discounts ----------
+    async getVariantDiscounts (productId : number, variantId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Discounts
+        return await productRepository.getVariantDiscounts(variantId)
+    }
     
 }
 

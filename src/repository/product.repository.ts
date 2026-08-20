@@ -596,6 +596,19 @@ class ProductRepository {
         })
         return rows === 1
     }
+
+    // --- Discount ---
+    async getVariantDiscounts (variantId : number)
+    {
+        return await ProductDiscount.findAll({
+            where : {
+                variantId,
+            },
+            order : [
+                ['startDate', 'DESC']
+            ]
+        })
+    }
 }
 
 export default new ProductRepository()
