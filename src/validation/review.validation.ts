@@ -54,8 +54,13 @@ export const adminReviewQS = z.object({
     }
 })
 
+export const reviewIdSchema = z.object({
+    reviewId : z.coerce.number().int().positive()
+})
+
 export type ReviewQSDto = z.infer<typeof reviewQS>
 export type ReviewDto = z.infer<typeof reviewSchema>
 export type ChangeReviewDto = z.infer<typeof changeReviewSchema>
 export type ReviewParamsDto = z.infer<typeof changeReviewParams>
 export type AdminReviewQSDto = z.infer<typeof adminReviewQS>
+export type ReviewIdSchemaDto = z.infer<typeof reviewIdSchema>

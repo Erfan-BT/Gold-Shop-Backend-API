@@ -2,6 +2,7 @@ import { FindAndCountOptions } from "sequelize";
 import Review from "../models/review.model.js";
 import { Product, ProductVariant } from "../models/product.model.js";
 import { ChangeReviewDto, ReviewDto } from "../validation/review.validation.js";
+import User from "../models/user.model.js";
 
 class ReviewRepository {
     async reviewById (reviewId : number, productSlug : string)
@@ -124,6 +125,34 @@ class ReviewRepository {
     async getAllReviews (options : FindAndCountOptions)
     {
         return await Review.findAndCountAll(options)
+    }
+
+    async getReview (reviewId : number)
+    {
+        return await Review.findOne({
+            where : {
+                id : reviewId
+            },
+            attributes : [
+                'id',
+                'userId',
+                'varianId',
+                'rating',
+                'comment',
+                'isApproved',
+                'isVerifiedPurchase',
+                'adminReply',
+                'repliedAt',
+                'createdAt'
+            ],
+            include : [
+                {
+                    model : User,
+                    as : 'user',
+                    attributes : ['id', 'name'],
+                }
+            ]
+        })
     }
 }
 
