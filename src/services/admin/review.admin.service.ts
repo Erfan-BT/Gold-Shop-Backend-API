@@ -1,7 +1,9 @@
 import { AdminReviewQueryBuilder } from "../../builders/adminReviewQuery.builder.js";
 import Review from "../../models/review.model.js";
 import reviewRepository from "../../repository/review.repository.js";
-import { ConflictError, NotFoundError } from "../../utils/appError.js";
+import userRepository from "../../repository/user.repository.js";
+import { RolesTitle } from "../../types/role.enum.js";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../utils/appError.js";
 import { AdminChangeReviewSchemaDto, AdminReviewQSDto } from "../../validation/review.validation.js";
 
 class AdminReviewService {
@@ -56,6 +58,23 @@ class AdminReviewService {
         // Change Status
         if (!(await reviewRepository.changeReviewStatus(reviewId, review.isApproved)))
             throw new ConflictError('Review Status Not Changed')
+        return
+    }
+
+    async deleteReview (reviewId : number, adminId : number)
+    {
+        // Get Admin
+        const admin = await userRepository.userById(adminId)
+        if (!admin)
+            throw new NotFoundError(`Admin Not Found { ID : ${adminId} }`)
+
+        const isOwner = admin.roles?.some(userRole => userRole.role?.name === RolesTitle.OWNER) ?? false
+        if (!isOwner)
+            throw new ForbiddenError('Not Access')
+
+        // Delete
+        if (!(await reviewRepository.adminDeleteReview(reviewId)))
+            throw new ConflictError('Review Not Deleted')
         return
     }
 }   

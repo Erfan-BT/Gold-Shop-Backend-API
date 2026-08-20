@@ -9,5 +9,6 @@ router.get('/', validate({ query : adminReviewQS }), adminReviewController.getAl
 router.get('/:reviewId', validate({ params : reviewIdSchema }), adminReviewController.getReview)
 router.patch('/:reviewId', validate({ params : reviewIdSchema, body : adminChangeReviewSchema }), adminReviewController.changeReview)
 router.patch('/:reviewId/status', validate({ params : reviewIdSchema }), adminReviewController.changeReviewStatus)
+router.delete('/:reviewId', validate({ params : reviewIdSchema }), adminReviewController.deleteReview)
 
 export default router

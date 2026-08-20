@@ -64,6 +64,23 @@ class AdminReviewController {
             next(error)
         }
     }
+
+    async deleteReview (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { reviewId } = req.validated.params as ReviewIdSchemaDto
+            const adminId = req.user!.userId
+            await adminReviewService.deleteReview(reviewId, adminId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Review',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminReviewController()

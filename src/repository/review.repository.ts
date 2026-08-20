@@ -177,6 +177,16 @@ class ReviewRepository {
         })
         return rows === 1
     }
+
+    async adminDeleteReview (reviewId : number)
+    {
+        const rows = await Review.destroy({
+            where : {
+                id : reviewId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ReviewRepository()
