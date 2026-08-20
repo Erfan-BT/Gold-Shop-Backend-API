@@ -119,6 +119,12 @@ class ReviewRepository {
             }
         })
     }
+
+    // ----- Admin -----
+    async getAllReviews (options : FindAndCountOptions)
+    {
+        return await Review.findAndCountAll(options)
+    }
 }
 
 export default new ReviewRepository()

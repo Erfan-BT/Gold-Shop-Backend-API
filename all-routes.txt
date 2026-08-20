@@ -138,8 +138,8 @@ POST   | ./discounts                            |     Admin    |       -        
 PATCH  | ./discounts/:discountId                |     Admin    |       -        | type, value, startDate, endDate
 PATCH  | ./discounts/:discountId/status         |     Admin    |       -        |   -
 DELETE | ./discounts/:discountId                |     Admin    |       -        |   -
-----------------------------------------------------------------------------------------------------------------
-GET    | ./reviews                              |     Admin    |       -        |   -
-GET    | ./reviews/:reviewId                    |     Admin    |       -        |   -
-PATCH  | ./reviews/:reviewId/status             |     Admin    |       -        |   -
-DELETE | ./reviews/:reviewId                    |     Owner    |       -        |   -
+________________________________________________________________________________________________________________
+GET    | admin/reviews                          |     Admin    | .............. |   -
+GET    | admin/reviews/:reviewId                |     Admin    |       -        |   -
+PATCH  | admin/reviews/:reviewId/status         |     Admin    |       -        | adminReplay?
+DELETE | admin/reviews/:reviewId                |     Owner    |       -        |   -

@@ -26,7 +26,36 @@ export const changeReviewParams = z.object({
     reviewId : z.coerce.number().int().positive()
 })
 
+export const adminReviewQS = z.object({
+    page : z.coerce.number().int().positive().min(1).default(1),
+    limit : z.coerce.number().int().positive().min(1).max(50).default(20),
+    sort : z.enum(ReviewSort).default(ReviewSort.NEWEST),
+
+    q : z.string().trim().min(1).optional(),
+
+    minRating : z.coerce.number().nonnegative().optional(),
+    maxRating : z.coerce.number().nonnegative().max(5).optional(),
+
+    isApproved : z.coerce.boolean().optional(),
+    isVerifiedPurchase : z.coerce.boolean().optional(),
+    hasAdminReply : z.coerce.boolean().optional(),
+})
+.superRefine((data , ctx) => {
+    if (
+        data.minRating !== undefined &&
+        data.maxRating !== undefined &&
+        data.minRating > data.maxRating
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['maxRating'],
+            message : 'Max Rating Must Be Greater Than Or Equal To Min Rating'
+        })
+    }
+})
+
 export type ReviewQSDto = z.infer<typeof reviewQS>
 export type ReviewDto = z.infer<typeof reviewSchema>
 export type ChangeReviewDto = z.infer<typeof changeReviewSchema>
 export type ReviewParamsDto = z.infer<typeof changeReviewParams>
+export type AdminReviewQSDto = z.infer<typeof adminReviewQS>
