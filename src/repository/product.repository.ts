@@ -635,6 +635,20 @@ class ProductRepository {
         })
         return rows === 1
     }
+
+    async changeVariantDiscountStatus (variantId : number, discountId : number, currentStatus : boolean)
+    {
+        const [rows] = await ProductDiscount.update({
+            isActive : !currentStatus
+        },{
+            where : {
+                isActive : currentStatus,
+                variantId,
+                id : discountId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ProductRepository()

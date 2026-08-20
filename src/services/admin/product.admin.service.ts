@@ -781,9 +781,9 @@ class AdminProductService {
             throw new NotFoundError(`Discount Not Found { ID : ${discountId}} `)
         // Check Data
         const finalType = discountData.type ?? discount.type
-        const finalValue = discountData.value ?? discount.value
+        const finalValue = discountData.value !== undefined ? discountData.value : discount.value
         const finalStartDate = discountData.startDate ?? discount.startDate
-        const finalEndDate = discountData.endDate ?? discount.endDate
+        const finalEndDate = discountData.endDate !== undefined ? discountData.endDate : discount.endDate
 
         if (finalType === 'percent' && finalValue > 100)
             throw new BadRequestError('Discount Percent Must Be Between 0 And 100')
@@ -854,6 +854,73 @@ class AdminProductService {
 
         if (!(await productRepository.changeVariantDiscount(variantId, discountId, data)))
             throw new ConflictError('Discount Data Not Changed')
+        return
+    }
+
+    async changeVariantDiscountStatus (productId : number, variantId : number, discountId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get This Discount
+        const [discount] = await productRepository.getVariantDiscounts(variantId, { id : discountId })
+        if (!discount)
+            throw new NotFoundError(`Discount Not Found { ID : ${discountId}} `)
+
+        // Change Status To False
+        if (discount.isActive) {
+            if (!(await productRepository.changeVariantDiscountStatus(variantId, discountId, true)))
+                throw new ConflictError('Product Variant Discount Status Not Changed')
+            return
+        }
+
+        // Change Status To True
+        // Get Other Discounts
+        const now = new Date()
+        const discounts = await productRepository.getVariantDiscounts(variantId,{
+                id : {
+                    [Op.ne] : discountId
+                },
+                isActive : true,
+                [Op.or] : [
+                    {
+                        endDate : {
+                            [Op.gt]: now
+                        }
+                    },
+                    {
+                        endDate : {
+                            [Op.is]: null
+                        }
+                    }
+                ]
+
+            })
+        if (discount.endDate !== null && discount.endDate.getTime() < now.getTime())
+            throw new BadRequestError('An Expired Discount Cannot Be Activated')
+
+        if (discounts.length > 0) {
+            const hasOverlap = discounts.some(
+                existingDiscount =>
+                    (
+                        existingDiscount.endDate === null ||
+                        existingDiscount.endDate.getTime() > discount.startDate.getTime()
+                    ) &&
+                    (
+                        discount.endDate === null ||
+                        discount.endDate.getTime() > existingDiscount.startDate.getTime()
+                    )
+            )
+            if (hasOverlap)
+                throw new ConflictError('Another Discount Has An Overlapping Date Range')
+        }
+        if (!(await productRepository.changeVariantDiscountStatus(variantId, discountId, false)))
+            throw new ConflictError('Product Variant Discount Status Not Changed')
         return
     }
 

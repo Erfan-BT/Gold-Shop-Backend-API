@@ -446,9 +446,24 @@ class AdminProductController {
             const discountData = req.validated.body as ChangeVariantDiscount
             await adminProductService.changeVariantDiscount(productId, variantId, discountId, discountData)
 
-            res.status(201).json({
+            res.status(200).json({
                 success : true,
                 msg : 'Change Variant Discount',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeVariantDiscountStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
+            await adminProductService.changeVariantDiscountStatus(productId, variantId, discountId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Variant Discount Status',
                 data : {}
             })
         } catch (error) {
