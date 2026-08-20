@@ -669,7 +669,7 @@ class AdminProductService {
         // Delete InActive Pricing
         if (!pricing.isActive) {
             if (!(await productRepository.deletePricing(variantId, pricingId)))
-                throw new InternalServerError('Product Variant Pricing Not Deleted')
+                throw new ConflictError('Product Variant Pricing Not Deleted')
             return
         }
         // Delete Active Pricing
@@ -921,6 +921,22 @@ class AdminProductService {
         }
         if (!(await productRepository.changeVariantDiscountStatus(variantId, discountId, false)))
             throw new ConflictError('Product Variant Discount Status Not Changed')
+        return
+    }
+
+    async deleteDiscount (productId : number, variantId : number, discountId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Delete
+        if (!(await productRepository.deleteDiscount(variantId, discountId)))
+            throw new ConflictError('Product Variant Discount Not Deleted')
         return
     }
 

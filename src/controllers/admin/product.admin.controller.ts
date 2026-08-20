@@ -471,6 +471,21 @@ class AdminProductController {
         }
     }
 
+    async deleteDiscount (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
+            await adminProductService.deleteDiscount(productId, variantId, discountId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Variant Discount',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminProductController()
