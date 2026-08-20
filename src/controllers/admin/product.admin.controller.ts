@@ -378,6 +378,21 @@ class AdminProductController {
         }
     }
 
+    async changeVariantPricingStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId, pricingId } = req.validated.params as ProductVariantPricingIdsDto
+            await adminProductService.changeVariantPricingStatus(productId, variantId, pricingId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Variant Pricing Status',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminProductController()

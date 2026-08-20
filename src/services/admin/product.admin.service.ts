@@ -583,6 +583,73 @@ class AdminProductService {
             throw new ConflictError(`Variant Pricing NoT Changed`)
         return
     }
+
+    async changeVariantPricingStatus (productId : number, variantId : number, pricingId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get This Pricing
+        const [pricing] = await productRepository.getVariantPricing(variantId, {id : pricingId})
+        if (!pricing)
+            throw new NotFoundError(`Pricing Not Found { ID : ${pricingId} }`)
+        // Get Other Pricing
+        const now = new Date()
+        const allPricing = await productRepository.getVariantPricing(variantId,
+            {
+                id : {
+                    [Op.ne] : pricingId
+                },
+                isActive : true,
+                [Op.or] : [
+                    {
+                        validTo : {
+                            [Op.gte]: now
+                        }
+                    },
+                    {
+                        validTo : {
+                            [Op.is]: null
+                        }
+                    }
+                ]
+            })
+
+        // Change Status To False
+        if (pricing.isActive && allPricing.length === 0)
+            throw new BadRequestError('The Product Requires At Least One Active Pricing')
+
+        if (pricing.isActive) {
+            if (!(await productRepository.changeVariantPricingStatus(variantId, pricingId, true)))
+                throw new ConflictError('Product Variant Pricing Status Not Changed')
+            return
+        }
+        
+        // Change Status To True
+        if (pricing.validTo !== null && pricing.validTo.getTime() < now.getTime())
+            throw new BadRequestError('An Expired Pricing Cannot Be Activated')
+        
+        if (allPricing.length > 0) {
+            const hasPriorityOverlap = allPricing.some(
+                existingPricing =>
+                    existingPricing.priority === pricing.priority &&
+                    (
+                        (existingPricing.validTo === null || existingPricing.validTo.getTime() >= pricing.validFrom.getTime()) &&
+                        (pricing.validTo === null || pricing.validTo.getTime() >= existingPricing.validFrom.getTime())
+                    )
+            )
+            if (hasPriorityOverlap)
+                throw new ConflictError('Another Active Pricing With The Same Priority Has An Overlapping Date Range')
+        }
+        if (!(await productRepository.changeVariantPricingStatus(variantId, pricingId, false)))
+            throw new ConflictError('Product Variant Pricing Status Not Changed')
+        return
+    }
     
 }
 
