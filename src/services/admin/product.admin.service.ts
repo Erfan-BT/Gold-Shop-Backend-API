@@ -7,7 +7,7 @@ import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
 import { ImageService } from "../image.service.js";
 import { Op } from "sequelize";
 
@@ -716,6 +716,53 @@ class AdminProductService {
             throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
         // Get Discounts
         return await productRepository.getVariantDiscounts(variantId)
+    }
+
+    async createVariantDiscount (productId : number, variantId : number, discountData : CreateVariantDiscount)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Variant Discounts
+        if (discountData.isActive) {
+            const now = new Date()
+            const discounts = await productRepository.getVariantDiscounts(variantId,{
+                isActive : true,
+                [Op.or] : [
+                    {
+                        endDate : {
+                            [Op.gt]: now
+                        }
+                    },
+                    {
+                        endDate : {
+                            [Op.is]: null
+                        }
+                    }
+                ]
+
+            })
+            const hasOverlap = discounts.some(
+                existingDiscount =>
+                    (
+                        existingDiscount.endDate === null ||
+                        existingDiscount.endDate.getTime() > discountData.startDate.getTime()
+                    ) &&
+                    (
+                        discountData.endDate === null ||
+                        discountData.endDate.getTime() > existingDiscount.startDate.getTime()
+                    )
+            )
+            if (hasOverlap)
+                throw new ConflictError('Another Discount Has An Overlapping Date Range')
+        }
+        // Create Discount
+        return await productRepository.createVariantDiscount(variantId, discountData)
     }
     
 }

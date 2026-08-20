@@ -473,7 +473,7 @@ export class ProductDiscount extends Model<
 
     declare startDate: Date;
 
-    declare endDate: Date;
+    declare endDate: Date | null;
 
     declare isActive: boolean;
 
@@ -511,7 +511,7 @@ ProductDiscount.init(
 
         endDate: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: true
         },
 
         isActive: {

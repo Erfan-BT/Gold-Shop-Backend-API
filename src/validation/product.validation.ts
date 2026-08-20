@@ -262,6 +262,37 @@ export const changeVariantPricing = z.object({
     }
 })
 
+export const createVariantDiscount = z.object({
+    type : z.enum(["fixed" , "percent"]),
+    value : z.coerce.number().nonnegative(),
+    startDate : z.coerce.date(),
+    endDate : z.coerce.date().nullable(),
+    isActive : z.coerce.boolean().default(false)
+})
+.superRefine((data, ctx) => {
+    if (
+        data.type === 'percent' &&
+        data.value > 100
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['value'],
+            message : 'Discount Percent Must Be Between 0 And 100'
+        })
+    }
+
+    if (
+        data.endDate !== null &&
+        data.startDate.getTime() > data.endDate.getTime()
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['endDate'],
+            message : 'End Date Must Be Greater Than Or Equal To Start Date'
+        })
+    }
+})
+
 
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
@@ -321,3 +352,4 @@ export type CreateVariantSchemaDto = z.infer<typeof createVariantSchema>
 export type ChangeVariantSchemaDto = z.infer<typeof changeVariantSchema>
 export type CreateVariantPricing = z.infer<typeof createVariantPricing>
 export type ChangeVariantPricing = z.infer<typeof changeVariantPricing>
+export type CreateVariantDiscount = z.infer<typeof createVariantDiscount>

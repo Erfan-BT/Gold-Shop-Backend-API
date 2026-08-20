@@ -134,7 +134,7 @@ PATCH  | ./pricing/:pricingId/status            |     Admin    |       -        
 DELETE | ./pricing/:pricingId                   |     Admin    |       -        |   -
 ----------------------------------------------------------------------------------------------------------------
 GET    | ./discounts                            |     Admin    |       -        |   -
-POST   | ./discounts                            |     Admin    |       -        |   -
+POST   | ./discounts                            |     Admin    |       -        | type, value, startDate, endDate, isActive
 PATCH  | ./discounts/:discountId                |     Admin    |       -        |   -
 PATCH  | ./discounts/:discountId/status         |     Admin    |       -        |   -
 DELETE | ./discounts/:discountId                |     Admin    |       -        |   -

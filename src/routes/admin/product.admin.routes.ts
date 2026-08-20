@@ -1,6 +1,6 @@
 import express from 'express'
 import { validate } from '../../middleware/validation.js'
-import { adminProductQS, changeProductSchema, changeVariantPricing, changeVariantSchema, createProductSchema, createVariantPricing, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantIds, productVariantImageIds, productVariantPricingIds } from '../../validation/product.validation.js'
+import { adminProductQS, changeProductSchema, changeVariantPricing, changeVariantSchema, createProductSchema, createVariantDiscount, createVariantPricing, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantIds, productVariantImageIds, productVariantPricingIds } from '../../validation/product.validation.js'
 import adminProductController from '../../controllers/admin/product.admin.controller.js'
 
 const router = express.Router()
@@ -36,6 +36,7 @@ router.patch('/:productId/variants/:variantId/pricing/:pricingId', validate({ pa
 router.patch('/:productId/variants/:variantId/pricing/:pricingId/status', validate({ params : productVariantPricingIds }), adminProductController.changeVariantPricingStatus)
 router.delete('/:productId/variants/:variantId/pricing/:pricingId/', validate({ params : productVariantPricingIds }), adminProductController.deleteVariantPricing)
 // ----- Discount -----
-router.get('/:productId/variants/:variantId/discount', validate({ params : productVariantIds }), adminProductController.getVariantDiscounts)
+router.get('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds }), adminProductController.getVariantDiscounts)
+router.post('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds, body : createVariantDiscount }), adminProductController.createVariantDiscount)
 
 export default router
