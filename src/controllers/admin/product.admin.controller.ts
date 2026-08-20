@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageAltTextDto, ImageIdsSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantIdsDto, ProductVariantImageIdsDto, ProductVariantPricingIdsDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantDiscount, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageAltTextDto, ImageIdsSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantDiscountIdsDto, ProductVariantIdsDto, ProductVariantImageIdsDto, ProductVariantPricingIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -434,6 +434,22 @@ class AdminProductController {
                 success : true,
                 msg : 'Create Variant Discount',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeVariantDiscount (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
+            const discountData = req.validated.body as ChangeVariantDiscount
+            await adminProductService.changeVariantDiscount(productId, variantId, discountId, discountData)
+
+            res.status(201).json({
+                success : true,
+                msg : 'Change Variant Discount',
+                data : {}
             })
         } catch (error) {
             next(error)

@@ -618,6 +618,23 @@ class ProductRepository {
             ...discountData,
         })
     }
+
+    async changeVariantDiscount (variantId : number, discountId : number, data : Partial<Pick<
+        ProductDiscount,
+          'type'
+        | 'value'
+        | 'startDate'
+        | 'endDate'
+    >>)
+    {
+        const [rows] = await ProductDiscount.update(data,{
+            where : {
+                variantId,
+                id : discountId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ProductRepository()

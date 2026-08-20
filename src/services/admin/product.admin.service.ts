@@ -1,13 +1,13 @@
 import { is } from "zod/locales";
 import { AdminProductQueryBuilder } from "../../builders/adminProductQuery.builder.js";
 import sequelize from "../../configs/sequelize.config.js";
-import { Product, ProductPricing, ProductVariant } from "../../models/product.model.js";
+import { Product, ProductDiscount, ProductPricing, ProductVariant } from "../../models/product.model.js";
 import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantDiscount, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
 import { ImageService } from "../image.service.js";
 import { Op } from "sequelize";
 
@@ -544,7 +544,7 @@ class AdminProductService {
         // Change
         const data: Partial<Pick<
             ProductPricing,
-            | 'wageType'
+              'wageType'
             | 'wageValue'
             | 'profitType'
             | 'profitValue'
@@ -764,7 +764,99 @@ class AdminProductService {
         // Create Discount
         return await productRepository.createVariantDiscount(variantId, discountData)
     }
-    
+
+    async changeVariantDiscount (productId : number, variantId : number, discountId : number, discountData : ChangeVariantDiscount)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get This Discount
+        const [discount] = await productRepository.getVariantDiscounts(variantId, { id : discountId })
+        if (!discount)
+            throw new NotFoundError(`Discount Not Found { ID : ${discountId}} `)
+        // Check Data
+        const finalType = discountData.type ?? discount.type
+        const finalValue = discountData.value ?? discount.value
+        const finalStartDate = discountData.startDate ?? discount.startDate
+        const finalEndDate = discountData.endDate ?? discount.endDate
+
+        if (finalType === 'percent' && finalValue > 100)
+            throw new BadRequestError('Discount Percent Must Be Between 0 And 100')
+
+        if (finalType === 'fixed' && finalValue > variant.currentPrice)
+            throw new BadRequestError('Discount Value Should Not Be Greater Than Variant Current Amount')
+
+        if (finalEndDate !== null && finalStartDate.getTime() > finalEndDate.getTime())
+            throw new BadRequestError('End Date Must Be Greater Than Or Equal To Start Date')
+
+        // Get Variant Discounts
+        if (discount.isActive) {
+            const now = new Date()
+            const discounts = await productRepository.getVariantDiscounts(variantId,{
+                id : {
+                    [Op.ne] : discountId
+                },
+                isActive : true,
+                [Op.or] : [
+                    {
+                        endDate : {
+                            [Op.gt]: now
+                        }
+                    },
+                    {
+                        endDate : {
+                            [Op.is]: null
+                        }
+                    }
+                ]
+
+            })
+            const hasOverlap = discounts.some(
+                existingDiscount =>
+                    (
+                        existingDiscount.endDate === null ||
+                        existingDiscount.endDate.getTime() > finalStartDate.getTime()
+                    ) &&
+                    (
+                        finalEndDate === null ||
+                        finalEndDate.getTime() > existingDiscount.startDate.getTime()
+                    )
+            )
+            if (hasOverlap)
+                throw new ConflictError('Another Discount Has An Overlapping Date Range')
+        }
+
+        // Change
+        const data : Partial<Pick<
+            ProductDiscount,
+              'type'
+            | 'value'
+            | 'startDate'
+            | 'endDate'
+        >> = {}
+
+        if (discountData.type !== undefined)
+            data.type = discountData.type;
+
+        if (discountData.value !== undefined)
+            data.value = discountData.value;
+
+        if (discountData.startDate !== undefined)
+            data.startDate = discountData.startDate;
+
+        if (discountData.endDate !== undefined)
+            data.endDate = discountData.endDate;
+
+        if (!(await productRepository.changeVariantDiscount(variantId, discountId, data)))
+            throw new ConflictError('Discount Data Not Changed')
+        return
+    }
+
 }
 
 export default new AdminProductService()

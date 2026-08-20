@@ -221,6 +221,21 @@ export const changeVariantPricing = z.object({
 })
 .superRefine((data, ctx) => {
     if (
+        data.wageType === undefined &&
+        data.wageValue === undefined &&
+        data.profitType === undefined &&
+        data.profitType === undefined &&
+        data.taxPercent === undefined &&
+        data.priority === undefined &&
+        data.validFrom === undefined &&
+        data.validTo === undefined
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            message : "All Params Can Not Empty"
+        })
+    }
+    if (
         data.validFrom !== undefined &&
         data.validTo !== undefined &&
         data.validTo !== null &&
@@ -293,6 +308,50 @@ export const createVariantDiscount = z.object({
     }
 })
 
+export const changeVariantDiscount = z.object({
+    type : z.enum(["fixed" , "percent"]).optional(),
+    value : z.coerce.number().nonnegative().optional(),
+    startDate : z.coerce.date().optional(),
+    endDate : z.coerce.date().nullable().optional(),
+})
+.superRefine((data, ctx) => {
+    if (
+        data.type === undefined &&
+        data.value === undefined &&
+        data.startDate === undefined &&
+        data.endDate === undefined
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            message : "All Params Can Not Empty"
+        })
+    }
+    if (
+        data.type !== undefined &&
+        data.value !== undefined &&
+        data.type === 'percent' &&
+        data.value > 100
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['value'],
+            message : 'Discount Percent Must Be Between 0 And 100'
+        })
+    }
+
+    if (
+        data.startDate !== undefined &&
+        data.endDate !== undefined &&
+        data.endDate !== null &&
+        data.startDate.getTime() > data.endDate.getTime()
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['endDate'],
+            message : 'End Date Must Be Greater Than Or Equal To Start Date'
+        })
+    }
+})
 
 export const variantId = z.object({
     variantId : z.coerce.number().int().positive()
@@ -324,6 +383,12 @@ export const productVariantPricingIds = z.object({
     pricingId : z.coerce.number().int().positive(),
 })
 
+export const productVariantDiscountIds = z.object({
+    productId : z.coerce.number().int().positive(),
+    variantId : z.coerce.number().int().positive(),
+    discountId : z.coerce.number().int().positive(),
+})
+
 export const imageAltText = z.object({
     altText : z.string().trim().min(1).max(200)
 })
@@ -344,6 +409,7 @@ export type ProductCategoryIdsDto = z.infer<typeof productCategoryIds>
 export type ProductVariantIdsDto = z.infer<typeof productVariantIds>
 export type ProductVariantImageIdsDto = z.infer<typeof productVariantImageIds>
 export type ProductVariantPricingIdsDto = z.infer<typeof productVariantPricingIds>
+export type ProductVariantDiscountIdsDto = z.infer<typeof productVariantDiscountIds>
 export type ImageAltTextDto = z.infer<typeof imageAltText>
 export type ImageIdsSchemaDto = z.infer<typeof imageIdsSchema>
 export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
@@ -353,3 +419,4 @@ export type ChangeVariantSchemaDto = z.infer<typeof changeVariantSchema>
 export type CreateVariantPricing = z.infer<typeof createVariantPricing>
 export type ChangeVariantPricing = z.infer<typeof changeVariantPricing>
 export type CreateVariantDiscount = z.infer<typeof createVariantDiscount>
+export type ChangeVariantDiscount = z.infer<typeof changeVariantDiscount>
