@@ -585,6 +585,17 @@ class ProductRepository {
         })
         return rows === 1
     }
+
+    async deletePricing (variantId : number, pricingId : number)
+    {
+        const rows = await ProductPricing.destroy({
+            where : {
+                id : pricingId,
+                variantId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ProductRepository()

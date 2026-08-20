@@ -633,7 +633,7 @@ class AdminProductService {
         // Change Status To True
         if (pricing.validTo !== null && pricing.validTo.getTime() < now.getTime())
             throw new BadRequestError('An Expired Pricing Cannot Be Activated')
-        
+
         if (allPricing.length > 0) {
             const hasPriorityOverlap = allPricing.some(
                 existingPricing =>
@@ -649,6 +649,58 @@ class AdminProductService {
         if (!(await productRepository.changeVariantPricingStatus(variantId, pricingId, false)))
             throw new ConflictError('Product Variant Pricing Status Not Changed')
         return
+    }
+
+    async deleteVariantPricing (productId : number, variantId : number, pricingId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get This Pricing
+        const [pricing] = await productRepository.getVariantPricing(variantId, {id : pricingId})
+        if (!pricing)
+            throw new NotFoundError(`Pricing Not Found { ID : ${pricingId} }`)
+        
+        // Delete InActive Pricing
+        if (!pricing.isActive) {
+            if (!(await productRepository.deletePricing(variantId, pricingId)))
+                throw new InternalServerError('Product Variant Pricing Not Deleted')
+            return
+        }
+        // Delete Active Pricing
+        // Get Other Pricing
+        const now = new Date()
+        const allPricing = await productRepository.getVariantPricing(variantId,
+            {
+                id : {
+                    [Op.ne] : pricingId
+                },
+                isActive : true,
+                [Op.or] : [
+                    {
+                        validTo : {
+                            [Op.gte] : now
+                        }
+                    },
+                    {
+                        validTo : {
+                            [Op.is] : null
+                        }
+                    }
+                ]
+            })
+        
+        if (allPricing.length === 0)
+            throw new BadRequestError('The Product Requires At Least One Active Pricing')
+
+        if (!(await productRepository.deletePricing(variantId, pricingId)))
+            throw new ConflictError('Product Variant Pricing Not Deleted')     
+        return   
     }
     
 }
