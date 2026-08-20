@@ -54,6 +54,24 @@ export const adminReviewQS = z.object({
     }
 })
 
+export const adminChangeReviewSchema = z.object({
+    rating : z.coerce.number().int().min(0).max(5).optional() ,
+    comment : z.string().trim().min(1).optional() ,
+    adminReply : z.string().trim().nullable().optional() ,
+})
+.superRefine ((data, ctx) => {
+    if (
+        data.rating === undefined &&
+        data.comment === undefined &&
+        data.adminReply === undefined
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            message : 'All Params Can Not Empty'
+        })
+    }
+})
+
 export const reviewIdSchema = z.object({
     reviewId : z.coerce.number().int().positive()
 })
@@ -63,4 +81,5 @@ export type ReviewDto = z.infer<typeof reviewSchema>
 export type ChangeReviewDto = z.infer<typeof changeReviewSchema>
 export type ReviewParamsDto = z.infer<typeof changeReviewParams>
 export type AdminReviewQSDto = z.infer<typeof adminReviewQS>
+export type AdminChangeReviewSchemaDto = z.infer<typeof adminChangeReviewSchema> 
 export type ReviewIdSchemaDto = z.infer<typeof reviewIdSchema>

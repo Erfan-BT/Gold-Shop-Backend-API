@@ -154,6 +154,29 @@ class ReviewRepository {
             ]
         })
     }
+
+    async adminChangeReview (reviewId : number, data : Partial<Pick<Review, 'comment' | 'rating' | 'adminReply' | 'repliedAt'>>)
+    {
+        const [rows] = await Review.update(data, {
+            where : {
+                id : reviewId
+            }
+        })
+        return rows === 1
+    }
+
+    async changeReviewStatus (reviewId : number, currentStatus : boolean)
+    {
+        const [rows] = await Review.update({
+            isApproved : !currentStatus
+        }, {
+            where : {
+                id : reviewId,
+                isApproved : currentStatus
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ReviewRepository()
