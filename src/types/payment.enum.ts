@@ -5,3 +5,12 @@ export enum PaymentStatus {
     REFUND_PROCESSING = 'REFUND_PROCESSING',
     REFUND = 'REFUND',
 }
+
+export enum PaymentSort {
+    NEWEST = 'NEWEST',
+    OLDEST = 'OLDEST',
+    PRICE_ASC = 'PRICE_ASC',
+    PRICE_DESC = 'PRICE_DESC',
+    REFUND_PRICE_ASC = 'REFUND_PRICE_ASC',
+    REFUND_PRICE_DESC = 'REFUND_PRICE_DESC',
+}

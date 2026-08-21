@@ -12,6 +12,8 @@ import adminInventoryController from '../../controllers/admin/inventory.admin.co
 import { imageAltText, imageIdsSchema, productVariantImageIds } from '../../validation/image.validation.js'
 import { changeVariantPricing, createVariantPricing, productVariantPricingIds } from '../../validation/pricing.validation.js'
 import { changeVariantDiscount, createVariantDiscount, productVariantDiscountIds } from '../../validation/discount.validation.js'
+import { roleMiddleware } from '../../middleware/auth.middleware.js'
+import { RolesTitle } from '../../types/role.enum.js'
 
 const router = express.Router()
 
@@ -52,7 +54,8 @@ router.patch('/:productId/variants/:variantId/discounts/:discountId', validate({
 router.patch('/:productId/variants/:variantId/discounts/:discountId/status', validate({ params : productVariantDiscountIds }), adminDiscountController.changeVariantDiscountStatus)
 router.delete('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds }), adminDiscountController.deleteDiscount)
 // ----- Inventory -----
-router.get('/:productId/variants/:variantId/inventory', validate({ params : productVariantIds }), adminInventoryController.getVariantInventory)
-router.patch('/:productId/variants/:variantId/inventory', validate({ params : productVariantIds, body : adminChangeInventorySchema }), adminInventoryController.changeVariantInventory)
+router.get('/:productId/variants/:variantId/inventory', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.INVENTORY]), validate({ params : productVariantIds }), adminInventoryController.getVariantInventory)
+router.patch('/:productId/variants/:variantId/inventory', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.INVENTORY]), validate({ params : productVariantIds, body : adminChangeInventorySchema }), adminInventoryController.changeVariantInventory)
+
 
 export default router

@@ -1,4 +1,4 @@
-import { Transaction } from "sequelize";
+import { FindAndCountOptions, Transaction } from "sequelize";
 import Payment from "../models/payment.model.js";
 import { PaymentData } from "../types/payment.type.js";
 import { PaymentStatus } from "../types/payment.enum.js";
@@ -69,6 +69,12 @@ class PaymentRepository {
             },
             limit
         })
+    }
+
+    // --- Admin ---
+    async getAllPayments (options : FindAndCountOptions)
+    {
+        return await Payment.findAndCountAll(options)
     }
 }
 
