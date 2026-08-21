@@ -2,6 +2,7 @@ import express from 'express'
 import { validate } from '../../middleware/validation.js'
 import { adminProductQS, changeProductSchema, changeVariantDiscount, changeVariantPricing, changeVariantSchema, createProductSchema, createVariantDiscount, createVariantPricing, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantDiscountIds, productVariantIds, productVariantImageIds, productVariantPricingIds } from '../../validation/product.validation.js'
 import adminProductController from '../../controllers/admin/product.admin.controller.js'
+import { adminChangeInventorySchema } from '../../validation/inventory.validation.js'
 
 const router = express.Router()
 
@@ -20,7 +21,7 @@ router.get('/:productId/variants', validate({ params : productId }), adminProduc
 router.get('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.getVariant)
 router.post('/:productId/variants', validate({ params : productId, body : createVariantSchema }), adminProductController.createVariant)
 router.patch('/:productId/variants/:variantId', validate({ params : productVariantIds, body : changeVariantSchema }), adminProductController.changeVariant)
-router.patch('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.changeVariantStatus)
+router.patch('/:productId/variants/:variantId/status', validate({ params : productVariantIds }), adminProductController.changeVariantStatus)
 router.delete('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.deleteVariant)
 // ----- Images -----
 router.get('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.getVariantImages)
@@ -42,6 +43,7 @@ router.patch('/:productId/variants/:variantId/discounts/:discountId', validate({
 router.patch('/:productId/variants/:variantId/discounts/:discountId/status', validate({ params : productVariantDiscountIds }), adminProductController.changeVariantDiscountStatus)
 router.delete('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds }), adminProductController.deleteDiscount)
 // ----- Inventory -----
-router.get('/:productId/variants/:variantId/inventory', validate({ params :productVariantIds }), adminProductController.getVariantInventory)
+router.get('/:productId/variants/:variantId/inventory', validate({ params : productVariantIds }), adminProductController.getVariantInventory)
+router.patch('/:productId/variants/:variantId/inventory', validate({ params : productVariantIds, body : adminChangeInventorySchema }), adminProductController.changeVariantInventory)
 
 export default router

@@ -55,6 +55,16 @@ class InventoryRepository {
             attributes : ['id', 'quantity', 'minThreshold']
         })
     }
+
+    async changeInventory (variantId : number, data : Partial<Pick<Inventory, 'quantity' | 'minThreshold'>>)
+    {
+        const [rows] = await Inventory.update(data, {
+            where : {
+                variantId
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new InventoryRepository()

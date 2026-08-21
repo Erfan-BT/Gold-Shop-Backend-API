@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
 import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantDiscount, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageAltTextDto, ImageIdsSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantDiscountIdsDto, ProductVariantIdsDto, ProductVariantImageIdsDto, ProductVariantPricingIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
+import { adminChangeInventorySchemaDto } from "../../validation/inventory.validation.js";
 
 class AdminProductController {
     async getAllProducts (req : AuthRequest, res : Response, next : NextFunction) {
@@ -495,6 +496,22 @@ class AdminProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Get Variant Inventory',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeVariantInventory (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId, variantId } = req.validated.params as ProductVariantIdsDto
+            const inventoryData = req.validated.body as adminChangeInventorySchemaDto
+            const result = await adminProductService.changeVariantInventory(productId, variantId, inventoryData)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Variant Inventory',
                 data : result
             })
         } catch (error) {

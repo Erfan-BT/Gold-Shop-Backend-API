@@ -52,6 +52,12 @@ export class AdminReviewQueryBuilder {
             })
         }
 
+        if (qs.variantId !== undefined) {
+            conditions.push({
+                variantId : qs.variantId
+            })
+        }
+
         const ratingCondition: {
             [Op.gte]?: number;
             [Op.lte]?: number;
