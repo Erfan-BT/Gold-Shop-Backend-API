@@ -97,100 +97,6 @@ class AdminProductController {
         }
     }
 
-    // ---------- Images ----------
-    async getVariantImages (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const result = await adminProductService.getVariantImages(productId, variantId)
-            
-            res.status(200).json({
-                success : true,
-                msg : 'Get Variant Images',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async addVariantImages (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const files: Express.Multer.File[] = Array.isArray(req.files) ? req.files : [];
-            const result = await adminProductService.addVariantImages(productId, variantId, files)
-            
-            res.status(201).json({
-                success : true,
-                msg : 'Add Variant Images',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async changeImageAltText (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
-            const { altText } = req.validated.body as ImageAltTextDto
-            await adminProductService.changeImageAltText(productId, variantId, imageId, altText)
-            
-            res.status(200).json({
-                success : true,
-                msg : 'Change Image Alt Text',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async changeVariantImagePrimary (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
-            await adminProductService.changeVariantImagePrimary(productId, variantId, imageId)
-            
-            res.status(200).json({
-                success : true,
-                msg : 'Change Variant Image Primary',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async changeVariantImagesOrder (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const { imageIds } = req.validated.body as ImageIdsSchemaDto
-            await adminProductService.changeVariantImagesOrder(productId, variantId, imageIds)
-            
-            res.status(200).json({
-                success : true,
-                msg : 'Change Variant Images Order',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async deleteImage (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
-            await adminProductService.deleteImage(productId, variantId, imageId)
-            
-            res.status(200).json({
-                success : true,
-                msg : 'Delete Variant Image',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
     // ---------- Pricing ----------
     async getVariantPricing (req : AuthRequest, res : Response, next : NextFunction) {
         try {
@@ -347,7 +253,7 @@ class AdminProductController {
         }
     }
 
-    // ---------- Discounts ----------
+    // ---------- Inventory ----------
     async getVariantInventory (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId, variantId } = req.validated.params as ProductVariantIdsDto

@@ -5,6 +5,7 @@ import adminProductController from '../../controllers/admin/product.admin.contro
 import { adminChangeInventorySchema } from '../../validation/inventory.validation.js'
 import adminCategoryController from '../../controllers/admin/category.admin.controller.js'
 import adminVariantController from '../../controllers/admin/variant.admin.controller.js'
+import adminImageController from '../../controllers/admin/image.admin.controller.js'
 
 const router = express.Router()
 
@@ -26,12 +27,12 @@ router.patch('/:productId/variants/:variantId', validate({ params : productVaria
 router.patch('/:productId/variants/:variantId/status', validate({ params : productVariantIds }), adminVariantController.changeVariantStatus)
 router.delete('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminVariantController.deleteVariant)
 // ----- Images -----
-router.get('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.getVariantImages)
-router.post('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.addVariantImages)
-router.patch('/:productId/variants/:variantId/images/reorder', validate({ params : productVariantIds, body : imageIdsSchema }), adminProductController.changeVariantImagesOrder)
-router.patch('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds, body : imageAltText }), adminProductController.changeImageAltText)
-router.patch('/:productId/variants/:variantId/images/:imageId/primary', validate({ params : productVariantImageIds }), adminProductController.changeVariantImagePrimary)
-router.delete('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds }), adminProductController.deleteImage)
+router.get('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminImageController.getVariantImages)
+router.post('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminImageController.addVariantImages)
+router.patch('/:productId/variants/:variantId/images/reorder', validate({ params : productVariantIds, body : imageIdsSchema }), adminImageController.changeVariantImagesOrder)
+router.patch('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds, body : imageAltText }), adminImageController.changeImageAltText)
+router.patch('/:productId/variants/:variantId/images/:imageId/primary', validate({ params : productVariantImageIds }), adminImageController.changeVariantImagePrimary)
+router.delete('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds }), adminImageController.deleteImage)
 // ----- Pricing -----
 router.get('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds }), adminProductController.getVariantPricing)
 router.post('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds, body : createVariantPricing }), adminProductController.createVariantPricing)
