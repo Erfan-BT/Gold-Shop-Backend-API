@@ -130,6 +130,7 @@ class ProductRepository {
             }
         })
     }
+
     async getProductAdmin (productId : number)
     {
         return await Product.findOne({
@@ -259,6 +260,7 @@ class ProductRepository {
         })
         return rows === 1
     }
+
     // --- Variants ---
     async findVariant (variantId : number, productId ?: number)
     {
@@ -413,6 +415,7 @@ class ProductRepository {
             }
         })
     }
+    
     async getVariantImages (variantId : number)
     {
         return await ProductImage.findAll({

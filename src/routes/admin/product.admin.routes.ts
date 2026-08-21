@@ -4,6 +4,7 @@ import { adminProductQS, changeProductSchema, changeVariantDiscount, changeVaria
 import adminProductController from '../../controllers/admin/product.admin.controller.js'
 import { adminChangeInventorySchema } from '../../validation/inventory.validation.js'
 import adminCategoryController from '../../controllers/admin/category.admin.controller.js'
+import adminVariantController from '../../controllers/admin/variant.admin.controller.js'
 
 const router = express.Router()
 
@@ -18,12 +19,12 @@ router.get('/:productId/categories', validate({ params : productId }), adminCate
 router.post('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminCategoryController.setCategoryForProduct)
 router.delete('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminCategoryController.deleteCategoryFromProduct)
 // ----- Variants -----
-router.get('/:productId/variants', validate({ params : productId }), adminProductController.getProductVariants)
-router.get('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.getVariant)
-router.post('/:productId/variants', validate({ params : productId, body : createVariantSchema }), adminProductController.createVariant)
-router.patch('/:productId/variants/:variantId', validate({ params : productVariantIds, body : changeVariantSchema }), adminProductController.changeVariant)
-router.patch('/:productId/variants/:variantId/status', validate({ params : productVariantIds }), adminProductController.changeVariantStatus)
-router.delete('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.deleteVariant)
+router.get('/:productId/variants', validate({ params : productId }), adminVariantController.getProductVariants)
+router.get('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminVariantController.getVariant)
+router.post('/:productId/variants', validate({ params : productId, body : createVariantSchema }), adminVariantController.createVariant)
+router.patch('/:productId/variants/:variantId', validate({ params : productVariantIds, body : changeVariantSchema }), adminVariantController.changeVariant)
+router.patch('/:productId/variants/:variantId/status', validate({ params : productVariantIds }), adminVariantController.changeVariantStatus)
+router.delete('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminVariantController.deleteVariant)
 // ----- Images -----
 router.get('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.getVariantImages)
 router.post('/:productId/variants/:variantId/images', validate({ params : productVariantIds }), adminProductController.addVariantImages)
