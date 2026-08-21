@@ -7,6 +7,7 @@ import adminCategoryController from '../../controllers/admin/category.admin.cont
 import adminVariantController from '../../controllers/admin/variant.admin.controller.js'
 import adminImageController from '../../controllers/admin/image.admin.controller.js'
 import adminPricingController from '../../controllers/admin/pricing.admin.controller.js'
+import adminDiscountController from '../../controllers/admin/discount.admin.controller.js'
 
 const router = express.Router()
 
@@ -41,11 +42,11 @@ router.patch('/:productId/variants/:variantId/pricing/:pricingId', validate({ pa
 router.patch('/:productId/variants/:variantId/pricing/:pricingId/status', validate({ params : productVariantPricingIds }), adminPricingController.changeVariantPricingStatus)
 router.delete('/:productId/variants/:variantId/pricing/:pricingId/', validate({ params : productVariantPricingIds }), adminPricingController.deleteVariantPricing)
 // ----- Discount -----
-router.get('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds }), adminProductController.getVariantDiscounts)
-router.post('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds, body : createVariantDiscount }), adminProductController.createVariantDiscount)
-router.patch('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds, body : changeVariantDiscount }), adminProductController.changeVariantDiscount)
-router.patch('/:productId/variants/:variantId/discounts/:discountId/status', validate({ params : productVariantDiscountIds }), adminProductController.changeVariantDiscountStatus)
-router.delete('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds }), adminProductController.deleteDiscount)
+router.get('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds }), adminDiscountController.getVariantDiscounts)
+router.post('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds, body : createVariantDiscount }), adminDiscountController.createVariantDiscount)
+router.patch('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds, body : changeVariantDiscount }), adminDiscountController.changeVariantDiscount)
+router.patch('/:productId/variants/:variantId/discounts/:discountId/status', validate({ params : productVariantDiscountIds }), adminDiscountController.changeVariantDiscountStatus)
+router.delete('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds }), adminDiscountController.deleteDiscount)
 // ----- Inventory -----
 router.get('/:productId/variants/:variantId/inventory', validate({ params : productVariantIds }), adminProductController.getVariantInventory)
 router.patch('/:productId/variants/:variantId/inventory', validate({ params : productVariantIds, body : adminChangeInventorySchema }), adminProductController.changeVariantInventory)

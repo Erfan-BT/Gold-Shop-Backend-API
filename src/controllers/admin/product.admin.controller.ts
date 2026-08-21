@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantDiscount, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageAltTextDto, ImageIdsSchemaDto, ProductCategoryIdsDto, ProductIdDto, ProductVariantDiscountIdsDto, ProductVariantIdsDto, ProductVariantImageIdsDto, ProductVariantPricingIdsDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 import { adminChangeInventorySchemaDto } from "../../validation/inventory.validation.js";
 
@@ -90,84 +90,6 @@ class AdminProductController {
             res.status(200).json({
                 success : true,
                 msg : 'Delete Product',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    // ---------- Discounts ----------
-    async getVariantDiscounts (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const result = await adminProductService.getVariantDiscounts(productId, variantId)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Get Variant Discounts',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async createVariantDiscount (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const discountData = req.validated.body as CreateVariantDiscount
-            const result = await adminProductService.createVariantDiscount(productId, variantId, discountData)
-
-            res.status(201).json({
-                success : true,
-                msg : 'Create Variant Discount',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async changeVariantDiscount (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
-            const discountData = req.validated.body as ChangeVariantDiscount
-            await adminProductService.changeVariantDiscount(productId, variantId, discountId, discountData)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Change Variant Discount',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async changeVariantDiscountStatus (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
-            await adminProductService.changeVariantDiscountStatus(productId, variantId, discountId)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Change Variant Discount Status',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async deleteDiscount (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
-            await adminProductService.deleteDiscount(productId, variantId, discountId)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Delete Variant Discount',
                 data : {}
             })
         } catch (error) {
