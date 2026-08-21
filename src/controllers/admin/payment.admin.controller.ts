@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { PaymentQSDto } from "../../validation/payment.validation.js";
+import { PaymentIdSchemaDto, PaymentQSDto } from "../../validation/payment.validation.js";
 import adminPaymentService from "../../services/admin/payment.admin.service.js";
 
 class AdminPaymentController {
@@ -12,6 +12,21 @@ class AdminPaymentController {
             res.status(200).json({
                 success : true,
                 msg : 'Get All Payments',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getPayment (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { paymentId } = req.validated.params as PaymentIdSchemaDto
+            const result = await adminPaymentService.getPayment(paymentId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Payment',
                 data : result
             })
         } catch (error) {

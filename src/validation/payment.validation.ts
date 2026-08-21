@@ -28,7 +28,37 @@ export const paymentQS = z.object({
 
     hasRefund : z.coerce.boolean().optional(),
 })
+.superRefine((data, ctx) => {
+    if (
+        data.from !== undefined &&
+        data.to !== undefined &&
+        data.from.getTime() > data.to.getTime()
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['to'],
+            message : 'To Date Must Be Greater Than Or Equal To From Date'
+        })
+    }
+
+    if (
+        data.minPrice !== undefined &&
+        data.maxPrice !== undefined &&
+        data.minPrice > data.maxPrice
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['maxPrice'],
+            message : 'Max Price Must Be Greater Than Or Equal To Min Price'
+        })
+    }
+})
+
+export const paymentIdSchema = z.object({
+    paymentId : z.coerce.number().int().positive()
+})
 
 export type PaymentSchemaDto = z.infer<typeof paymentSchema>
 export type CallbackSchemaDto = z.infer<typeof callbackSchema>
 export type PaymentQSDto = z.infer<typeof paymentQS>
+export type PaymentIdSchemaDto = z.infer<typeof paymentIdSchema>

@@ -76,6 +76,34 @@ class PaymentRepository {
     {
         return await Payment.findAndCountAll(options)
     }
+
+    async adminGetPayment (paymentId : number)
+    {
+        return await Payment.findOne({
+            where : {
+                id : paymentId
+            },
+            attributes : [
+                'id',
+                'orderId',
+                'amount',
+                'transactionId',
+                'authorityCode',
+                'referenceCode',
+                'cardPan',
+                'status',
+                'ipAddress',
+                'refundAmount',
+                'refundReason',
+                'terminal_id',
+                'refundId',
+                'bankResponse',
+                'paidAt',
+                'refundedAt',
+                'updatedAt',
+            ]
+        })
+    }
 }
 
 export default new PaymentRepository()
