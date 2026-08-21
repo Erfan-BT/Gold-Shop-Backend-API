@@ -1,8 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductIdDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
-import { adminChangeInventorySchemaDto } from "../../validation/inventory.validation.js";
 
 class AdminProductController {
     async getAllProducts (req : AuthRequest, res : Response, next : NextFunction) {
@@ -91,38 +90,6 @@ class AdminProductController {
                 success : true,
                 msg : 'Delete Product',
                 data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    // ---------- Inventory ----------
-    async getVariantInventory (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId, variantId } = req.validated.params as ProductVariantIdsDto
-            const result = await adminProductService.getVariantInventory(productId, variantId)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Get Variant Inventory',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async changeVariantInventory (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId, variantId } = req.validated.params as ProductVariantIdsDto
-            const inventoryData = req.validated.body as adminChangeInventorySchemaDto
-            const result = await adminProductService.changeVariantInventory(productId, variantId, inventoryData)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Change Variant Inventory',
-                data : result
             })
         } catch (error) {
             next(error)
