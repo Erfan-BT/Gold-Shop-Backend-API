@@ -41,5 +41,7 @@ router.post('/:productId/variants/:variantId/discounts', validate({ params : pro
 router.patch('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds, body : changeVariantDiscount }), adminProductController.changeVariantDiscount)
 router.patch('/:productId/variants/:variantId/discounts/:discountId/status', validate({ params : productVariantDiscountIds }), adminProductController.changeVariantDiscountStatus)
 router.delete('/:productId/variants/:variantId/discounts/:discountId', validate({ params : productVariantDiscountIds }), adminProductController.deleteDiscount)
+// ----- Inventory -----
+router.get('/:productId/variants/:variantId/inventory', validate({ params :productVariantIds }), adminProductController.getVariantInventory)
 
 export default router

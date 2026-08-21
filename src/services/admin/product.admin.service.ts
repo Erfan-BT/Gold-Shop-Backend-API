@@ -10,6 +10,7 @@ import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, No
 import { AdminProductQSDto, ChangeProductSchemaDto, ChangeVariantDiscount, ChangeVariantPricing, ChangeVariantSchemaDto, CreateProductSchemaDto, CreateVariantDiscount, CreateVariantPricing, CreateVariantSchemaDto, ImageIdsSchemaDto, variantId } from "../../validation/product.validation.js";
 import { ImageService } from "../image.service.js";
 import { Op } from "sequelize";
+import inventoryRepository from "../../repository/inventory.repository.js";
 
 class AdminProductService {
     async getAllProducts (qs : AdminProductQSDto)
@@ -938,6 +939,24 @@ class AdminProductService {
         if (!(await productRepository.deleteDiscount(variantId, discountId)))
             throw new ConflictError('Product Variant Discount Not Deleted')
         return
+    }
+
+    // ---------- Inventory ----------
+    async getVariantInventory (productId : number, variantId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Variant
+        const variant = await productRepository.findVariant(variantId, productId)
+        if (!variant)
+            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+        // Get Inventory
+        const inventory = await inventoryRepository.getVariantInventory(variantId)
+        if (!inventory)
+            throw new NotFoundError(`Inventory For Variant Not Found { Variant-ID : ${variantId} }`)
+        return inventory
     }
 
 }

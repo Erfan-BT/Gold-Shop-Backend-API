@@ -44,6 +44,17 @@ class InventoryRepository {
         )
         return rows === 1;
     }
+
+    // --- Admin ---
+    async getVariantInventory (variantId : number)
+    {
+        return await Inventory.findOne({
+            where : {
+                variantId
+            },
+            attributes : ['id', 'quantity', 'minThreshold']
+        })
+    }
 }
 
 export default new InventoryRepository()

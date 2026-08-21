@@ -138,6 +138,9 @@ POST   | ./discounts                            |     Admin    |       -        
 PATCH  | ./discounts/:discountId                |     Admin    |       -        | type, value, startDate, endDate
 PATCH  | ./discounts/:discountId/status         |     Admin    |       -        |   -
 DELETE | ./discounts/:discountId                |     Admin    |       -        |   -
+----------------------------------------------------------------------------------------------------------------
+GET    | ./inventory                            |     Admin    |       -        |   -
+PATCH  | ./inventory                            |     Admin    |       -        | quantity, minThreshold
 ________________________________________________________________________________________________________________
 GET    | admin/reviews                          |     Admin    | .............. |   -
 GET    | admin/reviews/:reviewId                |     Admin    |       -        |   -

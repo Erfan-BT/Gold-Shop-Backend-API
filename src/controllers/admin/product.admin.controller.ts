@@ -486,6 +486,22 @@ class AdminProductController {
         }
     }
 
+    // ---------- Discounts ----------
+    async getVariantInventory (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { productId, variantId } = req.validated.params as ProductVariantIdsDto
+            const result = await adminProductService.getVariantInventory(productId, variantId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Variant Inventory',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminProductController()
