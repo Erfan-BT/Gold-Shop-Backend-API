@@ -1,9 +1,9 @@
 import { Op } from "sequelize"
 import productRepository from "../../repository/product.repository.js"
 import { BadRequestError, ConflictError, NotFoundError } from "../../utils/appError.js"
-import { ChangeVariantPricing, CreateVariantPricing } from "../../validation/product.validation.js"
 import { ProductPricing } from "../../models/product.model.js"
 import pricingRepository from "../../repository/pricing.repository.js"
+import { ChangeVariantPricing, CreateVariantPricing } from "../../validation/pricing.validation.js"
 
 class AdminPricingService {
     async getVariantPricing (productId : number, variantId : number)

@@ -1,6 +1,5 @@
 import z from "zod";
 import { ReviewSort } from "../types/review.enum.js";
-import { variantId } from "./product.validation.js";
 
 export const reviewQS = z.object({
     page : z.coerce.number().int().positive().min(1).default(1),

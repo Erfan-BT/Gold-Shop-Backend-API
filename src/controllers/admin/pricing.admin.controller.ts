@@ -1,7 +1,8 @@
 import { NextFunction, Response } from "express"
 import { AuthRequest } from "../../middleware/auth.middleware.js"
-import { ChangeVariantPricing, CreateVariantPricing, ProductVariantIdsDto, ProductVariantPricingIdsDto } from "../../validation/product.validation.js"
+import { ProductVariantIdsDto } from "../../validation/product.validation.js"
 import adminPricingService from "../../services/admin/pricing.admin.service.js"
+import { ChangeVariantPricing, CreateVariantPricing, ProductVariantPricingIdsDto } from "../../validation/pricing.validation.js"
 
 class AdminPricingController {
     async getVariantPricing (req : AuthRequest, res : Response, next : NextFunction) {

@@ -1,7 +1,7 @@
 import { Op } from "sequelize"
 import productRepository from "../../repository/product.repository.js"
 import { BadRequestError, ConflictError, NotFoundError } from "../../utils/appError.js"
-import { ChangeVariantDiscount, CreateVariantDiscount } from "../../validation/product.validation.js"
+import { ChangeVariantDiscount, CreateVariantDiscount } from "../../validation/discount.validation.js"
 import { ProductDiscount } from "../../models/product.model.js"
 import discountRepository from "../../repository/discount.repository.js"
 

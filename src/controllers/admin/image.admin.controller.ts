@@ -1,7 +1,8 @@
 import { NextFunction, Response } from "express"
 import { AuthRequest } from "../../middleware/auth.middleware.js"
-import { ImageAltTextDto, ImageIdsSchemaDto, ProductVariantIdsDto, ProductVariantImageIdsDto } from "../../validation/product.validation.js"
+import { ProductVariantIdsDto } from "../../validation/product.validation.js"
 import adminImageService from "../../services/admin/image.admin.service.js"
+import { ImageAltTextDto, ImageIdsSchemaDto, ProductVariantImageIdsDto } from "../../validation/image.validation.js"
 
 class AdminImageController {
     async getVariantImages (req : AuthRequest, res : Response, next : NextFunction) {

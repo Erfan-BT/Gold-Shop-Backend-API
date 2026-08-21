@@ -1,6 +1,6 @@
 import express from 'express'
 import { validate } from '../../middleware/validation.js'
-import { adminProductQS, changeProductSchema, changeVariantDiscount, changeVariantPricing, changeVariantSchema, createProductSchema, createVariantDiscount, createVariantPricing, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantDiscountIds, productVariantIds, productVariantImageIds, productVariantPricingIds } from '../../validation/product.validation.js'
+import { adminProductQS, changeProductSchema, changeVariantSchema, createProductSchema, createVariantSchema, productCategoryIds, productId, productVariantIds} from '../../validation/product.validation.js'
 import adminProductController from '../../controllers/admin/product.admin.controller.js'
 import { adminChangeInventorySchema } from '../../validation/inventory.validation.js'
 import adminCategoryController from '../../controllers/admin/category.admin.controller.js'
@@ -9,6 +9,9 @@ import adminImageController from '../../controllers/admin/image.admin.controller
 import adminPricingController from '../../controllers/admin/pricing.admin.controller.js'
 import adminDiscountController from '../../controllers/admin/discount.admin.controller.js'
 import adminInventoryController from '../../controllers/admin/inventory.admin.controller.js'
+import { imageAltText, imageIdsSchema, productVariantImageIds } from '../../validation/image.validation.js'
+import { changeVariantPricing, createVariantPricing, productVariantPricingIds } from '../../validation/pricing.validation.js'
+import { changeVariantDiscount, createVariantDiscount, productVariantDiscountIds } from '../../validation/discount.validation.js'
 
 const router = express.Router()
 

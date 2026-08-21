@@ -1,6 +1,6 @@
 import { WhereOptions } from "sequelize"
 import { ProductPricing } from "../models/product.model.js"
-import { CreateVariantPricing } from "../validation/product.validation.js"
+import { CreateVariantPricing } from "../validation/pricing.validation.js"
 
 class PricingRepository {
     async getVariantPricing (variantId : number, where?: WhereOptions<ProductPricing>)
