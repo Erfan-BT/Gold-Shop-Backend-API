@@ -97,52 +97,6 @@ class AdminProductController {
         }
     }
 
-    // ---------- Categories ----------
-    async getProductCategories (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId } = req.validated.params as ProductIdDto
-            const result = await adminProductService.getProductCategories(productId)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Product Categories',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async setCategoryForProduct (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId, categoryId } = req.validated.params as ProductCategoryIdsDto
-            const result = await adminProductService.setCategoryForProduct(productId, categoryId)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Set Category For Product',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async deleteCategoryFromProduct (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { productId, categoryId } = req.validated.params as ProductCategoryIdsDto
-            await adminProductService.deleteCategoryFromProduct(productId, categoryId)
-
-            res.status(200).json({
-                success : true,
-                msg : 'Delete Category From Product',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
     // ---------- Variants ----------
     async getProductVariants (req : AuthRequest, res : Response, next : NextFunction) {
         try {

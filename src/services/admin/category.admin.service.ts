@@ -1,5 +1,6 @@
 import { CategoryQueryBuilder } from "../../builders/categoryQuary.builder.js";
 import categoryRepository from "../../repository/category.repository.js";
+import productRepository from "../../repository/product.repository.js";
 import userRepository from "../../repository/user.repository.js";
 import { RolesTitle } from "../../types/role.enum.js";
 import { ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js";
@@ -74,6 +75,41 @@ class AdminCategoryService {
         if (!(await categoryRepository.deleteCategory(categoryId)))
             throw new InternalServerError('Category Not Deleted')
 
+        return
+    }
+
+    // Product-Variant Categories
+    async getProductCategories (productId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get P-Categories
+        return await categoryRepository.getProductCategories(productId)
+    }
+
+    async setCategoryForProduct (productId : number, categoryId : number)
+    {
+        // Get Product
+        const product = await productRepository.getProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        // Get Category
+        const category = await categoryRepository.getCategory(categoryId)
+        if (!category)
+            throw new NotFoundError(`Category Not Found { ID : ${categoryId} }`)
+        // Check Exists Category
+        if (await categoryRepository.checkExists(productId, categoryId))
+            throw new ConflictError('Product Already Has This Category')
+        // Set
+        return await categoryRepository.setProductCategory(productId, categoryId)
+    }
+
+    async deleteCategoryFromProduct (productId : number, categoryId : number)
+    {
+        if (!(await categoryRepository.deleteProductCategory(productId, categoryId)))
+            throw new NotFoundError('Category Not Found In Product')
         return
     }
 }

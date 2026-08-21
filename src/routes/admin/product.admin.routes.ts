@@ -3,6 +3,7 @@ import { validate } from '../../middleware/validation.js'
 import { adminProductQS, changeProductSchema, changeVariantDiscount, changeVariantPricing, changeVariantSchema, createProductSchema, createVariantDiscount, createVariantPricing, createVariantSchema, imageAltText, imageIdsSchema, productCategoryIds, productId, productVariantDiscountIds, productVariantIds, productVariantImageIds, productVariantPricingIds } from '../../validation/product.validation.js'
 import adminProductController from '../../controllers/admin/product.admin.controller.js'
 import { adminChangeInventorySchema } from '../../validation/inventory.validation.js'
+import adminCategoryController from '../../controllers/admin/category.admin.controller.js'
 
 const router = express.Router()
 
@@ -13,9 +14,9 @@ router.patch('/:productId', validate({ params : productId, body : changeProductS
 router.patch('/:productId/status', validate({ params : productId }), adminProductController.changeProductStatus)
 router.delete('/:productId', validate({ params : productId }), adminProductController.deleteProduct)
 // ----- Categories -----
-router.get('/:productId/categories', validate({ params : productId }), adminProductController.getProductCategories)
-router.post('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminProductController.setCategoryForProduct)
-router.delete('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminProductController.deleteCategoryFromProduct)
+router.get('/:productId/categories', validate({ params : productId }), adminCategoryController.getProductCategories)
+router.post('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminCategoryController.setCategoryForProduct)
+router.delete('/:productId/categories/:categoryId', validate({ params : productCategoryIds }), adminCategoryController.deleteCategoryFromProduct)
 // ----- Variants -----
 router.get('/:productId/variants', validate({ params : productId }), adminProductController.getProductVariants)
 router.get('/:productId/variants/:variantId', validate({ params : productVariantIds }), adminProductController.getVariant)
