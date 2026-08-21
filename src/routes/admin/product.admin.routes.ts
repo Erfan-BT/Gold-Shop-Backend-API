@@ -6,6 +6,7 @@ import { adminChangeInventorySchema } from '../../validation/inventory.validatio
 import adminCategoryController from '../../controllers/admin/category.admin.controller.js'
 import adminVariantController from '../../controllers/admin/variant.admin.controller.js'
 import adminImageController from '../../controllers/admin/image.admin.controller.js'
+import adminPricingController from '../../controllers/admin/pricing.admin.controller.js'
 
 const router = express.Router()
 
@@ -34,11 +35,11 @@ router.patch('/:productId/variants/:variantId/images/:imageId', validate({ param
 router.patch('/:productId/variants/:variantId/images/:imageId/primary', validate({ params : productVariantImageIds }), adminImageController.changeVariantImagePrimary)
 router.delete('/:productId/variants/:variantId/images/:imageId', validate({ params : productVariantImageIds }), adminImageController.deleteImage)
 // ----- Pricing -----
-router.get('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds }), adminProductController.getVariantPricing)
-router.post('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds, body : createVariantPricing }), adminProductController.createVariantPricing)
-router.patch('/:productId/variants/:variantId/pricing/:pricingId', validate({ params : productVariantPricingIds , body : changeVariantPricing }), adminProductController.changeVariantPricing)
-router.patch('/:productId/variants/:variantId/pricing/:pricingId/status', validate({ params : productVariantPricingIds }), adminProductController.changeVariantPricingStatus)
-router.delete('/:productId/variants/:variantId/pricing/:pricingId/', validate({ params : productVariantPricingIds }), adminProductController.deleteVariantPricing)
+router.get('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds }), adminPricingController.getVariantPricing)
+router.post('/:productId/variants/:variantId/pricing', validate({ params : productVariantIds, body : createVariantPricing }), adminPricingController.createVariantPricing)
+router.patch('/:productId/variants/:variantId/pricing/:pricingId', validate({ params : productVariantPricingIds , body : changeVariantPricing }), adminPricingController.changeVariantPricing)
+router.patch('/:productId/variants/:variantId/pricing/:pricingId/status', validate({ params : productVariantPricingIds }), adminPricingController.changeVariantPricingStatus)
+router.delete('/:productId/variants/:variantId/pricing/:pricingId/', validate({ params : productVariantPricingIds }), adminPricingController.deleteVariantPricing)
 // ----- Discount -----
 router.get('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds }), adminProductController.getVariantDiscounts)
 router.post('/:productId/variants/:variantId/discounts', validate({ params : productVariantIds, body : createVariantDiscount }), adminProductController.createVariantDiscount)
