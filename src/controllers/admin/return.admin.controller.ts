@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { ReturnRequestQSDto } from "../../validation/return.validation.js";
+import { ReturnIdSchemaDto, ReturnRequestQSDto } from "../../validation/return.validation.js";
 import adminReturnService from "../../services/admin/return.admin.service.js";
 
 class AdminReturnController {
@@ -12,6 +12,21 @@ class AdminReturnController {
             res.status(200).json({
                 success : true,
                 msg : 'Get All Return Requests',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async getReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const result = await adminReturnService.getReturnRequest(returnId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Return Request',
                 data : result
             })
         } catch (error) {

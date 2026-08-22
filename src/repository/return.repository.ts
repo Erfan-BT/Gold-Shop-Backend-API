@@ -2,6 +2,7 @@ import { FindAndCountOptions, Transaction } from "sequelize"
 import { ReturnItem, ReturnRequest } from "../models/return.model.js"
 import { CreateReturnItemType, RefundStatus, ReturnStatus } from "../types/return.enum.js"
 import { Order, OrderItem } from "../models/order.model.js"
+import User from "../models/user.model.js"
 
 class ReturnRepository {
     async getUserReturnRequests (userId : number)
@@ -85,6 +86,93 @@ class ReturnRepository {
     {
         return await ReturnRequest.findAndCountAll(options)
     }
+
+    async getReturnRequest (returnId : number)
+    {
+        return await ReturnRequest.findOne({
+            where : {
+                id : returnId
+            },
+            attributes : [
+                'id',
+                'orderId',
+                'status',
+                'reviewedBy',
+                'reviewedAt',
+                'adminNote',
+                'refundAmount',
+                'refundStatus',
+                'returnTrackingCode',
+                'resolvedAt',
+                'createdAt',
+            ],
+            include : [
+                {
+                    model : ReturnItem,
+                    as : 'items',
+                    required : true,
+                    attributes : [
+                        'id',
+                        'orderItemId',
+                        'reason',
+                        'description',
+                        'quantity',
+                        'refundAmount',
+                        'createdAt',
+                    ],
+                    include : [
+                        {
+                            model : OrderItem,
+                            as : 'orderItem',
+                            required : true,
+                            attributes : [
+                                'id',
+                                'variantId',
+                                'productTitle',
+                                'sku',
+                                'weight',
+                                'karat',
+                                'stoneType',
+                                'color',
+                                'quantity',
+                                'unitPrice',
+                                'discountAmount',
+                                'finalPrice',
+                                'goldPrice18kAtTime',
+                            ],
+                        }
+                    ]
+                },
+                {
+                    model : Order,
+                    as : 'order',
+                    required : true,
+                    attributes : [
+                        'id',
+                        'orderNumber',
+                        'finalPrice',
+                        'status',
+                        'paymentStatus',
+                        'createdAt',
+                    ],
+                    include : [
+                        {
+                            model : User,
+                            as : 'user',
+                            required : true,
+                            attributes : ['id', 'name', 'email', 'phone']
+                        }
+                    ]
+                },
+                {
+                    model : User,
+                    as : 'admin',
+                    required : false,
+                    attributes : ['id', 'name']
+                }
+            ]
+        })
+    }    
 }
 
 export default new ReturnRepository()
