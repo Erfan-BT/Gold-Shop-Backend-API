@@ -10,6 +10,7 @@ import PricesAdminRoutes from './goldPrice.admin.routes.js'
 import ProductAdminRoutes from './product.admin.routes.js'
 import ReviewAdminRoutes from './review.admin.routes.js'
 import PaymentAdminRoutes from './payment.admin.routes.js'
+import ReturnAdminRoutes from './return.admin.routes.js'
 import { authMiddleware, roleMiddleware } from '../../middleware/auth.middleware.js'
 import { RolesTitle } from '../../types/role.enum.js'
 
@@ -25,5 +26,6 @@ router.use('/gold-prices', authMiddleware, roleMiddleware([RolesTitle.OWNER]), P
 router.use('/products', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ProductAdminRoutes)
 router.use('/reviews', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReviewAdminRoutes)
 router.use('/payments', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), PaymentAdminRoutes)
+router.use('/return-requests', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReturnAdminRoutes)
 
 export default router

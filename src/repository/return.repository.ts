@@ -1,4 +1,4 @@
-import { Transaction } from "sequelize"
+import { FindAndCountOptions, Transaction } from "sequelize"
 import { ReturnItem, ReturnRequest } from "../models/return.model.js"
 import { CreateReturnItemType, RefundStatus, ReturnStatus } from "../types/return.enum.js"
 import { Order, OrderItem } from "../models/order.model.js"
@@ -78,6 +78,12 @@ class ReturnRepository {
     async createReturnItems (items : CreateReturnItemType[], transaction : Transaction)
     : Promise<void> {
         await ReturnItem.bulkCreate(items, {transaction})
+    }
+
+    // --- Admin ---
+    async getAllReturnRequests (options : FindAndCountOptions)
+    {
+        return await ReturnRequest.findAndCountAll(options)
     }
 }
 

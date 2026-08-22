@@ -1,4 +1,5 @@
 import z from "zod";
+import { RefundStatus, ReturnSort, ReturnStatus } from "../types/return.enum.js";
 
 export const returnRequestSchema = z.object({
     orderNumber : z.string().trim().min(1).max(50),
@@ -32,5 +33,84 @@ export const returnIdSchema = z.object({
     returnId : z.coerce.number().int().positive()
 })
 
+export const returnRequestQSSchema = z.object({
+    page : z.coerce.number().int().positive().min(1).default(1),
+    limit : z.coerce.number().int().positive().min(1).max(50).default(20),
+    sort : z.enum(ReturnSort).optional(),
+
+    q : z.string().trim().max(100).optional(),
+
+    returnStatus : z.enum(ReturnStatus).optional(),
+    refundStatus : z.enum(RefundStatus).optional(),
+    reviewedBy : z.array(z.coerce.number().int().positive()).min(1).optional(),
+    orderItemId : z.array(z.coerce.number().int().positive()).min(1).optional(),
+
+    minRefundPrice : z.coerce.number().nonnegative().optional(),
+    maxRefundPrice : z.coerce.number().nonnegative().optional(),
+
+    createdFrom : z.coerce.date().optional(),
+    createdTo : z.coerce.date().optional(),
+
+    reviewedFrom : z.coerce.date().optional(),
+    reviewedTo : z.coerce.date().optional(),
+
+    resolvedFrom : z.coerce.date().optional(),
+    resolvedTo : z.coerce.date().optional(),
+})
+.superRefine((data, ctx) => {
+    if (
+        data.createdFrom !== undefined &&
+        data.createdTo !== undefined &&
+        data.createdFrom.getTime() > data.createdTo.getTime()
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['createdTo'],
+            message:
+                'Created To Date Must Be Greater Than Or Equal To Created From Date'
+        })
+    }
+
+    if (
+        data.reviewedFrom !== undefined &&
+        data.reviewedTo !== undefined &&
+        data.reviewedFrom.getTime() > data.reviewedTo.getTime()
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['reviewedTo'],
+            message:
+                'Reviewed To Date Must Be Greater Than Or Equal To Reviewed From Date'
+        })
+    }
+
+    if (
+        data.resolvedFrom !== undefined &&
+        data.resolvedTo !== undefined &&
+        data.resolvedFrom.getTime() > data.resolvedTo.getTime()
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['resolvedTo'],
+            message:
+                'Resolved To Date Must Be Greater Than Or Equal To Resolved From Date'
+        });
+    }
+
+    if (
+        data.minRefundPrice !== undefined &&
+        data.maxRefundPrice !== undefined &&
+        data.minRefundPrice > data.maxRefundPrice
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['maxRefundPrice'],
+            message:
+                'Max Refund Price Must Be Greater Than Or Equal To Min Refund Price'
+        });
+    }
+})
+
 export type ReturnRequestSchemaDto = z.infer<typeof returnRequestSchema>
 export type ReturnIdSchemaDto = z.infer<typeof returnIdSchema>
+export type ReturnRequestQSDto = z.infer<typeof returnRequestQSSchema>
