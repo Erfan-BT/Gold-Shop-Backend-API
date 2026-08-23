@@ -65,6 +65,69 @@ class AdminReturnService {
         })
         returnId
     }
+
+    async finalizeReturn (returnId : number, adminId : number, adminNote ?: string)
+    {
+        // Get Return Request
+        const returnRequest = await returnRepository.getReturnRequest(returnId)
+        if (!returnRequest)
+            throw new NotFoundError(`Return Request Not Found { ID : ${returnId} }`)
+
+        // Check Request Status
+        if (returnRequest.status !== ReturnStatus.PENDING)
+            throw new ConflictError('Return Request Is Already Finalized')
+
+        // Items
+        const returnItems = returnRequest.items
+        if (!returnItems || returnItems.length === 0)
+            throw new NotFoundError('Return Items Not Found')
+
+        // Check Items Status
+        const pendingItem = returnItems.find(item => item.status === ReturnItemStatus.PENDING)
+        if (pendingItem)
+            throw new BadRequestError('All Return Items Not Checked')
+
+        // Return Request Status
+        const hasApprovedItem = returnItems.some(item => item.status === ReturnItemStatus.APPROVED)
+        const hasRejectedItem = returnItems.some(item => item.status === ReturnItemStatus.REJECTED)
+        let finalReturnStatus : ReturnStatus = ReturnStatus.PENDING
+
+        if (hasApprovedItem && hasRejectedItem)
+            finalReturnStatus = ReturnStatus.PARTIALLY_APPROVED
+        else if (hasApprovedItem)
+            finalReturnStatus = ReturnStatus.APPROVED
+        else 
+            finalReturnStatus = ReturnStatus.REJECTED
+
+        // Rejected Return Request
+        if (finalReturnStatus === ReturnStatus.REJECTED) {
+            if (!(await returnRepository.finalizeReturnRequest(returnId, adminId, finalReturnStatus, 0, adminNote)))
+                throw new ConflictError('Return Request Status Not Changed [Rejected Request]')
+            return {
+                finalReturnStatus,
+                totalRefundAmount : 0
+            }
+        }
+
+        // Approved Or Partially Approved
+        // Calculate Refund Amount
+        const totalRefundAmount = returnItems
+            .filter(item => item.status === ReturnItemStatus.APPROVED)
+            .reduce(
+                (sum, item) => sum + (item.refundAmount ?? 0),
+                0
+            )
+
+        if (finalReturnStatus === ReturnStatus.APPROVED || finalReturnStatus === ReturnStatus.PARTIALLY_APPROVED)
+            if (!(await returnRepository.finalizeReturnRequest(returnId, adminId, finalReturnStatus, totalRefundAmount, adminNote)))
+                throw new ConflictError('Return Request Status Not Changed [Approved-PartiallyApproved Request]')
+
+        return {
+            finalReturnStatus,
+            totalRefundAmount
+        }
+        
+    }
 }
 
 export default new AdminReturnService()

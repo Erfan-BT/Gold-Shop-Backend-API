@@ -194,6 +194,23 @@ class ReturnRepository {
         return rows === 1
     }
     
+    async finalizeReturnRequest (returnId : number, adminId : number, status : ReturnStatus, refundAmount : number, adminNote ?: string)
+    {
+        const [rows] = await ReturnRequest.update({
+            status,
+            adminNote : adminNote ?? null,
+            reviewedBy : adminId,
+            reviewedAt : new Date(),
+            refundAmount,
+        }, {
+            where : {
+                id : returnId,
+                status : ReturnStatus.PENDING,
+                refundStatus : RefundStatus.PENDING
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ReturnRepository()

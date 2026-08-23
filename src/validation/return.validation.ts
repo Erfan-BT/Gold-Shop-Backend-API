@@ -149,7 +149,12 @@ export const reviewReturnItemsSchema = z.object({
     })
 })
 
+export const adminNoteSchema = z.object({
+    adminNote : z.string().trim().max(200).optional()
+})
+
 export type ReturnRequestSchemaDto = z.infer<typeof returnRequestSchema>
 export type ReturnIdSchemaDto = z.infer<typeof returnIdSchema>
 export type ReturnRequestQSDto = z.infer<typeof returnRequestQSSchema>
 export type ReviewReturnItemsSchemaDto = z.infer<typeof reviewReturnItemsSchema>
+export type AdminNoteSchemaDto = z.infer<typeof adminNoteSchema>
