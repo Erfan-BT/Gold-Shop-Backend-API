@@ -1,8 +1,17 @@
 export enum ReturnStatus {
     PENDING = 'PENDING',
+    PARTIALLY_APPROVED = 'PARTIALLY_APPROVED',
     APPROVED = 'APPROVED',
     REJECTED = 'REJECTED',
-    CANCELED = 'CANCELED',
+    RECEIVED = 'RECEIVED',
+    COMPLETED = 'COMPLETED',
+    CANCELED = 'CANCELED'
+}
+
+export enum ReturnItemStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    REJECTED = 'REJECTED',
 }
 
 export enum RefundStatus {
@@ -26,4 +35,5 @@ export type CreateReturnItemType = {
     reason : string;
     description ?: string;
     quantity : number;
+    status : ReturnItemStatus;
 }

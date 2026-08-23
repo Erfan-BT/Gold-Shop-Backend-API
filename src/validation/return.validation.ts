@@ -1,5 +1,5 @@
 import z from "zod";
-import { RefundStatus, ReturnSort, ReturnStatus } from "../types/return.enum.js";
+import { RefundStatus, ReturnItemStatus, ReturnSort, ReturnStatus } from "../types/return.enum.js";
 
 export const returnRequestSchema = z.object({
     orderNumber : z.string().trim().min(1).max(50),
@@ -111,6 +111,45 @@ export const returnRequestQSSchema = z.object({
     }
 })
 
+export const reviewReturnItemsSchema = z.object({
+    items : z.array(z.object({
+        itemId : z.coerce.number().int().positive(),
+        status : z.enum([
+            ReturnItemStatus.APPROVED,
+            ReturnItemStatus.REJECTED,
+        ]),
+        refundAmount : z.coerce.number().nonnegative().optional(),
+        adminNote : z.string().trim().max(200).optional()
+    })).min(1)
+})
+.superRefine((data, ctx) => {
+    data.items.forEach((item, index) => {
+        if (
+            item.status === ReturnItemStatus.APPROVED &&
+            (item.refundAmount === undefined)
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['items', index, 'refundAmount'],
+                message: 'Refund Amount Is Required For Approved Item'
+            })
+        }
+
+        if (
+            item.status === ReturnItemStatus.REJECTED &&
+            item.refundAmount !== undefined &&
+            item.refundAmount > 0
+        ) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['items', index, 'refundAmount'],
+                message: 'Rejected Item Cannot Have Refund Amount'
+            })
+        }
+    })
+})
+
 export type ReturnRequestSchemaDto = z.infer<typeof returnRequestSchema>
 export type ReturnIdSchemaDto = z.infer<typeof returnIdSchema>
 export type ReturnRequestQSDto = z.infer<typeof returnRequestQSSchema>
+export type ReviewReturnItemsSchemaDto = z.infer<typeof reviewReturnItemsSchema>

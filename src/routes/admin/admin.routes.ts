@@ -26,6 +26,6 @@ router.use('/gold-prices', authMiddleware, roleMiddleware([RolesTitle.OWNER]), P
 router.use('/products', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ProductAdminRoutes)
 router.use('/reviews', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReviewAdminRoutes)
 router.use('/payments', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), PaymentAdminRoutes)
-router.use('/return-requests', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReturnAdminRoutes)
+router.use('/returns', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReturnAdminRoutes)
 
 export default router

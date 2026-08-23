@@ -151,7 +151,6 @@ ________________________________________________________________________________
 GET    | admin/payments                         |     Admin    | .............. |   -
 GET    | admin/payments/:paymentId              |     Admin    |       -        |   -
 ________________________________________________________________________________________________________________
-GET    | admin/return-requests                  |     Admin    | .............. |   -
-GET    | admin/return-requests/:requestId       |     Admin    |       -        |   -
-//PATCH  | admin/return-requests/:requestId       |     Admin    |       -        | status, adminNote, refundAmount
-//PATCH  | admin/return-requests/:requestId/track |     Admin    |       -        | returnTrackingCode
+GET    | admin/returns                          |     Admin    | .............. |   -
+GET    | admin/returns/:returnId                |     Admin    |       -        |   -
+PATCH  | admin/returns/:returnId/review         |     Admin    |       -        | items:{itemId, status, adminNote, refundAmount}[]

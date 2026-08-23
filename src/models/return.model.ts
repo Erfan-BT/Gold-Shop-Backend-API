@@ -4,12 +4,13 @@ import {
     ForeignKey,
     InferAttributes,
     InferCreationAttributes,
-    Model
+    Model,
+    NonAttribute
 } from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
 import { Order , OrderItem } from "./order.model.js";
 import User from "./user.model.js";
-import { RefundStatus, ReturnStatus } from "../types/return.enum.js";
+import { RefundStatus, ReturnItemStatus, ReturnStatus } from "../types/return.enum.js";
 
 // Return Request
 export class ReturnRequest extends Model<
@@ -35,6 +36,13 @@ export class ReturnRequest extends Model<
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date | null>;
     declare deletedAt: CreationOptional<Date | null>;
+
+    // Associations
+    declare order?: NonAttribute<Order>;
+
+    declare items ?: NonAttribute<ReturnItem[]>;
+
+    declare admin ?: NonAttribute<User>;
 }
 
 ReturnRequest.init(
@@ -117,8 +125,16 @@ export class ReturnItem extends Model<
     declare quantity: number;
     declare refundAmount: CreationOptional<number | null>;
 
+    declare status : ReturnItemStatus;
+    declare adminNote: CreationOptional<string | null>;
+    declare reviewedBy: CreationOptional<ForeignKey<User['id']> | null>;
+    declare reviewedAt: CreationOptional<Date | null>;
+
     declare createdAt: CreationOptional<Date>;
     declare deletedAt: CreationOptional<Date | null>;
+
+    // Associations
+    declare orderItem?: NonAttribute<OrderItem>;
 }
 
 ReturnItem.init(
@@ -149,6 +165,16 @@ ReturnItem.init(
         },
         refundAmount: {
             type: DataTypes.DECIMAL(15, 2),
+        },
+        status : {
+            type: DataTypes.ENUM(...Object.values(ReturnItemStatus)),
+            allowNull: false
+        },
+        reviewedAt: {
+            type: DataTypes.DATE
+        },
+        adminNote: {
+            type: DataTypes.TEXT
         },
         createdAt: {
             type: DataTypes.DATE

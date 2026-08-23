@@ -1,6 +1,6 @@
 import { FindAndCountOptions, Transaction } from "sequelize"
 import { ReturnItem, ReturnRequest } from "../models/return.model.js"
-import { CreateReturnItemType, RefundStatus, ReturnStatus } from "../types/return.enum.js"
+import { CreateReturnItemType, RefundStatus, ReturnItemStatus, ReturnStatus } from "../types/return.enum.js"
 import { Order, OrderItem } from "../models/order.model.js"
 import User from "../models/user.model.js"
 
@@ -118,6 +118,8 @@ class ReturnRepository {
                         'description',
                         'quantity',
                         'refundAmount',
+                        'status',
+                        'adminNote',
                         'createdAt',
                     ],
                     include : [
@@ -172,7 +174,26 @@ class ReturnRepository {
                 }
             ]
         })
-    }    
+    }
+    
+    async reviewReturnItem (returnId : number, itemId : number, adminId : number, status : ReturnItemStatus, refundAmount : number, adminNote : string | null, transaction : Transaction)
+    {
+        const [rows] = await ReturnItem.update({
+            status,
+            refundAmount,
+            adminNote,
+            reviewedBy : adminId,
+            reviewedAt : new Date()
+        }, {
+            where : {
+                returnRequestId : returnId,
+                id : itemId
+            },
+            transaction
+        })
+        return rows === 1
+    }
+    
 }
 
 export default new ReturnRepository()

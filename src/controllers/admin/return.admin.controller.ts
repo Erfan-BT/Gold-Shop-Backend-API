@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { ReturnIdSchemaDto, ReturnRequestQSDto } from "../../validation/return.validation.js";
+import { ReturnIdSchemaDto, ReturnRequestQSDto, ReviewReturnItemsSchemaDto } from "../../validation/return.validation.js";
 import adminReturnService from "../../services/admin/return.admin.service.js";
 
 class AdminReturnController {
@@ -28,6 +28,23 @@ class AdminReturnController {
                 success : true,
                 msg : 'Get Return Request',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async reviewReturnItems (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const reviewData = req.validated.body as ReviewReturnItemsSchemaDto
+            const adminId = req.user!.userId
+            await adminReturnService.reviewReturnItems(returnId, adminId, reviewData)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Review Return Items',
+                data : {}
             })
         } catch (error) {
             next(error)

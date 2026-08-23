@@ -3,7 +3,7 @@ import { ReturnRequest } from "../models/return.model.js";
 import orderRepository from "../repository/order.repository.js";
 import returnRepository from "../repository/return.repository.js";
 import { OrderStatus } from "../types/order.enum.js";
-import { CreateReturnItemType } from "../types/return.enum.js";
+import { CreateReturnItemType, ReturnItemStatus } from "../types/return.enum.js";
 import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../utils/appError.js";
 import { ReturnRequestSchemaDto } from "../validation/return.validation.js";
 
@@ -48,6 +48,7 @@ class ReturnService {
                     orderItemId : item.orderItemId,
                     quantity : item.quantity,
                     reason : item.reason,
+                    status : ReturnItemStatus.PENDING,
                     ...(item.description ? { description: item.description } : {})
                 }
             })
