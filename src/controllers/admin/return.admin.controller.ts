@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminNoteSchemaDto, ReturnIdSchemaDto, ReturnRequestQSDto, ReviewReturnItemsSchemaDto } from "../../validation/return.validation.js";
+import { AdminNoteSchemaDto, ReturnIdSchemaDto, ReturnRequestQSDto, ReturnTrackingCodeSchemaDto, ReviewReturnItemsSchemaDto } from "../../validation/return.validation.js";
 import adminReturnService from "../../services/admin/return.admin.service.js";
 
 class AdminReturnController {
@@ -62,6 +62,23 @@ class AdminReturnController {
                 success : true,
                 msg : 'Finalize Return Request',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async adminChangeTrackingCode (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const { trackingCode } = req.validated.body as ReturnTrackingCodeSchemaDto
+            const adminId = req.user!.userId
+            await adminReturnService.adminChangeTrackingCode(returnId, adminId, trackingCode)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Admin Change Return Tracking Code',
+                data : {}
             })
         } catch (error) {
             next(error)

@@ -126,7 +126,23 @@ class AdminReturnService {
             finalReturnStatus,
             totalRefundAmount
         }
-        
+    }
+
+    async adminChangeTrackingCode (returnId : number, adminId : number, trackingCode : string)
+    {
+        // Get Return Request
+        const returnRequest = await returnRepository.getReturnRequest(returnId)
+        if (!returnRequest)
+            throw new NotFoundError(`Return Request Not Found { ID : ${returnId} }`)
+
+        // Check Request Status
+        if (returnRequest.status !== ReturnStatus.APPROVED && returnRequest.status !== ReturnStatus.PARTIALLY_APPROVED)
+            throw new BadRequestError(`Tracking Code For This Return Can Not Be Registered { Status : ${returnRequest.status} }`)
+
+        // Change Return Tracking Code
+        if (!(await returnRepository.adminChangeTrackingCode(returnId, trackingCode)))
+            throw new ConflictError('Return Tracking Code Not Changed')
+        return
     }
 }
 

@@ -233,6 +233,24 @@ class ReturnRepository {
         })
         return rows === 1
     }
+
+    async adminChangeTrackingCode (returnId : number, returnTrackingCode : string)
+    {
+        const [rows] = await ReturnRequest.update({
+            returnTrackingCode
+        }, {
+            where : {
+                id : returnId,
+                status: {
+                    [Op.in]: [
+                        ReturnStatus.APPROVED,
+                        ReturnStatus.PARTIALLY_APPROVED
+                    ]
+                }
+            }
+        })
+        return rows === 1
+    }
 }
 
 export default new ReturnRepository()
