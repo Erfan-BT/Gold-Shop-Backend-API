@@ -153,8 +153,13 @@ export const adminNoteSchema = z.object({
     adminNote : z.string().trim().max(200).optional()
 })
 
+export const returnTrackingCodeSchema = z.object({
+    trackingCode : z.string().trim().min(1).max(100)
+})
+
 export type ReturnRequestSchemaDto = z.infer<typeof returnRequestSchema>
 export type ReturnIdSchemaDto = z.infer<typeof returnIdSchema>
 export type ReturnRequestQSDto = z.infer<typeof returnRequestQSSchema>
 export type ReviewReturnItemsSchemaDto = z.infer<typeof reviewReturnItemsSchema>
 export type AdminNoteSchemaDto = z.infer<typeof adminNoteSchema>
+export type ReturnTrackingCodeSchemaDto = z.infer<typeof returnTrackingCodeSchema>

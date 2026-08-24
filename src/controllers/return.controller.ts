@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
-import { ReturnIdSchemaDto, ReturnRequestSchemaDto } from "../validation/return.validation.js";
+import { ReturnIdSchemaDto, ReturnRequestSchemaDto, ReturnTrackingCodeSchemaDto } from "../validation/return.validation.js";
 import returnService from "../services/return.service.js";
 
 class ReturnController {
@@ -46,6 +46,23 @@ class ReturnController {
                 success : true,
                 msg : 'Return Request Data',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async userRegisterTrackingCode (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const { trackingCode } = req.validated.body as ReturnTrackingCodeSchemaDto
+            await returnService.userRegisterTrackingCode(userId, returnId, trackingCode)
+
+            res.status(200).json({
+                success : true,
+                msg : 'User Register Return Request Tracking Code',
+                data : {}
             })
         } catch (error) {
             next(error)

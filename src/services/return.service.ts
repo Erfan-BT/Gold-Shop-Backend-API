@@ -3,7 +3,7 @@ import { ReturnRequest } from "../models/return.model.js";
 import orderRepository from "../repository/order.repository.js";
 import returnRepository from "../repository/return.repository.js";
 import { OrderStatus } from "../types/order.enum.js";
-import { CreateReturnItemType, ReturnItemStatus } from "../types/return.enum.js";
+import { CreateReturnItemType, ReturnItemStatus, ReturnStatus } from "../types/return.enum.js";
 import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../utils/appError.js";
 import { ReturnRequestSchemaDto } from "../validation/return.validation.js";
 
@@ -72,6 +72,22 @@ class ReturnService {
         if (!request)
             throw new NotFoundError('Return Request Not Found')
         return request
+    }
+
+    async userRegisterTrackingCode (userId : number, returnId : number, trackingCode : string)
+    : Promise<void> {
+        // Get Request
+        const request = await returnRepository.getReturnRequestById(returnId, userId)
+        if (!request)
+            throw new NotFoundError(`User Return Request Not Found { UserID : ${userId} , ReturnID : ${returnId} }`)
+        if (request.returnTrackingCode !== null)
+            throw new ConflictError('Tracking Code Already Registered')
+        if (request.status !== ReturnStatus.PARTIALLY_APPROVED && request.status !== ReturnStatus.APPROVED)
+            throw new BadRequestError(`Tracking Code For This Return Can Not Be Registered { Status : ${request.status} }`)
+        // Register Tracking Code
+        if (!(await returnRepository.userTrackingCode(returnId, trackingCode)))
+            throw new ConflictError('Tracking Code Not Registered')
+        return
     }
 }
 

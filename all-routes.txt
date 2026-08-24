@@ -45,6 +45,7 @@ ________________________________________________________________________________
 POST   | returns/                               |   Customer   |       -       | orderNumber, items:{id, quantity, reason, description}[]
 GET    | returns/                               |   Customer   |       -       |    -
 GET    | returns/:returnId                      |   Customer   |       -       |    -
+PATCH  | returns/:returnId/tracking-code        |   Customer   |       -       | trackingCode
 ________________________________________________________________________________________________________________
 GET    | gold-prices/                           |       -      |       -       |    -
 ________________________________________________________________________________________________________________
