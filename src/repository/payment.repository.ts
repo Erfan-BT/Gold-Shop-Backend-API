@@ -41,7 +41,7 @@ class PaymentRepository {
         return rows === 1
     }
 
-    async refundPayment (paymentId : number, refundAmount : number, refundReason : string, refundId : string, terminal_id : string, transaction : Transaction)
+    async refundPayment (paymentId : number, refundAmount : number, refundReason : string, refundId : string, terminal_id : string, returnId : number | null, transaction : Transaction)
     : Promise<boolean> {
         const [rows] = await Payment.update({
             refundAmount,
@@ -49,7 +49,8 @@ class PaymentRepository {
             refundId,
             terminal_id,
             refundedAt : new Date(),
-            status : PaymentStatus.REFUND
+            returnRequestId : returnId,
+            status : returnId ? PaymentStatus.PARTIALLY_REFUNDED : PaymentStatus.REFUND
         },
         {
             where : {

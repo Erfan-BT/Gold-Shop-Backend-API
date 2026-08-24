@@ -251,6 +251,44 @@ class ReturnRepository {
         })
         return rows === 1
     }
+
+    async receiveReturnItems (returnId : number, adminId : number, transaction : Transaction)
+    {
+        const [rows] = await ReturnRequest.update({
+            status : ReturnStatus.RECEIVED,
+            receivedBy : adminId,
+            receivedAt : new Date()
+        }, {
+            where : {
+                id : returnId,
+                status: {
+                    [Op.in]: [
+                        ReturnStatus.APPROVED,
+                        ReturnStatus.PARTIALLY_APPROVED
+                    ]
+                }
+            },
+            transaction
+        })
+        return rows === 1
+    }
+
+    async completeReturn (returnId : number, transaction : Transaction)
+    {
+        const [rows] = await ReturnRequest.update({
+            status : ReturnStatus.COMPLETED,
+            refundStatus : RefundStatus.COMPLETED,
+            resolvedAt : new Date()
+        }, {
+            where : {
+                id : returnId,
+                status : ReturnStatus.RECEIVED,
+                refundStatus : RefundStatus.PENDING
+            },
+            transaction
+        })
+        return rows === 1
+    }
 }
 
 export default new ReturnRepository()

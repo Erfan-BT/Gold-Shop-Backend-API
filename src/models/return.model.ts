@@ -31,6 +31,10 @@ export class ReturnRequest extends Model<
     declare refundStatus: RefundStatus;
 
     declare returnTrackingCode: CreationOptional<string | null>;
+
+    declare receivedBy : CreationOptional<ForeignKey<User["id"]> | null>
+    declare receivedAt : CreationOptional<Date | null>
+
     declare resolvedAt: CreationOptional<Date | null>;
 
     declare createdAt: CreationOptional<Date>;
@@ -77,6 +81,12 @@ ReturnRequest.init(
         },
         returnTrackingCode: {
             type: DataTypes.STRING(100)
+        },
+        receivedBy : {
+            type : DataTypes.INTEGER
+        },
+        receivedAt : {
+            type: DataTypes.DATE
         },
         resolvedAt: {
             type: DataTypes.DATE

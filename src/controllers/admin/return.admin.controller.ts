@@ -84,6 +84,22 @@ class AdminReturnController {
             next(error)
         }
     }
+
+    async verifyReturnedItems (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const adminId = req.user!.userId
+            await adminReturnService.verifyReturnedItems(returnId, adminId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Verify Return Process',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new AdminReturnController()

@@ -9,6 +9,7 @@ import {
 import sequelize from "../configs/sequelize.config.js";
 import { Order } from "./order.model.js";
 import { PaymentStatus } from "../types/payment.enum.js";
+import { ReturnRequest } from "./return.model.js";
 
 class Payment extends Model<
     InferAttributes<Payment>,
@@ -31,6 +32,8 @@ class Payment extends Model<
     declare refundReason: CreationOptional<string | null>;
     declare terminal_id: CreationOptional<string | null>
     declare refundId: CreationOptional<string | null>;
+
+    declare returnRequestId : CreationOptional<ForeignKey<ReturnRequest['id']> | null>
 
     declare bankResponse: string;
 
@@ -94,6 +97,9 @@ Payment.init(
         },
         refundId: {
             type: DataTypes.STRING()
+        },
+        returnRequestId : {
+            type : DataTypes.INTEGER
         },
         bankResponse: {
             type: DataTypes.STRING,

@@ -1,8 +1,10 @@
 import { ReturnQueryBuilder } from "../../builders/returnQuery.builder.js";
 import sequelize from "../../configs/sequelize.config.js";
+import { refundQueue } from "../../queue/refund.queue.js";
+import inventoryRepository from "../../repository/inventory.repository.js";
 import returnRepository from "../../repository/return.repository.js";
 import { ReturnItemStatus, ReturnStatus } from "../../types/return.enum.js";
-import { BadRequestError, ConflictError, NotFoundError } from "../../utils/appError.js";
+import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../../utils/appError.js";
 import { ReturnRequestQSDto, ReviewReturnItemsSchemaDto } from "../../validation/return.validation.js";
 
 class AdminReturnService {
@@ -142,6 +144,53 @@ class AdminReturnService {
         // Change Return Tracking Code
         if (!(await returnRepository.adminChangeTrackingCode(returnId, trackingCode)))
             throw new ConflictError('Return Tracking Code Not Changed')
+        return
+    }
+
+    async verifyReturnedItems (returnId : number, adminId : number)
+    {
+        // Get Return Request
+        const returnRequest = await returnRepository.getReturnRequest(returnId)
+        if (!returnRequest)
+            throw new NotFoundError(`Return Request Not Found { ID : ${returnId} }`)
+
+        // Check Request Status
+        if (returnRequest.status !== ReturnStatus.APPROVED && returnRequest.status !== ReturnStatus.PARTIALLY_APPROVED)
+            throw new BadRequestError(`This Return Request Can Not Be Completed { Status : ${returnRequest.status} }`)
+
+        // Return Items
+        const items = returnRequest.items
+        if (!items || items.length === 0)
+            throw new NotFoundError('Return Items Not Found')
+
+        const approvedItems = items.filter(item => item.status === ReturnItemStatus.APPROVED)
+        if (approvedItems.length === 0)
+            throw new NotFoundError('Approved Items Not Found')
+
+        // Process
+        await sequelize.transaction(async t => {
+            // Change Return Status To Received
+            if (!(await returnRepository.receiveReturnItems(returnId, adminId, t)))
+                throw new ConflictError('Return Request Status Not Changed To Received')
+
+            // Return Inventory
+            for (let item of approvedItems) {
+                const orderItem = item.orderItem
+                if (!orderItem)
+                    throw new NotFoundError(`Order Item Not Found For Return Item { ID : ${item.id} }`)
+
+                if (!(await inventoryRepository.increaseStock(orderItem.variantId, item.quantity, t)))
+                    throw new InternalServerError("Inventory Not Changed")
+            }
+        })
+
+        refundQueue.add('return-refund', {
+            returnId,
+            adminId,
+            refundAmount : returnRequest.refundAmount,
+            returnOrderId : returnRequest.orderId
+        })
+
         return
     }
 }

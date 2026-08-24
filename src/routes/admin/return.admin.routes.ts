@@ -10,5 +10,6 @@ router.get('/:returnId', validate({ params : returnIdSchema }), adminReturnContr
 router.patch('/:returnId/review', validate({ params : returnIdSchema, body : reviewReturnItemsSchema }), adminReturnController.reviewReturnItems)
 router.patch('/:returnId/finalize', validate({ params : returnIdSchema, body : adminNoteSchema }), adminReturnController.finalizeReturn)
 router.patch('/:returnId/tracking-code', validate({ params : returnIdSchema, body : returnTrackingCodeSchema }), adminReturnController.adminChangeTrackingCode)
+router.patch('/:returnId/verify', validate({ params : returnIdSchema }), adminReturnController.verifyReturnedItems)
 
 export default router
