@@ -37,6 +37,10 @@ export class ReturnRequest extends Model<
 
     declare resolvedAt: CreationOptional<Date | null>;
 
+    declare canceledBy : CreationOptional<ForeignKey<User['id']> | null>
+    declare canceledAt : CreationOptional<Date | null>
+    declare cancelReason : CreationOptional<string | null>
+
     declare createdAt: CreationOptional<Date>;
     declare updatedAt: CreationOptional<Date | null>;
     declare deletedAt: CreationOptional<Date | null>;
@@ -90,6 +94,15 @@ ReturnRequest.init(
         },
         resolvedAt: {
             type: DataTypes.DATE
+        },
+        canceledBy : {
+            type : DataTypes.INTEGER
+        },
+        canceledAt : {
+            type : DataTypes.DATE
+        },
+        cancelReason : {
+            type : DataTypes.STRING
         },
         createdAt: {
             type: DataTypes.DATE

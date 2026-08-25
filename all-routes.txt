@@ -157,4 +157,5 @@ GET    | admin/returns/:returnId                |     Admin    |       -        
 PATCH  | admin/returns/:returnId/review         |     Admin    |       -        | items:{itemId, status, adminNote, refundAmount}[]
 PATCH  | admin/returns/:returnId/finalize       |     Admin    |       -        | adminNote?
 PATCH  | admin/returns/:returnId/tracking-code  |     Admin    |       -        | trackingCode
-PATCH  | admin/returns/:returnId/verify       |     Admin    |       -        |   -
+PATCH  | admin/returns/:returnId/verify         |     Admin    |       -        |   -
+PATCH  | admin.returns/:returnId/cancel         |     Admin    |       -        | reason

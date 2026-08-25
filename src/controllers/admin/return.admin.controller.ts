@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminNoteSchemaDto, ReturnIdSchemaDto, ReturnRequestQSDto, ReturnTrackingCodeSchemaDto, ReviewReturnItemsSchemaDto } from "../../validation/return.validation.js";
+import { AdminNoteSchemaDto, CancelReturnReasonSchemaDto, ReturnIdSchemaDto, ReturnRequestQSDto, ReturnTrackingCodeSchemaDto, ReviewReturnItemsSchemaDto } from "../../validation/return.validation.js";
 import adminReturnService from "../../services/admin/return.admin.service.js";
 
 class AdminReturnController {
@@ -94,6 +94,23 @@ class AdminReturnController {
             res.status(200).json({
                 success : true,
                 msg : 'Verify Return Process',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async cancelReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const { reason } = req.validated.body as CancelReturnReasonSchemaDto
+            const adminId = req.user!.userId
+            await adminReturnService.cancelReturnRequest(returnId, adminId, reason)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Admin Cancel Return Request',
                 data : {}
             })
         } catch (error) {

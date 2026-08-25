@@ -193,6 +193,28 @@ class AdminReturnService {
 
         return
     }
+
+    async cancelReturnRequest (returnId : number, adminId : number, reason : string)
+    {
+        // Get Return Request
+        const returnRequest = await returnRepository.getReturnRequest(returnId)
+        if (!returnRequest)
+            throw new NotFoundError(`Return Request Not Found { ID : ${returnId} }`)
+
+        // Check Request Status
+        if ((returnRequest.status !== ReturnStatus.APPROVED &&
+            returnRequest.status !== ReturnStatus.PARTIALLY_APPROVED &&
+            returnRequest.status !== ReturnStatus.PENDING ) ||
+            returnRequest.returnTrackingCode !== null
+        )
+            throw new BadRequestError(`This Return Request Can Not Be Canceled`)
+
+        // Cancel
+        if (!(await returnRepository.adminCancelReturn(returnId, adminId, reason)))
+            throw new ConflictError('Return Request Not Canceled')
+
+        return
+    }
 }
 
 export default new AdminReturnService()
