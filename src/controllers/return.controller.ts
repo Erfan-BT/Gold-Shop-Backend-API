@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
-import { ReturnIdSchemaDto, ReturnRequestSchemaDto, ReturnTrackingCodeSchemaDto } from "../validation/return.validation.js";
+import { CancelReturnReasonSchemaDto, ReturnIdSchemaDto, ReturnRequestSchemaDto, ReturnTrackingCodeSchemaDto } from "../validation/return.validation.js";
 import returnService from "../services/return.service.js";
 
 class ReturnController {
@@ -68,6 +68,23 @@ class ReturnController {
             next(error)
         }
     }
+
+    async cancelReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
+            try {
+                const { returnId } = req.validated.params as ReturnIdSchemaDto
+                const { reason } = req.validated.body as CancelReturnReasonSchemaDto
+                const { userId } = req.user!
+                await returnService.cancelReturnRequest(returnId, userId, reason)
+    
+                res.status(200).json({
+                    success : true,
+                    msg : 'User Cancel Return Request',
+                    data : {}
+                })
+            } catch (error) {
+                next(error)
+            }
+        }
 }
 
 export default new ReturnController()

@@ -46,6 +46,7 @@ POST   | returns/                               |   Customer   |       -       |
 GET    | returns/                               |   Customer   |       -       |    -
 GET    | returns/:returnId                      |   Customer   |       -       |    -
 PATCH  | returns/:returnId/tracking-code        |   Customer   |       -       | trackingCode
+PATCH  | returns/:returnId/cancel               |   Customer   |       -       | reason
 ________________________________________________________________________________________________________________
 GET    | gold-prices/                           |       -      |       -       |    -
 ________________________________________________________________________________________________________________

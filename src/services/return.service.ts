@@ -89,6 +89,28 @@ class ReturnService {
             throw new ConflictError('Tracking Code Not Registered')
         return
     }
+
+    async cancelReturnRequest (returnId : number, userId : number, reason : string)
+        {
+            // Get Return Request
+            const returnRequest = await returnRepository.getReturnRequestById(returnId, userId)
+            if (!returnRequest)
+                throw new NotFoundError(`Return Request Not Found { ID : ${returnId} }`)
+    
+            // Check Request Status
+            if ((returnRequest.status !== ReturnStatus.APPROVED &&
+                returnRequest.status !== ReturnStatus.PARTIALLY_APPROVED &&
+                returnRequest.status !== ReturnStatus.PENDING ) ||
+                returnRequest.returnTrackingCode !== null
+            )
+                throw new BadRequestError(`This Return Request Can Not Be Canceled`)
+    
+            // Cancel
+            if (!(await returnRepository.adminCancelReturn(returnId, userId, reason)))
+                throw new ConflictError('Return Request Not Canceled')
+    
+            return
+        }
 }
 
 export default new ReturnService()

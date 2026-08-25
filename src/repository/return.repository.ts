@@ -103,6 +103,30 @@ class ReturnRepository {
         return rows === 1
     }
 
+    async userCancelReturnRequest (returnId : number, userId : number, reason : string)
+    {
+        const [rows] = await ReturnRequest.update({
+            status : ReturnStatus.CANCELED,
+            refundStatus : RefundStatus.CANCELED,
+            canceledBy : userId,
+            canceledAt : new Date(),
+            cancelReason : reason
+        }, {
+            where : {
+                id : returnId,
+                status : {
+                    [Op.in] : [
+                        ReturnStatus.APPROVED,
+                        ReturnStatus.PARTIALLY_APPROVED,
+                        ReturnStatus.PENDING
+                    ]
+                },
+                returnTrackingCode : null,
+            }
+        })
+        return rows === 1
+    }
+
     // --- Admin ---
     async getAllReturnRequests (options : FindAndCountOptions)
     {
