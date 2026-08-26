@@ -66,7 +66,17 @@ class SettingRepository {
         return await Setting.findOne({
             where : {
                 id : settingId
-            }
+            },
+            attributes : [
+                'id',
+                'key',
+                'value',
+                'type',
+                'group',
+                'isPublic',
+                'description',
+                'createdAt'
+            ],
         })
     }
 

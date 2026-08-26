@@ -9,6 +9,14 @@ class AdminSettingService {
         return await settingRepository.getAllSettings(qs)
     }
 
+    async getSetting (settingId : number)
+    : Promise<Setting> {
+        const setting = await settingRepository.getSetting(settingId)    
+        if (!setting)
+            throw new ConflictError('New Setting Data Not Created')
+        return setting
+    }
+
     async createSetting (settingData : CreateSettingSchemaDto)
     : Promise<Setting> {
         const setting = await settingRepository.createSetting(settingData)    

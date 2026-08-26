@@ -6,9 +6,10 @@ import { changeSettingSchema, createSettingSchema, settingIdSchema, settingQSSch
 const router = express.Router()
 
 router.get('/', validate({ query : settingQSSchema }), adminSettingController.getAllSettings)
+router.get('/:settingId', validate({ params : settingIdSchema }), adminSettingController.getSetting)
 router.post('/', validate({ body : createSettingSchema }), adminSettingController.createSetting)
 router.patch('/:settingId', validate({ params : settingIdSchema, body : changeSettingSchema }), adminSettingController.changeSetting)
-router.patch('/:settingId/status', validate({ params : settingIdSchema }), adminSettingController.changeSettingStatus)
+router.patch('/:settingId/visibility', validate({ params : settingIdSchema }), adminSettingController.changeSettingStatus)
 router.delete('/:settingId', validate({ params : settingIdSchema }), adminSettingController.deleteSetting)
 
 export default router

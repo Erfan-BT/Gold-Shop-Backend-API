@@ -162,7 +162,8 @@ PATCH  | admin/returns/:returnId/verify         |     Admin    |       -        
 PATCH  | admin/returns/:returnId/cancel         |     Admin    |       -        | reason
 ________________________________________________________________________________________________________________
 GET    | admin/settings                         |     Owner    | .............. |   -
+GET    | admin/settings/:settingId              |     Owner    |       -        |   -
 POST   | admin/settings                         |     Owner    |       -        | key, value, type, group, description, isPublic
 PATCH  | admin/settings/:settingId              |     Owner    |       -        | key, value, type, group, description
-PATCH  | admin/settings/:settingId/status       |     Owner    |       -        |   -
+PATCH  | admin/settings/:settingId/visibility   |     Owner    |       -        |   -
 DELETE | admin/settings/:settingId              |     Owner    |       -        |   -

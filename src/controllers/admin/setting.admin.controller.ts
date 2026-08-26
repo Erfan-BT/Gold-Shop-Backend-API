@@ -6,6 +6,21 @@ import { ChangeSettingSchemaDto, CreateSettingSchemaDto, SettingIdSchemaDto, Set
 class AdminSettingController {
     async getAllSettings (req : AuthRequest, res : Response, next : NextFunction) {
         try {
+            const { settingId } = req.validated.params as SettingIdSchemaDto
+            const result = await adminSettingService.getSetting(settingId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Get Setting',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    
+    async getSetting (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
             const qs = req.validated.query as SettingQSDto
             const result = await adminSettingService.getAllSettings(qs)
 
