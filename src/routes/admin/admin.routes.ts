@@ -11,6 +11,7 @@ import ProductAdminRoutes from './product.admin.routes.js'
 import ReviewAdminRoutes from './review.admin.routes.js'
 import PaymentAdminRoutes from './payment.admin.routes.js'
 import ReturnAdminRoutes from './return.admin.routes.js'
+import SettingAdminRoutes from './setting.admin.routes.js'
 import { authMiddleware, roleMiddleware } from '../../middleware/auth.middleware.js'
 import { RolesTitle } from '../../types/role.enum.js'
 
@@ -27,5 +28,6 @@ router.use('/products', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesT
 router.use('/reviews', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReviewAdminRoutes)
 router.use('/payments', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), PaymentAdminRoutes)
 router.use('/returns', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReturnAdminRoutes)
+router.use('/settings', authMiddleware, roleMiddleware([RolesTitle.OWNER]), SettingAdminRoutes)
 
 export default router

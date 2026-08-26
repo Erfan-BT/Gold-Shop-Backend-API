@@ -159,4 +159,6 @@ PATCH  | admin/returns/:returnId/review         |     Admin    |       -        
 PATCH  | admin/returns/:returnId/finalize       |     Admin    |       -        | adminNote?
 PATCH  | admin/returns/:returnId/tracking-code  |     Admin    |       -        | trackingCode
 PATCH  | admin/returns/:returnId/verify         |     Admin    |       -        |   -
-PATCH  | admin.returns/:returnId/cancel         |     Admin    |       -        | reason
+PATCH  | admin/returns/:returnId/cancel         |     Admin    |       -        | reason
+________________________________________________________________________________________________________________
+GET    | admin/settings                         |     Owner    | .............. |   -

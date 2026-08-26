@@ -1,12 +1,12 @@
 export enum SettingType {
-    STRING = 'String',
-    NUMBER = 'Number',
-    BOOLEAN = 'Boolean',
-    JSON = 'Json',
+    STRING = 'STRING',
+    NUMBER = 'NUMBER',
+    BOOLEAN = 'BOOLEAN',
+    JSON = 'JSON',
 }
 
 export enum SettingGroup {
-    GENERAL = 'General',
-    CONTACT = 'Contact',
-    SOCIAL = 'Social',
+    GENERAL = 'GENERAL',
+    CONTACT = 'CONTACT',
+    SOCIAL = 'SOCIAL',
 }
