@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
 import adminSettingService from "../../services/admin/setting.admin.service.js";
-import { SettingQSDto } from "../../validation/setting.validation.js";
+import { CreateSettingSchemaDto, SettingQSDto } from "../../validation/setting.validation.js";
 
 class AdminSettingController {
     async getAllSettings (req : AuthRequest, res : Response, next : NextFunction) {
@@ -18,6 +18,22 @@ class AdminSettingController {
             next(error)
         }
     }
+
+    async createSetting (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const settingData = req.validated.body as CreateSettingSchemaDto
+            const result = await adminSettingService.createSetting(settingData)
+
+            res.status(201).json({
+                success : true,
+                msg : 'Create Setting',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminSettingController()

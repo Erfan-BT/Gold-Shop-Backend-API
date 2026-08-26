@@ -1,6 +1,6 @@
 import { Op } from "sequelize"
 import Setting from "../models/setting.model.js"
-import { SettingQSDto } from "../validation/setting.validation.js"
+import { CreateSettingSchemaDto, SettingQSDto } from "../validation/setting.validation.js"
 
 class SettingRepository {
     async getAllSettings (qs : SettingQSDto)
@@ -58,6 +58,18 @@ class SettingRepository {
                 ['group', 'ASC'],
                 ['key', 'ASC']
             ]
+        })
+    }
+
+    async createSetting (settingData : CreateSettingSchemaDto)
+    : Promise<Setting> {
+        return await Setting.create({
+            key : settingData.key,
+            value : settingData.value,
+            type : settingData.type,
+            group : settingData.group,
+            isPublic : settingData.isPublic,
+            description : settingData.description ?? null
         })
     }
 }
