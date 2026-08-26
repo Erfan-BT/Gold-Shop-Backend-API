@@ -65,6 +65,21 @@ class AdminSettingController {
         }
     }
 
+    async deleteSetting (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { settingId } = req.validated.params as SettingIdSchemaDto
+            await adminSettingService.deleteSetting(settingId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Delete Setting',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
 }
 
 export default new AdminSettingController()

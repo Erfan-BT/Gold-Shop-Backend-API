@@ -7,7 +7,8 @@ const router = express.Router()
 
 router.get('/', validate({ query : settingQSSchema }), adminSettingController.getAllSettings)
 router.post('/', validate({ body : createSettingSchema }), adminSettingController.createSetting)
-router.post('/:settingId', validate({ params : settingIdSchema, body : changeSettingSchema }), adminSettingController.changeSetting)
-router.post('/:settingId/status', validate({ params : settingIdSchema }), adminSettingController.changeSettingStatus)
+router.patch('/:settingId', validate({ params : settingIdSchema, body : changeSettingSchema }), adminSettingController.changeSetting)
+router.patch('/:settingId/status', validate({ params : settingIdSchema }), adminSettingController.changeSettingStatus)
+router.delete('/:settingId', validate({ params : settingIdSchema }), adminSettingController.deleteSetting)
 
 export default router

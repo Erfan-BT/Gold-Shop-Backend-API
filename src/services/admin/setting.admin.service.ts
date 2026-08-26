@@ -60,6 +60,19 @@ class AdminSettingService {
             throw new ConflictError('Setting Status Not Changed')
         return
     }
+
+    async deleteSetting (settingId : number)
+    : Promise<void> {
+        // Get Setting
+        const setting = await settingRepository.getSetting(settingId)
+        if (!setting)
+            throw new NotFoundError(`Setting Not Found { ID : ${settingId} }`)
+
+        // Delete
+        if (!(await settingRepository.deleteSetting(settingId)))
+            throw new ConflictError('Setting Not Deleted')
+        return
+    }
 }
 
 export default new AdminSettingService()

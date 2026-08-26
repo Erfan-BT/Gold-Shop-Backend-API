@@ -105,6 +105,16 @@ class SettingRepository {
         return rows === 1
     }
 
+    async deleteSetting (settingId : number)
+    : Promise<boolean> {
+        const rows = await Setting.destroy({
+            where : {
+                id : settingId
+            }
+        })
+        return rows === 1
+    }
+
 }
 
 export default new SettingRepository()

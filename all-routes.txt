@@ -165,3 +165,4 @@ GET    | admin/settings                         |     Owner    | .............. 
 POST   | admin/settings                         |     Owner    |       -        | key, value, type, group, description, isPublic
 PATCH  | admin/settings/:settingId              |     Owner    |       -        | key, value, type, group, description
 PATCH  | admin/settings/:settingId/status       |     Owner    |       -        |   -
+DELETE | admin/settings/:settingId              |     Owner    |       -        |   -
