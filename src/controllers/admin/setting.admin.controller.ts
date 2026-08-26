@@ -40,9 +40,24 @@ class AdminSettingController {
             const { settingId } = req.validated.params as SettingIdSchemaDto
             await adminSettingService.changeSetting(settingId, settingData)
 
-            res.status(201).json({
+            res.status(200).json({
                 success : true,
                 msg : 'Change Setting',
+                data : {}
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeSettingStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { settingId } = req.validated.params as SettingIdSchemaDto
+            await adminSettingService.changeSettingStatus(settingId)
+
+            res.status(200).json({
+                success : true,
+                msg : 'Change Setting Status',
                 data : {}
             })
         } catch (error) {

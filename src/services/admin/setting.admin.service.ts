@@ -47,6 +47,19 @@ class AdminSettingService {
             throw new ConflictError('Setting Data Not Changed')
         return
     }
+
+    async changeSettingStatus (settingId : number)
+    : Promise<void> {
+        // Get Setting
+        const setting = await settingRepository.getSetting(settingId)
+        if (!setting)
+            throw new NotFoundError(`Setting Not Found { ID : ${settingId} }`)
+
+        // Change Status
+        if (!(await settingRepository.changeSettingStatus(settingId, setting.isPublic)))
+            throw new ConflictError('Setting Status Not Changed')
+        return
+    }
 }
 
 export default new AdminSettingService()

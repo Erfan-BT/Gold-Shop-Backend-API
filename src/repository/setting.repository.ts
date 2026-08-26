@@ -91,6 +91,20 @@ class SettingRepository {
         })
         return rows === 1
     }
+
+    async changeSettingStatus (settingId : number, currentStatus : boolean)
+    : Promise<boolean> {
+        const [rows] = await Setting.update({
+            isPublic : !currentStatus
+        },{
+            where : {
+                id : settingId,
+                isPublic : currentStatus
+            }
+        })
+        return rows === 1
+    }
+
 }
 
 export default new SettingRepository()
