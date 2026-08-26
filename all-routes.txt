@@ -163,3 +163,4 @@ PATCH  | admin/returns/:returnId/cancel         |     Admin    |       -        
 ________________________________________________________________________________________________________________
 GET    | admin/settings                         |     Owner    | .............. |   -
 POST   | admin/settings                         |     Owner    |       -        | key, value, type, group, description, isPublic
+PATCH  | admin/settings/:settingId              |     Owner    |       -        | key, value, type, group, description

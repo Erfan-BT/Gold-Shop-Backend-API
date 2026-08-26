@@ -61,6 +61,15 @@ class SettingRepository {
         })
     }
 
+    async getSetting (settingId : number)
+    : Promise<Setting | null> {
+        return await Setting.findOne({
+            where : {
+                id : settingId
+            }
+        })
+    }
+
     async createSetting (settingData : CreateSettingSchemaDto)
     : Promise<Setting> {
         return await Setting.create({
@@ -71,6 +80,16 @@ class SettingRepository {
             isPublic : settingData.isPublic,
             description : settingData.description ?? null
         })
+    }
+
+    async changeSetting (settingId : number, data : Partial<Pick<Setting, 'key' | 'value' | 'type' | 'group' | 'description'>>)
+    : Promise<boolean> {
+        const [rows] = await Setting.update(data,{
+            where : {
+                id : settingId
+            }
+        })
+        return rows === 1
     }
 }
 
