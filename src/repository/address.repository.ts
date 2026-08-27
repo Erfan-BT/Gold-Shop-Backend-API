@@ -5,16 +5,24 @@ import User from "../models/user.model.js"
 import { Order } from "../models/order.model.js"
 
 class AddressRepository {
-    async userAddresses (userId : number)
+    async getUserAddresses (userId : number)
     : Promise<Address[]> {
         return await Address.findAll({
             where : {
                 userId
-            }
+            },
+            attributes : [
+                'id',
+                'addressLine',
+                'city',
+                'postalCode',
+                'isDefault',
+                'createdAt',
+            ]
         })
     }
 
-    async userAddressById (userId : number, addressId : number, transaction ?: Transaction)
+    async getUserAddress (userId : number, addressId : number, transaction ?: Transaction)
     : Promise<Address | null> {
         return await Address.findOne({
             where : {
@@ -48,15 +56,15 @@ class AddressRepository {
         })
     }
 
-    async updateAddress (userId : number, addressId : number, addressData : AddressDto)
-    :  Promise<number> {
-        const [rows] = await Address.update(addressData, {
+    async changeUserAddress (userId : number, addressId : number, data : Partial<Pick<Address, 'addressLine' | 'city' | 'postalCode'>>)
+    :  Promise<boolean> {
+        const [rows] = await Address.update(data, {
             where : {
                 id : addressId,
                 userId
             }
         })
-        return rows
+        return rows === 1
     }
 
     async setDefaultAddress (userId : number, addressId : number, transaction : Transaction)
@@ -84,13 +92,14 @@ class AddressRepository {
     }
 
     async deleteAddress (userId : number, addressId : number)
-    : Promise<number> {
-        return await Address.destroy({
+    : Promise<boolean> {
+        const rows = await Address.destroy({
             where : {
                 userId,
                 id : addressId
             }
         })
+        return rows === 1
     }
 
     // ----- Admin -----

@@ -94,7 +94,8 @@ Address.init(
                 fields: ["city"]
             },
             {
-                fields: ["postalCode"]
+                fields: ["postalCode"],
+                unique : true
             }
         ]
     }

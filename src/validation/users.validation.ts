@@ -1,18 +1,20 @@
 import { z } from 'zod'
 import { UserSort } from '../types/user.enum.js';
+import { normalizeIranPhone } from '../utils/normalizeIranPhone.js';
 
 export const userIdSchema = z.object({
-    userId : z.coerce.number().int()
+    userId : z.coerce.number().int().positive()
 })
 
 export const changeUserRolesSchema = z.object({
-    userId : z.coerce.number().int(),
-    roleId : z.coerce.number().int()
+    userId : z.coerce.number().int().positive(),
+    roleId : z.coerce.number().int().positive()
 })
 
 export const adminChangeUserInfo = z.object({
     name: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(100).optional(),
-    phone: z.string().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone').optional()
+    phone: z.string().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone')
+    .transform(normalizeIranPhone).optional()
 })
 .superRefine((data, ctx) => {
     if (data.name === undefined && data.phone === undefined) {
@@ -24,8 +26,20 @@ export const adminChangeUserInfo = z.object({
 })
 
 export const changeUserInfoSchema = z.object({
-    name: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(100),
-    phone: z.string().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone'),
+    name: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(100).optional(),
+    phone: z.string().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone')
+    .transform(normalizeIranPhone).optional(),
+})
+.superRefine((data, ctx) => {
+    if (
+        data.name === undefined &&
+        data.phone === undefined
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "At Least One Of The Fields Is Required"
+        })
+    }
 })
 
 export const usersQS = z.object({

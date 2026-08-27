@@ -119,6 +119,10 @@ User.init(
             unique: true
         },
         {
+            fields : ['phone'],
+            unique : true
+        },
+        {
             fields: ["name"]
         }
     ]

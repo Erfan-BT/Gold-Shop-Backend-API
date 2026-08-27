@@ -33,20 +33,25 @@ class UserRepository {
         })
     }
 
-    async updateUser (userId : number, name : string, phone : string)
-    : Promise<number> {
-        const [rows] = await User.update({
-            name,
-            phone
-        },{
-            where : {id : userId}
+    async changeUser (userId : number, data : Partial<Pick<User, 'name' | 'phone'>>)
+    : Promise<boolean> {
+        const [rows] = await User.update(data ,{
+            where : {
+                id : userId,
+                isActive : true
+            }
         })
-        return rows
+        return rows === 1
     }
 
     async deleteUser (userId : number)
-    : Promise<number> {
-        return await User.destroy({where : {id : userId}})
+    : Promise<boolean> {
+        const rows = await User.destroy({
+            where : {
+                id : userId
+            }
+        })
+        return rows === 1
     }
 
     // ----- Admin -----

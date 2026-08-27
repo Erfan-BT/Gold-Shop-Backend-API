@@ -2,18 +2,20 @@ import { Response , NextFunction } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import usersService from "../services/users.service.js";
 import addressService from "../services/address.service.js";
-import { AddressDto } from "../validation/address.validation.js";
+import { AddressDto, AddressIdDto, ChangeAddressDto } from "../validation/address.validation.js";
+import { ChangeUserDto } from "../validation/users.validation.js";
+import { PasswordDto } from "../validation/auth.validation.js";
 
 class UserController {
-    async updateUserInfo (req : AuthRequest, res : Response, next : NextFunction) {
+    async changeUser (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { name , phone } = req.body
-            const result = await usersService.updateUser(userId, name, phone)
+            const userData = req.validated.body as ChangeUserDto
+            const result = await usersService.changeUser(userId, userData)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change User Info',
+                msg : 'User Information Changed Successfully',
                 data : result
             })
         } catch (error) {
@@ -24,13 +26,13 @@ class UserController {
     async deleteUser (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { password } = req.body
+            const { password } = req.validated.body as PasswordDto
             await usersService.deleteUser(userId, password)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete User',
-                data : {}
+                msg : 'User Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -38,14 +40,14 @@ class UserController {
     }
 
     // Address
-    async userAddresses (req : AuthRequest, res : Response, next : NextFunction) {
+    async getUserAddresses (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const result = await addressService.userAddresses(userId)
+            const result = await addressService.getUserAddresses(userId)
 
             res.status(200).json({
                 success : true,
-                msg : 'User Addresses',
+                msg : 'User Addresses Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -53,15 +55,15 @@ class UserController {
         }
     }
 
-    async userAddressById (req : AuthRequest, res : Response, next : NextFunction) {
+    async getUserAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { addressId } = req.params
-            const result = await addressService.userAddressById(userId, Number(addressId))
+            const { addressId } = req.validated.params as AddressIdDto
+            const result = await addressService.getUserAddress(userId, addressId)
 
             res.status(200).json({
                 success : true,
-                msg : 'User Address',
+                msg : 'Address Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -72,12 +74,12 @@ class UserController {
     async createAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const addressData : AddressDto = req.body
+            const addressData = req.validated.body as AddressDto
             const result = await addressService.createAddress(userId, addressData)
             
             res.status(201).json({
                 success : true,
-                msg : 'Create Address',
+                msg : 'Address Created Successfully',
                 data : result
             })
         } catch (error) {
@@ -85,16 +87,16 @@ class UserController {
         }
     }
 
-    async updateAddressInfo (req : AuthRequest, res : Response, next : NextFunction) {
+    async changeAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const addressData : AddressDto = req.body
-            const { addressId } = req.params
-            const result = await addressService.updateAddressInfo(userId, Number(addressId), addressData)
+            const addressData = req.validated.body as ChangeAddressDto
+            const { addressId } = req.validated.params as AddressIdDto
+            const result = await addressService.changeAddress(userId, addressId, addressData)
             
-            res.status(201).json({
+            res.status(200).json({
                 success : true,
-                msg : 'Change Address',
+                msg : 'Address Changed Successfully',
                 data : result
             })
         } catch (error) {
@@ -105,13 +107,13 @@ class UserController {
     async setDefaultAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { addressId } = req.params
-            await addressService.setDefaultAddress(userId, Number(addressId))
+            const { addressId } = req.validated.params as AddressIdDto
+            await addressService.setDefaultAddress(userId, addressId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Default Address',
-                data : {}
+                msg : 'Default Address Set',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -121,13 +123,13 @@ class UserController {
     async deleteAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { addressId } = req.params
-            await addressService.deleteAddress(userId, Number(addressId))
+            const { addressId } = req.validated.params as AddressIdDto
+            await addressService.deleteAddress(userId, addressId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Address',
-                data : {}
+                msg : 'Address Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

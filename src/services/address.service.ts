@@ -1,35 +1,36 @@
 import sequelize from "../configs/sequelize.config.js"
 import Address from "../models/address.model.js"
 import addressRepository from "../repository/address.repository.js"
+import authRepository from "../repository/auth.repository.js"
 import userRepository from "../repository/user.repository.js"
-import { BadRequestError, InternalServerError } from "../utils/appError.js"
-import { AddressDto } from "../validation/address.validation.js"
+import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../utils/appError.js"
+import { AddressDto, ChangeAddressDto } from "../validation/address.validation.js"
 
 class AddressService {
-    async userAddresses (userId : number)
+    async getUserAddresses (userId : number)
     : Promise<Address[]> {
         // Get User
-        const user = await userRepository.userById(userId)
+        const user = await authRepository.getUserById(userId)
         if (!user)
-            throw new BadRequestError()
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+
         // Get User Addresses
-        const addresses = await addressRepository.userAddresses(userId)
-        
-        return addresses as Address[]
+        return await addressRepository.getUserAddresses(userId)
     }
 
-    async userAddressById (userId : number, addressId : number)
+    async getUserAddress (userId : number, addressId : number)
     : Promise<Address> {
         // Get User
-        const user = await userRepository.userById(userId)
+        const user = await authRepository.getUserById(userId)
         if (!user)
-            throw new BadRequestError()
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+
         // Get User Address
-        const address = await addressRepository.userAddressById(userId, addressId)
+        const address = await addressRepository.getUserAddress(userId, addressId)
         if (!address)
-            throw new BadRequestError('Address Not Found')
+            throw new NotFoundError(`Address Not Found { ID : ${addressId} }`)
         
-        return address as Address
+        return address
     }
 
     async createAddress (userId : number, addressData : AddressDto)
@@ -37,56 +38,71 @@ class AddressService {
         // Get User
         const user = await userRepository.userById(userId)
         if (!user)
-            throw new BadRequestError()
+            throw new NotFoundError(`User Not Found { ID : ${userId} }`)
+
         // Get User Address Count
         const count = await addressRepository.addressCount(userId)
-        let address : Address;
-        if (count === 0) {
-            // Default Address
-            address = await addressRepository.createAddress(userId, addressData, true)
-        } else {
-            // Not Default
-            address = await addressRepository.createAddress(userId, addressData)
-        }
+        let isDefault : boolean = false
+        if (count === 0)
+            isDefault = true
 
-        return address
+        return await addressRepository.createAddress(userId, addressData, isDefault)
     }
 
-    async updateAddressInfo (userId : number, addressId : number, addressData : AddressDto)
-    : Promise<Address> {
+    async changeAddress (userId : number, addressId : number, addressData : ChangeAddressDto)
+    : Promise<ChangeAddressDto> {
         // Get Address
-        const address = await addressRepository.userAddressById(userId, addressId)
+        const address = await addressRepository.getUserAddress(userId, addressId)
         if (!address)
-            throw new BadRequestError('Address Not Found')
-        // Update Address
-        await addressRepository.updateAddress(userId, addressId, addressData)
-        return (await addressRepository.userAddressById(userId, addressId)) as Address
+            throw new NotFoundError(`Address Not Found { ID : ${addressId} }`)
+
+        // Data
+        const data : Partial<Pick<Address, 'addressLine' | 'city' | 'postalCode'>> = {}
+
+        if (addressData.addressLine !== undefined && addressData.addressLine !== address.addressLine)
+            data.addressLine = addressData.addressLine
+
+        if (addressData.city !== undefined && addressData.city !== address.city)
+            data.city = addressData.city
+
+        if (addressData.postalCode !== undefined && addressData.postalCode !== address.postalCode)
+            data.postalCode = addressData.postalCode
+
+        // Change Address
+        if (!(await addressRepository.changeUserAddress(userId, addressId, data)))
+            throw new ConflictError('Address Not Changed')
+
+        return data
     }
 
     async setDefaultAddress (userId : number, addressId : number)
     : Promise<void> {
         await sequelize.transaction(async (t) => {
             // Get Address
-            const address = await addressRepository.userAddressById(userId, addressId, t)
+            const address = await addressRepository.getUserAddress(userId, addressId, t)
             if (!address)
-                throw new BadRequestError('Address Not Found')
+                throw new NotFoundError(`Address Not Found { ID : ${addressId} }`)
+
             if (address.isDefault)
                 return
+
             // Set Default
             await addressRepository.setDefaultAddress(userId, addressId, t)
         })
+        return
     }
 
     async deleteAddress (userId : number, addressId : number)
     : Promise<void> {
         // Get Address
-        const address = await addressRepository.userAddressById(userId, addressId)
+        const address = await addressRepository.getUserAddress(userId, addressId)
         if (!address)
-            throw new BadRequestError('Address Not Found')
+            throw new NotFoundError(`Address Not Found { ID : ${addressId} }`)
+
         // Delete Address
-        const rows = await addressRepository.deleteAddress(userId, addressId)
-        if (rows === 0)
-            throw new InternalServerError('Address Not Deleted, Please Try Again Late')
+        if (!(await addressRepository.deleteAddress(userId, addressId)))
+            throw new ConflictError('Address Not Deleted')
+        return
     }
 }
 

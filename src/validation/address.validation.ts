@@ -7,6 +7,23 @@ export const addressSchema = z.object({
     postalCode : z.string().trim().min(1, 'At Least A Characters Are Required').max(20),
 })
 
+export const changeAddressSchema = z.object({
+    addressLine : z.string().trim().min(3, 'At Least 3 Characters Are Required').optional(),
+    city : z.string().trim().min(1, 'At Least A Characters Are Required').max(50).optional(),
+    postalCode : z.string().trim().min(1, 'At Least A Characters Are Required').max(20).optional(),
+})
+.superRefine((data, ctx) => {
+    if (data.addressLine === undefined &&
+        data.city === undefined &&
+        data.postalCode === undefined
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "At Least One Of The Fields Is Required"
+        })
+    }
+})
+
 export const addressIdSchema = z.object({
     addressId : z.coerce.number().int().positive()
 })
@@ -40,4 +57,5 @@ export const addressesQS = z.object({
 
 export type AddressIdDto = z.infer<typeof addressIdSchema>
 export type AddressDto = z.infer<typeof addressSchema>
+export type ChangeAddressDto = z.infer<typeof changeAddressSchema>
 export type AddressesQSDto = z.infer<typeof addressesQS>
