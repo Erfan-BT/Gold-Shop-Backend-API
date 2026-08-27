@@ -4,7 +4,6 @@ import { validate } from '../middleware/validation.js'
 import { changePasswordSchema, emailSchema, loginSchema, otpSchema, passwordSchema, refreshSchema, registerSchema } from '../validation/auth.validation.js'
 import { getAuthLimiter, getEmailLimiter, getRefreshLimiter } from '../middleware/ratelimiter.middleware.js'
 import { authMiddleware, notLoginMiddleware } from '../middleware/auth.middleware.js'
-import roleRepository from '../repository/role.repository.js'
 
 const router = express.Router()
 
@@ -24,8 +23,4 @@ router.post('/reset-password/:token', validate({ params : otpSchema, body : pass
 
 router.patch('/change-password', authMiddleware, validate({ body : changePasswordSchema }), authController.changePassword)
 
-router.get('/test', async (req , res) => {
-    console.log((await roleRepository.getUserRoles(1)))
-    res.end()
-})
 export default router

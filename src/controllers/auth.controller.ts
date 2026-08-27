@@ -1,15 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 import authService from "../services/auth.service.js";
 import { AuthRequest } from "../middleware/auth.middleware.js";
+import { changePasswordDto, EmailDto, LoginDto, OptDto, PasswordDto, RefreshDto, RegisterDto } from "../validation/auth.validation.js";
 
 class AuthController {
     async register (req : Request, res : Response, next : NextFunction) {
         try {
-            const { name , email , password , phone } = req.body
-            const result = await authService.register(name, email, phone, password)
+            const registerData = req.validated.body as RegisterDto
+            const result = await authService.register(registerData)
+
             res.status(201).json({
                 success : true,
-                msg : 'Register',
+                msg : 'Registration Successful',
                 data : result
             })
         } catch (error) {
@@ -19,11 +21,12 @@ class AuthController {
 
     async login (req : Request, res : Response, next : NextFunction) {
         try {
-            const { email, password } = req.body
+            const { email, password } = req.validated.body as LoginDto
             const result = await authService.login(email, password)
+
             res.status(200).json({
                 success : true,
-                msg : 'Login',
+                msg : 'Login Successful',
                 data : result
             })
         } catch (error) {
@@ -38,8 +41,8 @@ class AuthController {
 
             res.status(200).json({
                 success : true,
-                msg : 'LogOut',
-                data : {}
+                msg : 'Logout Successful',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -48,12 +51,12 @@ class AuthController {
 
     async refresh (req : Request, res : Response, next : NextFunction) {
         try {
-            const { refreshToken } = req.body
+            const { refreshToken } = req.validated.body as RefreshDto
             const result = await authService.refresh(refreshToken)
             
             res.status(200).json({
                 success : true,
-                msg : 'New Access Token',
+                msg : 'New Access Token Created',
                 data : result
             })
         } catch (error) {
@@ -68,7 +71,7 @@ class AuthController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Account',
+                msg : 'User Account Found Successfully',
                 data : result
             })
         } catch (error) {
@@ -84,7 +87,7 @@ class AuthController {
             res.status(200).json({
                 success : true,
                 msg : 'If The Email Exists, A Verification Email Has Been Sent',
-                data : {}
+                data : null
             })
         } catch (error) {
             next(error)
@@ -93,13 +96,13 @@ class AuthController {
 
     async verifyEmailConfirm (req : Request, res : Response, next : NextFunction) {
         try {
-            const { token } = req.params
-            await authService.verifyEmailConfirm(String(token))
+            const { token } = req.validated.params as OptDto
+            await authService.verifyEmailConfirm(token)
 
             res.status(200).json({
                 success : true,
-                msg : 'Email Verified',
-                data : {}
+                msg : 'Email Successfully Verified',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -108,13 +111,13 @@ class AuthController {
 
     async forgetPassword (req : Request, res : Response, next : NextFunction) {
         try {
-            const { email } = req.body
+            const { email } = req.validated.body as EmailDto
             await authService.forgetPassword(email)
 
             res.status(200).json({
                 success : true,
                 msg : 'If The Email Exists, A Verification Email Has Been Sent',
-                data : {}
+                data : null
             })
         } catch (error) {
             next(error)
@@ -123,14 +126,14 @@ class AuthController {
 
     async resetPassword (req : Request, res : Response, next : NextFunction) {
         try {
-            const { token } = req.params
-            const { password } = req.body
-            await authService.resetPassword(String(token) , String(password))
+            const { token } = req.validated.params as OptDto
+            const { password } = req.validated.body as PasswordDto
+            await authService.resetPassword(token , password)
 
             res.status(200).json({
                 success : true,
-                msg : 'Reset Password',
-                data : {}
+                msg : 'Password Reset Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -140,13 +143,13 @@ class AuthController {
     async changePassword (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { oldPassword , newPassword } = req.body
+            const { oldPassword , newPassword } = req.validated.body as changePasswordDto
             await authService.changePassword(userId, oldPassword, newPassword)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Password',
-                data : {}
+                msg : 'Change Password Succesfully',
+                data : null
             })
         } catch (error) {
             next(error)

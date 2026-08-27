@@ -2,24 +2,37 @@ import { Model, Transaction } from "sequelize";
 import User from "../models/user.model.js";
 
 class AuthRepository {
-    async userByEmail (email : string, showPassword : boolean = false) 
+    async getUserByEmail (email : string) 
     : Promise<User | null> {
         return await User.findOne({
             where : {
                 email
             },
             attributes : {
-                exclude : showPassword ? [] : ['password']
+                exclude : ['password']
             }
         })
     }
 
-    async userById (userId : number, showPassword : boolean = false) 
+    async getUserById (userId : number) 
     : Promise<User | null> {
-        return await User.findByPk(userId, {
+        return await User.findOne({
+            where : {
+                id : userId
+            },
             attributes : {
-                exclude : showPassword ? [] : ['password']
+                exclude : ['password']
             }
+        })
+    }
+
+    async getUserPasswordById (userId : number)
+    : Promise<User | null> {
+        return await User.findOne({
+            where : {
+                id : userId,
+            },
+            attributes : ['password']
         })
     }
 
@@ -39,28 +52,31 @@ class AuthRepository {
     }
 
     async verifyEmail (userId : number)
-    : Promise<number> {
+    : Promise<boolean> {
         const [rows] = await User.update({
             isEmailVerified : true,
             emailVerifiedAt : new Date()
         },{
             where : {
-                id : userId
+                id : userId,
+                isEmailVerified : false,
+                isActive : true
             }
         })
-        return rows
+        return rows === 1
     }
     
     async changeUserPassword (userId : number, password : string)
-    : Promise<number> {
+    : Promise<boolean> {
         const [rows] = await User.update({
             password
         },{
             where : {
-                id : userId
+                id : userId,
+                isActive : true
             }
         })
-        return rows
+        return rows === 1
     }
 }
 

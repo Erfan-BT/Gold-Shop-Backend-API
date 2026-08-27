@@ -167,3 +167,6 @@ POST   | admin/settings                         |     Owner    |       -        
 PATCH  | admin/settings/:settingId              |     Owner    |       -        | key, value, type, group, description
 PATCH  | admin/settings/:settingId/visibility   |     Owner    |       -        |   -
 DELETE | admin/settings/:settingId              |     Owner    |       -        |   -
+________________________________________________________________________________________________________________
+GET    | /admin/audits                          |     Owner    | .............. |   -
+GET    | /admin/audits/:auditId                 |     Owner    |       -        |   -

@@ -8,7 +8,10 @@ import sequelize from "../configs/sequelize.config.js"
 class UserRepository {
     async userById (userId : number)
     : Promise<User | null> {
-        return await User.findByPk(userId, {
+        return await User.findOne({
+            where : {
+                id : userId
+            },
             attributes : {
                 exclude : ['password']
             },
