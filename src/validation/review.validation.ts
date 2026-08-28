@@ -3,25 +3,36 @@ import { ReviewSort } from "../types/review.enum.js";
 
 export const reviewQS = z.object({
     page : z.coerce.number().int().positive().min(1).default(1),
-    limit : z.coerce.number().int().positive().min(1).max(50).default(20),
+    limit : z.coerce.number().int().positive().min(1).max(30).default(15),
     sort : z.enum(ReviewSort).default(ReviewSort.NEWEST),
 
-    rating : z.coerce.number().int().positive().min(0).max(5).optional(),
-    verified : z.coerce.boolean().optional()
+    rating : z.coerce.number().int().nonnegative().min(0).max(5).optional(),
+    isVerifiedPurchase : z.coerce.boolean().optional()
 })
 
 export const reviewSchema = z.object({
     variantId : z.coerce.number().int().positive(),
-    rating : z.coerce.number().int().positive().min(0).max(5),
-    comment : z.string().min(1)
+    rating : z.coerce.number().int().nonnegative().min(0).max(5),
+    comment : z.string().trim().min(1, 'At Least A Character Is Required')
 })
 
 export const changeReviewSchema = z.object({
-    rating : z.coerce.number().int().positive().min(0).max(5),
-    comment : z.string().min(1)
+    rating : z.coerce.number().int().nonnegative().min(0).max(5).optional(),
+    comment : z.string().min(1, 'At Least A Character Is Required').optional()
+})
+.superRefine((data, ctx) => {
+    if (
+        data.rating === undefined &&
+        data.comment === undefined
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            message : "At Least One Of The Fields Is Required"
+        })
+    }
 })
 
-export const changeReviewParams = z.object({
+export const productSlugReviewIdSchema = z.object({
     slug : z.string().min(1).max(200),
     reviewId : z.coerce.number().int().positive()
 })
@@ -80,7 +91,7 @@ export const reviewIdSchema = z.object({
 export type ReviewQSDto = z.infer<typeof reviewQS>
 export type ReviewDto = z.infer<typeof reviewSchema>
 export type ChangeReviewDto = z.infer<typeof changeReviewSchema>
-export type ReviewParamsDto = z.infer<typeof changeReviewParams>
+export type ProductSlugReviewIdDto = z.infer<typeof productSlugReviewIdSchema>
 export type AdminReviewQSDto = z.infer<typeof adminReviewQS>
 export type AdminChangeReviewSchemaDto = z.infer<typeof adminChangeReviewSchema> 
 export type ReviewIdSchemaDto = z.infer<typeof reviewIdSchema>

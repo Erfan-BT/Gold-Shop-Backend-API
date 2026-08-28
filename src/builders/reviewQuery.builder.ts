@@ -3,10 +3,11 @@ import { ReviewQSDto } from "../validation/review.validation.js";
 import { ReviewSort } from "../types/review.enum.js";
 import Review from "../models/review.model.js";
 import User from "../models/user.model.js";
+import { Product, ProductVariant } from "../models/product.model.js";
 
 export class ReviewQueryBuilder {
 
-    static build(qs: ReviewQSDto): FindAndCountOptions<Review> {
+    static build(qs: ReviewQSDto, productSlug : string): FindAndCountOptions<Review> {
         
         const where = this.buildReviewWhere(qs);
 
@@ -14,13 +15,48 @@ export class ReviewQueryBuilder {
             {
                 model: User,
                 as: "user",
-                attributes: ["id", "name"]
+                attributes: ["id", "name", 'email']
+            },
+            {
+                model: ProductVariant,
+                as: "variant",
+                required: true,
+                attributes: [
+                    'id',
+                    'sku'
+                ],
+                where : {
+                    isActive : true
+                },
+                include: [
+                    {
+                        model: Product,
+                        as: "product",
+                        required: true,
+                        attributes: [],
+                        where: {
+                            slug : productSlug,
+                            isActive: true
+                        }
+                    }
+                ]
             }
         ];
 
         return {
             where,
             include,
+            attributes : [
+                'id',
+                'userId',
+                'variantId',
+                'rating',
+                'comment',
+                'isVerifiedPurchase',
+                'adminReply',
+                'repliedAt',
+                'createdAt',
+            ],
             order: this.buildOrder(qs),
             limit: qs.limit,
             offset: (qs.page - 1) * qs.limit,
@@ -31,9 +67,9 @@ export class ReviewQueryBuilder {
 
     private static buildReviewWhere(
         qs: ReviewQSDto
-    ): WhereOptions {
+    ): WhereOptions<Review> {
 
-        const conditions: WhereOptions[] = [
+        const conditions: WhereOptions<Review>[] = [
             {
                 isApproved: true
             }
@@ -46,9 +82,9 @@ export class ReviewQueryBuilder {
 
         }
 
-        if (qs.verified !== undefined) {
+        if (qs.isVerifiedPurchase !== undefined) {
             conditions.push({
-                isVerifiedPurchase : qs.verified
+                isVerifiedPurchase : qs.isVerifiedPurchase
             });
 
         }

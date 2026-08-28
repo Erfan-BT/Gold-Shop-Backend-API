@@ -1,15 +1,11 @@
 import { FindAndCountOptions, InferCreationAttributes, Op, Transaction } from "sequelize"
 import { Order, OrderItem } from "../models/order.model.js"
 import { OrderPaymentStatus, OrderStatus, ShippingMethod } from "../types/order.enum.js"
-import { Product, ProductVariant } from "../models/product.model.js"
-import Inventory from "../models/inventory.model.js"
-import { PaymentStatus } from "../types/payment.enum.js"
 import Address from "../models/address.model.js"
 import Coupon from "../models/coupon.model.js"
 import Payment from "../models/payment.model.js"
-import { ReturnItem, ReturnRequest } from "../models/return.model.js"
+import { ReturnRequest } from "../models/return.model.js"
 import User from "../models/user.model.js"
-import sequelize from "../configs/sequelize.config.js"
 
 class OrderRepository {
     async hasUserPurchasedVariant(userId: number, variantId: number)
@@ -36,7 +32,7 @@ class OrderRepository {
                     attributes : []
                 }
             ]
-        })) ? true : false
+        })) !== null
     }
 
     async getOrderByOrderNumber (orderNumber : string, userId ?: number)

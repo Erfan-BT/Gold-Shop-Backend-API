@@ -5,20 +5,23 @@ import { NotFoundError } from "../utils/appError.js";
 import { ProductQSDto } from "../validation/product.validation.js";
 
 class ProductService {
-    async allProducts (qs : ProductQSDto)
+    async getAllProducts (qs : ProductQSDto)
     : Promise<{
         rows: Product[];
         count: number;
     }> {
+        // Create Options
         const options = ProductQueryBuilder.build(qs);
-        return await productRepository.getProducts(options);
+        // Get Products
+        return await productRepository.getAllProducts(options);
     }
 
-    async productBySlug (slug : string)
+    async getProductBySlug (slug : string)
     : Promise<Product> {
+        // Get Product
         const product = await productRepository.getProductBySlug(slug)
         if (!product)
-            throw new NotFoundError(`Product [${slug}] Not Found`)
+            throw new NotFoundError(`Product Not Found { Slug : ${slug} }`)
         return product
     }
 

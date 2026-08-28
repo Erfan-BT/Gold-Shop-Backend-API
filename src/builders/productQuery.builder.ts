@@ -135,14 +135,20 @@ export class ProductQueryBuilder {
         if (Object.keys(weightCondition).length)
             where.weight = weightCondition;
 
-        if (qs.karat)
-            where.karat = qs.karat;
+        if (qs.karat !== undefined && qs.karat.length > 0)
+            where.karat = {
+                [Op.in] : qs.karat
+            }
 
-        if (qs.color)
-            where.color = qs.color;
+        if (qs.color !== undefined && qs.color.length > 0)
+            where.color = {
+                [Op.in] : qs.color
+            }
 
-        if (qs.stone)
-            where.stoneType = qs.stone;
+        if (qs.stone !== undefined && qs.stone.length > 0)
+            where.stoneType = {
+                [Op.in] : qs.stone
+            }
         
         if (qs.inStock === true) {
 
@@ -150,10 +156,10 @@ export class ProductQueryBuilder {
                 model: Inventory,
                 as: "inventory",
                 required: true,
-                attributes: [],
+                attributes: ['id', 'quantity'],
                 where: {
                     quantity: {
-                        [Op.gt]: 0
+                        [Op.gt] : 0
                     }
                 }
             });
@@ -166,7 +172,7 @@ export class ProductQueryBuilder {
                 model: ProductDiscount,
                 as: "discounts",
                 required: true,
-                attributes: [],
+                attributes: ['id', 'type', 'value'],
                 where: {
                     isActive: true,
                     startDate: {
@@ -183,7 +189,12 @@ export class ProductQueryBuilder {
         return {
             model: ProductVariant,
             as: "variants",
-            attributes: [],
+            attributes: [
+                'id',
+                'weight',
+                'karat',
+                'currentPrice',
+            ],
             required: true,
             where,
             include
@@ -195,7 +206,7 @@ export class ProductQueryBuilder {
         qs: ProductQSDto
     ): IncludeOptions | null {
 
-        if (!qs.category)
+        if (qs.category === undefined || qs.category.length === 0)
             return null;
 
         return {
@@ -208,9 +219,20 @@ export class ProductQueryBuilder {
                     model: Category,
                     as: "category",
                     required: true,
-                    attributes: [],
+                    attributes: [
+                        'title',
+                        'slug',
+                    ],
                     where: {
-                        slug: qs.category
+                        [Op.or] : {
+                            title : {
+                                [Op.in] : qs.category
+                            },
+                            slug : {
+                                [Op.in] : qs.category
+                            },
+                        },
+                        isActive : true
                     }
                 }
             ]
@@ -229,9 +251,24 @@ export class ProductQueryBuilder {
                     ["createdAt", "DESC"]
                 ];
 
+            case ProductSort.OLDEST:
+                return [
+                    ["createdAt", "ASC"]
+                ];
+
             case ProductSort.POPULAR:
                 return [
                     ["soldCount", "DESC"]
+                ];
+
+            case ProductSort.NOT_POPULAR:
+                return [
+                    ["soldCount", "ASC"]
+                ];
+
+            case ProductSort.PRICE_DESC:
+                return [
+                    ["lowestPrice", "DESC"]
                 ];
 
             case ProductSort.PRICE_ASC:
@@ -239,9 +276,14 @@ export class ProductQueryBuilder {
                     ["lowestPrice", "ASC"]
                 ];
 
-            case ProductSort.PRICE_DESC:
+            case ProductSort.REVIEWCOUNT_DESC:
                 return [
-                    ["lowestPrice", "DESC"]
+                    ["reviewCount", "DESC"]
+                ];
+
+            case ProductSort.REVIEWCOUNT_ASC:
+                return [
+                    ["reviewCount", "ASC"]
                 ];
 
             default:

@@ -5,7 +5,7 @@ import { ChangeReviewDto, ReviewDto } from "../validation/review.validation.js";
 import User from "../models/user.model.js";
 
 class ReviewRepository {
-    async reviewById (reviewId : number, productSlug : string)
+    async getProductReview (reviewId : number, productSlug : string)
     : Promise<Review | null> {
         return await Review.findOne({
             where : {
@@ -38,43 +38,15 @@ class ReviewRepository {
         })
     }
 
-    async productReviews (slug : string, options: FindAndCountOptions<Review>)
+    async getProductReviews (options: FindAndCountOptions<Review>)
     : Promise<{
         rows: Review[];
         count: number;
     }> {
-        const includes = Array.isArray(options.include)
-            ? options.include
-            : options.include
-                ? [options.include]
-                : [];
-        return await Review.findAndCountAll({
-            ...options,
-            include : [
-                ...includes,
-                {
-                    model: ProductVariant,
-                    as: "variant",
-                    required: true,
-                    attributes: [],
-                    include: [
-                        {
-                            model: Product,
-                            as: "product",
-                            required: true,
-                            attributes: [],
-                            where: {
-                                slug,
-                                isActive: true
-                            }
-                        }
-                    ]
-                }
-            ]
-        })
+        return await Review.findAndCountAll(options)
     }
 
-    async getUserProductReview (variantId : number, userId : number, isApproved : boolean = true)
+    async getUserVariantReview (variantId : number, userId : number, isApproved : boolean = true)
     : Promise<Review | null> {
         return await Review.findOne({
             where : {
@@ -85,7 +57,7 @@ class ReviewRepository {
         })
     }
 
-    async createReview (slug : string, userId : number, isVerifiedPurchase : boolean, reviewData : ReviewDto)
+    async createReview (userId : number, isVerifiedPurchase : boolean, reviewData : ReviewDto)
     : Promise<Review> {
         return await Review.create({
             userId,
@@ -95,30 +67,31 @@ class ReviewRepository {
         })
     }
 
-    async changeReview (reviewId : number, reviewDate : ChangeReviewDto)
-    : Promise<number> {
+    async changeReview (reviewId : number, data : Partial<Pick<Review, 'rating' | 'comment'>>)
+    : Promise<boolean> {
         const [rows] = await Review.update(
         {
-            comment : reviewDate.comment,
-            rating : reviewDate.rating,
+            ...data,
             isApproved : false,
             adminReply : null,
-            repliedAt : null
+            repliedAt : null,
+            createdAt : new Date()
         },{
             where : {
                 id : reviewId
             }
         })
-        return rows
+        return rows === 1
     }
 
     async deleteReview (reviewId : number)
-    : Promise<number> {
-        return await Review.destroy({
+    : Promise<boolean> {
+        const rows = await Review.destroy({
             where : {
                 id : reviewId
             }
         })
+        return rows === 1
     }
 
     // ----- Admin -----

@@ -5,7 +5,7 @@ import { Category, ProductCategory } from "../models/category.model.js";
 import { CreateProductSchemaDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
 
 class ProductRepository {
-    async getProducts(options: FindAndCountOptions<Product>)
+    async getAllProducts(options: FindAndCountOptions<Product>)
     : Promise<{
         rows: Product[];
         count: number;
@@ -21,11 +21,34 @@ class ProductRepository {
                 slug,
                 isActive : true
             },
+            attributes : [
+                'id',
+                'title',
+                'slug',
+                'description',
+                'thumbnailImageId',
+                'lowestPrice',
+                'soldCount',
+                'reviewCount',
+                'averageRating',
+                'createdAt', 
+            ],
             include : [
                 {
                     model : ProductVariant,
                     as : 'variants',
                     required : true,
+                    attributes : [
+                        'id',
+                        'weight',
+                        'karat',
+                        'stoneType',
+                        'color',
+                        'sku',
+                        'soldCount',
+                        'currentPrice',
+                        'createdAt',
+                    ],
                     where : {
                         isActive : true
                     },
@@ -34,12 +57,20 @@ class ProductRepository {
                             model : ProductImage,
                             as : 'images',
                             required : false,
+                            attributes : [
+                                'id',
+                                'imageUrl',
+                                'altText',
+                                'isPrimary',
+                                'sortOrder',
+                                'fileName',
+                            ]
                         },
                         {
                             model : Inventory,
                             as : 'inventory',
                             required : false,
-                            attributes : ['quantity']
+                            attributes : ['quantity', 'minThreshold']
                         },
                         {
                             model : ProductDiscount,
@@ -53,7 +84,14 @@ class ProductRepository {
                                     [Op.gte]: now
                                 }
                             },
-                            required: false
+                            required: false,
+                            attributes : [
+                                'id',
+                                'type',
+                                'value',
+                                'startDate',
+                                'endDate',
+                            ]
                         },
                     ]
                 }
@@ -74,7 +112,7 @@ class ProductRepository {
         })
     }
 
-    async getVariantBySlug (slug : string, variantId : number)
+    async getProductVariantBySlug (productSlug : string, variantId : number)
     : Promise<ProductVariant | null> {
         return await ProductVariant.findOne({
             where : {
@@ -87,7 +125,7 @@ class ProductRepository {
                     as : 'product',
                     required : true,
                     where : {
-                        slug,
+                        slug : productSlug,
                         isActive : true
                     },
                     attributes : []
