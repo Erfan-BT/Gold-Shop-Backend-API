@@ -49,17 +49,17 @@ class CartService {
         }
     }
 
-    async addItem (userId : number, variantId : number, quantity : number)
+    async addItemToCart (userId : number, variantId : number, quantity : number)
     : Promise<void> {
         // Check Variant
         const variant = await productRepository.getVariant(variantId)
         if (!variant)
-            throw new NotFoundError('Product Not Found')
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
 
         // Stock
         const stock = variant.inventory?.quantity
-        if ((stock === undefined || stock === null))
-            throw new InternalServerError('Error On Get Product Stock')
+        if (stock === undefined)
+            throw new InternalServerError('Error On Get Product Variant Stock')
         
         // Check Exists Item
         const item = await cartRepository.findUserCartItem(userId, variantId)
@@ -68,19 +68,21 @@ class CartService {
         // Check New Quantity & Stock
         const newQuantity = oldQuantity + quantity
         if (newQuantity > stock)
-            throw new ConflictError('Insufficient stock')
+            throw new ConflictError('Insufficient Stock')
 
         // Change Quantity
-        if (item) {
-            await cartRepository.setItemQuantity(item.id, newQuantity)
-            return
+        if (item !== null) {
+            if (!(await cartRepository.setItemQuantity(item.id, oldQuantity, newQuantity)))
+                throw new ConflictError('Item Quantity Not Changed')
+            else
+                return
         }
 
         // Get Cart
         const [cart] = await cartRepository.findOrCreateCart(userId)
 
-        // Add Item
-        await cartRepository.addItem(cart.id, variantId, quantity)
+        // Add Item To Cart
+        await cartRepository.addItemToCart(cart.id, variantId, quantity)
         return
     }
 
@@ -89,7 +91,7 @@ class CartService {
         // Check Exists Item
         const item = await cartRepository.findUserCartItem(userId, variantId)
         if (!item)
-            throw new NotFoundError('Item Not Found')
+            throw new NotFoundError(`Item Not Found { Variant-ID : ${variantId} }`)
 
         // No Change
         if (item.quantity === quantity)
@@ -98,42 +100,45 @@ class CartService {
         // Check Variant
         const variant = await productRepository.getVariant(variantId)
         if (!variant)
-            throw new NotFoundError('Product Not Found')
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
 
         // Stock
         const stock = variant.inventory?.quantity
-        if ((stock === undefined || stock === null))
-            throw new InternalServerError('Error On Get Product Stock')
+        if (stock === undefined)
+            throw new InternalServerError('Error On Get Product  Variant Stock')
 
         // Check New Quantity & Stock
         if (quantity > stock)
-            throw new ConflictError('Insufficient stock')
+            throw new ConflictError('Insufficient Stock')
 
         // Change Quantity
-        await cartRepository.setItemQuantity(item.id, quantity)
+        if (!(await cartRepository.setItemQuantity(item.id, stock, quantity)))
+            throw new ConflictError('Item Quantity Not Changed')
         return
     }
 
-    async deleteItem (userId : number, variantId : number)
+    async deleteItemFromCart (userId : number, variantId : number)
     : Promise<void> {
         // Check Exists Item
         const item = await cartRepository.findUserCartItem(userId, variantId)
         if (!item)
-            throw new NotFoundError('Item Not Found')
+            throw new NotFoundError(`Item Not Found { Variant-ID : ${variantId} }`)
 
-        // Delete Item
-        await cartRepository.deleteItem(item.id)
+        // Delete Item From Cart
+        if (!(await cartRepository.deleteItemFromCart(item.id)))
+            throw new ConflictError('Item Not Deleted From Cart')
         return
     }
 
     async clearCart (userId : number)
     : Promise<void> {
         // Get Cart
-        const cart = await cartRepository.findCart(userId)
+        const cart = await cartRepository.findUserCart(userId)
         if (!cart)
             return
         // Clear Cart
         await cartRepository.clearCart(cart.id)
+        return
     }
 }
 

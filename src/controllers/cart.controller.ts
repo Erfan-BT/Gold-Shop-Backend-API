@@ -1,6 +1,8 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import cartService from "../services/cart.service.js";
+import { AddCartItemDto, QuantityDto } from "../validation/cart.validation.js";
+import { VariantIdDto } from "../validation/product.validation.js";
 
 class CartController {
     async getCart (req : AuthRequest, res : Response, next : NextFunction) {
@@ -10,7 +12,7 @@ class CartController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Cart',
+                msg : 'User Cart Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -18,16 +20,16 @@ class CartController {
         }
     }
 
-    async addItem (req : AuthRequest, res : Response, next : NextFunction) {
+    async addItemToCart (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { variantId, quantity } = req.validated.body
-            await cartService.addItem(userId, variantId, quantity)
+            const { variantId, quantity } = req.validated.body as AddCartItemDto
+            await cartService.addItemToCart(userId, variantId, quantity)
 
             res.status(200).json({
                 success : true,
-                msg : 'Add CartItem',
-                data : {}
+                msg : 'Item Added To Cart Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -37,30 +39,30 @@ class CartController {
     async changeQuantity (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { variantId } = req.validated.params
-            const { quantity } = req.validated.body
+            const { variantId } = req.validated.params as VariantIdDto
+            const { quantity } = req.validated.body as QuantityDto
             await cartService.changeQuantity(userId, variantId, quantity)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Quantity',
-                data : {}
+                msg : 'Item Quantity Changed Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
         }
     }
 
-    async deleteItem (req : AuthRequest, res : Response, next : NextFunction) {
+    async deleteItemFromCart (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { variantId } = req.validated.params
-            await cartService.deleteItem(userId, variantId)
+            const { variantId } = req.validated.params as VariantIdDto
+            await cartService.deleteItemFromCart(userId, variantId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Item',
-                data : {}
+                msg : 'Item Deleted From Cart Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -74,8 +76,8 @@ class CartController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Clear Cart',
-                data : {}
+                msg : 'Cart Cleared Successfully',
+                data : null
             })
         } catch (error) {
             next(error)

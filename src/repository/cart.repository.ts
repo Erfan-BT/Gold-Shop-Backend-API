@@ -11,6 +11,7 @@ class CartRepository {
             where : {
                 userId
             },
+            attributes : [],
             include : [
                 {
                     model : CartItem,
@@ -37,14 +38,14 @@ class CartRepository {
                                 {
                                     model : Inventory,
                                     as : 'inventory',
-                                    required : false,
-                                    attributes : ['quantity']
+                                    required : true,
+                                    attributes : ['quantity', 'minTreshold']
                                 },
                                 {
                                     model : ProductImage,
                                     as : 'images',
                                     required : false,
-                                    attributes : ['imageUrl', 'altText', 'fileName'],
+                                    attributes : ['id' ,'imageUrl', 'altText', 'fileName'],
                                     where : {
                                         isPrimary : true
                                     }
@@ -52,7 +53,7 @@ class CartRepository {
                                 {
                                     model : ProductDiscount,
                                     as : 'discounts',
-                                    attributes : ['id', 'type', 'value'],
+                                    attributes : ['id', 'type', 'value', 'startDate', 'endDate'],
                                     where: {
                                         isActive: true,
                                         startDate: {
@@ -75,7 +76,7 @@ class CartRepository {
         })
     }
 
-    async findCart (userId : number)
+    async findUserCart (userId : number)
     : Promise<Cart | null> {
         return await Cart.findOne({
             where : {
@@ -114,7 +115,7 @@ class CartRepository {
         })
     }
 
-    async addItem (cartId : number, variantId : number, quantity : number)
+    async addItemToCart (cartId : number, variantId : number, quantity : number)
     : Promise<CartItem> {
         return await CartItem.create({
             cartId,
@@ -123,26 +124,28 @@ class CartRepository {
         })
     }
 
-    async setItemQuantity (itemId : number, quantity : number)
-    : Promise<number> {
+    async setItemQuantity (itemId : number, oldQuantity : number, newQuantity : number)
+    : Promise<boolean> {
         const [rows] = await CartItem.update({
-            quantity
+            quantity : newQuantity
         },
         {
             where :{
-                id : itemId
+                id : itemId,
+                quantity : oldQuantity
             }
         })
-        return rows
+        return rows === 1
     }
 
-    async deleteItem (itemId : number)
-    : Promise<number> {
-        return await CartItem.destroy({
+    async deleteItemFromCart (itemId : number)
+    : Promise<boolean> {
+        const rows = await CartItem.destroy({
             where : {
                 id : itemId,
             }
         })
+        return rows === 1
     }
 
     async clearCart (cartId : number, transaction : Transaction | null = null)
