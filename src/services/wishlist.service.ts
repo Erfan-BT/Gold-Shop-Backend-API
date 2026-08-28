@@ -12,26 +12,32 @@ class WishlistService {
         return await wishlistRepository.getWishlist(userId)
     }
 
-    async createWishlist (userId : number, variantId : number)
+    async addVariantToWishlist (userId : number, variantId : number)
     : Promise<Wishlist> {
         // Check Variant
         const variant = await productRepository.getVariant(variantId)
         if (!variant)
-            throw new NotFoundError("Variant Not Found")
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
+
         // Check Exists
         const existsWishlist = await wishlistRepository.ExistsWishlist(userId, variantId)
         if (existsWishlist)
-            throw new ConflictError("Variant Already Exists In Wishlist");
-        // Create Wishlist
-        return await wishlistRepository.createWishlist(userId, variantId)
+            throw new ConflictError("Product Variant Already Exists In Wishlist");
+
+        // Add To Wishlist
+        return await wishlistRepository.addVariantToWishlist(userId, variantId)
     }
 
-    async deleteWishlist (userId : number, variantId : number)
+    async deleteVariantFromWishlist (userId : number, variantId : number)
     : Promise<void> {
-        // Delete Wishlist
-        const rows = await wishlistRepository.deleteWishlist(userId, variantId)
-        if (rows === 0)
-            throw new NotFoundError('Wishlist Not Found')
+        // Check Exists
+        const existsWishlist = await wishlistRepository.ExistsWishlist(userId, variantId)
+        if (!existsWishlist)
+            throw new NotFoundError('Product Variant Not Exists In Wishlist');
+        // Delete From Wishlist
+        if ((await wishlistRepository.deleteVariantFromWishlist(userId, variantId)))
+            throw new ConflictError('Product Variant Not Deleted From Wishlist')
+        return
     }
 }
 

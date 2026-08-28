@@ -188,7 +188,7 @@ export const changeVariantSchema = z.object({
     }
 })
 
-export const variantId = z.object({
+export const variantIdSchema = z.object({
     variantId : z.coerce.number().int().positive()
 })
 
@@ -213,6 +213,7 @@ export const productSlugSchema = z.object({
 export type ProductQSDto = z.infer<typeof productQS>
 export type AdminProductQSDto = z.infer<typeof adminProductQS>
 export type ProductSlugDto = z.infer<typeof productSlugSchema>
+export type VariantIdDto = z.infer<typeof variantIdSchema>
 export type ProductIdDto = z.infer<typeof productId>
 export type ProductCategoryIdsDto = z.infer<typeof productCategoryIds>
 export type ProductVariantIdsDto = z.infer<typeof productVariantIds>

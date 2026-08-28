@@ -1,3 +1,4 @@
+import Inventory from "../models/inventory.model.js";
 import { Product, ProductImage, ProductVariant } from "../models/product.model.js"
 import Wishlist from "../models/wishlist.model.js"
 
@@ -21,18 +22,34 @@ class Wishlistrepository {
             where : {
                 userId
             },
+            attributes : ['addedAt'],
             include : [
                 {
                     model : ProductVariant,
                     as : 'variant',
-                    required : false,
-                    attributes : ['id', 'weight', 'karat', 'stoneType', 'color', 'isActive'],
+                    required : true,
+                    attributes : [
+                        'id',
+                        'weight',
+                        'karat',
+                        'stoneType',
+                        'color',
+                        'currentPrice',
+                        'isActive',
+                    ],
                     include : [
                         {
                             model : Product,
                             as : 'product',
-                            required : false,
-                            attributes : ['id' ,'title', 'slug']
+                            required : true,
+                            attributes : [
+                                'id',
+                                'title',
+                                'slug',
+                                'isActive',
+                                'lowestPrice',
+                                'averageRating',
+                            ]
                         },
                         {
                             model : ProductImage,
@@ -41,7 +58,18 @@ class Wishlistrepository {
                             where : {
                                 isPrimary : true
                             },
-                            attributes : ['imageUrl', 'altText', 'fileName']
+                            attributes : [
+                                'id',
+                                'imageUrl',
+                                'altText',
+                                'fileName',
+                            ]
+                        },
+                        {
+                            model : Inventory,
+                            as : 'inventory',
+                            required : true,
+                            attributes : ['qauntity', 'minThreshold']
                         }
                     ]
                 }
@@ -49,7 +77,7 @@ class Wishlistrepository {
         })
     }
 
-    async createWishlist (userId : number, variantId : number)
+    async addVariantToWishlist (userId : number, variantId : number)
     : Promise<Wishlist> {
         return await Wishlist.create({
             userId,
@@ -57,14 +85,15 @@ class Wishlistrepository {
         })
     }
 
-    async deleteWishlist (userId : number, variantId : number)
-    : Promise<number> {
-        return await Wishlist.destroy({
+    async deleteVariantFromWishlist (userId : number, variantId : number)
+    : Promise<boolean> {
+        const rows = await Wishlist.destroy({
             where : {
                 userId,
                 variantId
             }
         })
+        return rows === 1
     }
 }
 

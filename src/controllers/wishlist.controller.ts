@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
 import wishlistService from "../services/wishlist.service.js";
+import { VariantIdDto } from "../validation/product.validation.js";
 
 class WishlistController {
     async getWishlist (req : AuthRequest, res : Response, next : NextFunction) {
@@ -10,7 +11,7 @@ class WishlistController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Wishlists',
+                msg : 'User Wishlist Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -18,15 +19,15 @@ class WishlistController {
         }
     }
 
-    async createWishlist (req : AuthRequest, res : Response, next : NextFunction) {
+    async addVariantToWishlist (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { variantId } = req.validated.body
-            const result = await wishlistService.createWishlist(userId, Number(variantId))
+            const { variantId } = req.validated.body as VariantIdDto
+            const result = await wishlistService.addVariantToWishlist(userId, variantId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Create Wishlist',
+                msg : 'Product Variant Added To Wishlist Successfully',
                 data : result
             })
         } catch (error) {
@@ -34,16 +35,16 @@ class WishlistController {
         }
     }
 
-    async deleteWishlist (req : AuthRequest, res : Response, next : NextFunction) {
+    async deleteVariantFromWishlist (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { variantId } = req.validated.params
-            await wishlistService.deleteWishlist(userId, Number(variantId))
+            const { variantId } = req.validated.params as VariantIdDto
+            await wishlistService.deleteVariantFromWishlist(userId, variantId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Wishlist',
-                data : {}
+                msg : 'Product Variant Deleted From Wishlist Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
