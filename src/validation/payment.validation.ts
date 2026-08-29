@@ -2,11 +2,11 @@ import z from "zod";
 import { PaymentSort, PaymentStatus } from "../types/payment.enum.js";
 
 export const paymentSchema = z.object({
-    checkoutToken : z.string().min(1),
+    checkoutToken : z.string().trim().min(1, 'At Least A Character Is Required').max(255, 'Max : 255 Characters')
 })
 
 export const callbackSchema = z.object({
-    Authority : z.string().min(1),
+    Authority : z.string().trim().min(1, 'At Least A Character Is Required').max(255, 'Max : 255 Characters'),
     Status : z.enum(['OK', 'NOK'])
 })
 
@@ -58,7 +58,7 @@ export const paymentIdSchema = z.object({
     paymentId : z.coerce.number().int().positive()
 })
 
-export type PaymentSchemaDto = z.infer<typeof paymentSchema>
-export type CallbackSchemaDto = z.infer<typeof callbackSchema>
+export type PaymentDto = z.infer<typeof paymentSchema>
+export type CallbackDto = z.infer<typeof callbackSchema>
 export type PaymentQSDto = z.infer<typeof paymentQS>
-export type PaymentIdSchemaDto = z.infer<typeof paymentIdSchema>
+export type PaymentIdDto = z.infer<typeof paymentIdSchema>

@@ -28,6 +28,9 @@ class CouponRepository {
                     isActive: true,
                     usedCount: {
                         [Op.lt]: col("usageLimit")
+                    },
+                    expiresAt : {
+                        [Op.gte] : new Date()
                     }
                 },
                 transaction
@@ -49,7 +52,7 @@ class CouponRepository {
                     isActive: true,
                     usedCount: {
                         [Op.gt]: 0
-                    }
+                    },
                 },
                 transaction
             }

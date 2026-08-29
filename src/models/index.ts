@@ -208,15 +208,9 @@ function associations() {
         foreignKey : 'variantId',
         as : 'variant'
     })
-    // ProductVariant - ProductPricing - Category
+    // ProductVariant - ProductPricing
     ProductVariant.hasMany(ProductPricing, {
         foreignKey : 'variantId',
-        as : 'prices',
-        onDelete : 'CASCADE',
-        onUpdate : 'CASCADE'
-    })
-    Category.hasMany(ProductPricing, {
-        foreignKey : 'categoryId',
         as : 'prices',
         onDelete : 'CASCADE',
         onUpdate : 'CASCADE'
@@ -224,10 +218,6 @@ function associations() {
     ProductPricing.belongsTo(ProductVariant, {
         foreignKey : 'variantId',
         as : 'variants'
-    })
-    ProductPricing.belongsTo(Category, {
-        foreignKey : 'categoryId',
-        as : 'categories'
     })
     // CartItem - Cart - User
     Cart.hasMany(CartItem, {

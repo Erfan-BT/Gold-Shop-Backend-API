@@ -7,6 +7,6 @@ import { callbackSchema, paymentSchema } from '../validation/payment.validation.
 const router = express.Router()
 
 router.post('/', authMiddleware, validate({ body : paymentSchema }), paymentController.beforePayment)
-router.get('/callback', validate({ params : callbackSchema }), paymentController.callback)
+router.get('/callback', validate({ query : callbackSchema }), paymentController.callback)
 
 export default router

@@ -127,34 +127,38 @@ class OrderService {
     }
 
     async cancelPendingOrder (orderNumber : string, userId : number, authority : string | null)
-    {
+    : Promise<void> {
         // Order
         const order = await orderRepository.getOrderByOrderNumber(orderNumber, userId)
         if (!order)
-            throw new NotFoundError('Order Not Found')
+            throw new NotFoundError(`Order Not Found { Order-Number : ${orderNumber} }`)
+
         // Check Order Current Status
         if (order.status !== OrderStatus.PENDING_PAYMENT)
-            throw new BadRequestError('Invalid Order Status')
+            throw new BadRequestError(`Invalid Order Status { Status : ${order.status} }`)
+
         // Change Status And Return Inventory & Coupon
-        await sequelize.transaction(async (t) => {
+        await sequelize.transaction(async t => {
             // Status
             if (!(await orderRepository.cancelPendingOrder(orderNumber, userId, t)))
-                throw new InternalServerError('Order Not Canceled')
+                throw new ConflictError('Order Not Canceled')
 
             // Inventory
             const orderItems = await orderRepository.getOrderItems(order.id, t)
             for (let item of orderItems) {
                 if(!(await inventoryRepository.increaseStock(item.variantId, item.quantity, t)))
-                    throw new InternalServerError('Inventory Not Changed')
+                    throw new ConflictError('Inventory Not Changed')
             }
+
             // Coupon
-            if (order.couponId)
+            if (order.couponId !== null)
                 if (!(await couponRepository.returnCoupon(order.couponId, t)))
-                    throw new InternalServerError('Coupon Not Return')
+                    throw new ConflictError('Coupon Not Return')
             
         })
+
         // Remove Redis
-        if (authority)
+        if (authority !== null)
             await RedisCache.delete(`payment:authority:${authority}`)
     }
 

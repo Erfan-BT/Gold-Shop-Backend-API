@@ -41,6 +41,7 @@ POST   | orders/checkout/                       |   Customer   |       -       |
 GET    | orders/                                |   Customer   |       -       |    -
 GET    | orders/:orderNumber                    |   Customer   |       -       |    -
 POST   | payments/                              |   Customer   |       -       | checkoutToken
+GET    | payments/callback                      |   Bank-Api   | ------------- |    -
 ________________________________________________________________________________________________________________
 POST   | returns/                               |   Customer   |       -       | orderNumber, items:{id, quantity, reason, description}[]
 GET    | returns/                               |   Customer   |       -       |    -

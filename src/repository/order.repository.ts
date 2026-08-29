@@ -40,7 +40,7 @@ class OrderRepository {
         return await Order.findOne({
             where : {
                 orderNumber,
-                ...(userId ? {userId : userId} : {})
+                ...(userId !== undefined ? {userId} : {})
             },
             include : [
                 {
