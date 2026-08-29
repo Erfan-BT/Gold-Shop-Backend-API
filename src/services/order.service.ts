@@ -8,7 +8,6 @@ import inventoryRepository from "../repository/inventory.repository.js"
 import orderRepository from "../repository/order.repository.js"
 import { OrderStatus, ShippingMethod } from "../types/order.enum.js"
 import { CheckoutItem, CheckoutSession, CouponData, Pricing } from "../types/order.type.js"
-import { ProductKarat } from "../types/product.enum.js"
 import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../utils/appError.js"
 import { RedisCache } from "../utils/cache.redis.js"
 import cartHelper from "../utils/cart.helper.js"
@@ -18,7 +17,15 @@ import tokenService from "./token.service.js"
 
 class OrderService {
     async checkout (userId : number, addressId : number, shippingMethod : ShippingMethod, couponCode ?: string)
-    {
+    : Promise<{
+        checkoutToken: string;
+        checkoutItems: CheckoutItem[];
+        subtotal: number;
+        productDiscount: number;
+        couponData: CouponData;
+        shippingCost: number;
+        total: number;
+    }> {
         const now = new Date()
         // Get Cart
         const cart = await cartRepository.getCart(userId)
@@ -35,19 +42,23 @@ class OrderService {
             const variant = item.variant
             const product = variant?.product
 
-            if (!variant || !product)
-                throw new NotFoundError('Product Not Found')
+            if (!variant)
+                throw new NotFoundError(`Product Variant Not Found { ID : ${item.variantId} }`)
+
+            if (!product)
+                throw new NotFoundError(`Product Not Found { ID : ${variant.productId} }`)
 
             if (!product.isActive || !variant.isActive)
-                throw new ConflictError('Product Is Not Active')
+                throw new ConflictError('Product Is InActive')
 
             if ((variant.inventory?.quantity ?? 0) < item.quantity)
-                throw new ConflictError('Not Enough Inventory')
+                throw new ConflictError('Not Enough Stock')
 
             // Pricing
             const pricing = cartHelper.calculatePricing(item)
             if (!pricing)
-                throw new InternalServerError("Pricing Calculation Failed");
+                throw new InternalServerError("Pricing Calculation Failed")
+
             subtotal += pricing.subtotal
             discountAmount += pricing.discountAmount
             lineTotal += pricing.lineTotal
@@ -58,9 +69,9 @@ class OrderService {
             })
         }
         // Validate Address
-        const address = await addressRepository.userAddressById(userId, addressId)
+        const address = await addressRepository.getUserAddress(userId, addressId)
         if (!address)
-            throw new NotFoundError('Address Not Found')
+            throw new NotFoundError(`Address Not Found { ID : ${addressId} }`)
 
         // Calculate Shipping Cost
         let shippingCost = shippingHelper.calculateShippingCost(shippingMethod)
@@ -84,6 +95,7 @@ class OrderService {
         const goldPriceAtTime = await goldPriceRepository.getPrice()
         if (!goldPriceAtTime)
             throw new InternalServerError('GOLD PRICE ERROR')
+        
         const checkoutSession : CheckoutSession = {
             userId,
             cartId : cart.id,
@@ -163,11 +175,12 @@ class OrderService {
         return await orderRepository.getUserOrders(userId, page, limit)
     }
 
-    async getOrder (userId : number, orderNumber : string)
+    async getUserOrder (userId : number, orderNumber : string)
     : Promise<Order> {
-        const order = await orderRepository.getOrder(userId, orderNumber)
+        // Get Order
+        const order = await orderRepository.getUserOrder(userId, orderNumber)
         if (!order)
-            throw new NotFoundError('Order Not Found')
+            throw new NotFoundError(`Order Not Found { Order-Number : ${orderNumber} }`)
         return order
     }
 }

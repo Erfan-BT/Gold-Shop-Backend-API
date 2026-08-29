@@ -155,11 +155,16 @@ class OrderRepository {
                 userId,
             },
             attributes: [
-                "orderNumber",
-                "status",
-                "paymentStatus",
-                "finalPrice",
-                "createdAt",
+                'id',
+                'orderNumber',
+                'subtotal',
+                'discountAmount',
+                'shippingMethod',
+                'shippingCost',
+                'finalPrice',
+                'status',
+                'paymentStatus',
+                'createdAt',
             ],
             order: [["createdAt", "DESC"]],
             limit,
@@ -167,7 +172,7 @@ class OrderRepository {
         })
     }
 
-    async getOrder (userId : number, orderNumber : string)
+    async getUserOrder (userId : number, orderNumber : string)
     : Promise<Order | null> {
         return await Order.findOne({
             where : {

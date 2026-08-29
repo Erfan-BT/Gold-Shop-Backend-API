@@ -2,7 +2,7 @@ import GoldPrice from "../models/goldPrice.model.js";
 
 class GoldPriceRepository {
     async getPrice ()
-    {
+    : Promise<GoldPrice | null> {
         return await GoldPrice.findOne()
     }
 

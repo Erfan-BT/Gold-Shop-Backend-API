@@ -9,6 +9,9 @@ class CouponRepository {
             where : {
                 code,
                 isActive : true,
+                expiresAt : {
+                    [Op.gte] : new Date()
+                }
             }
         })
     }

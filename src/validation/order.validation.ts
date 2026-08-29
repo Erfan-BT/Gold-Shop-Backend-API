@@ -2,22 +2,22 @@ import z from "zod";
 import { OrderPaymentStatus, OrderSort, OrderStatus, ShippingMethod } from "../types/order.enum.js";
 
 export const checkoutSchema = z.object({
-    coupon : z.string().trim().min(1).max(50).optional(),
+    coupon : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Characters').optional(),
     addressId : z.coerce.number().int().positive(),
     shippingMethod : z.enum(ShippingMethod)
 })
 
 export const orderQS = z.object({
     page : z.coerce.number().int().min(1).default(1),
-    limit : z.coerce.number().int().min(1).max(50).default(20),
+    limit : z.coerce.number().int().min(1).max(10).default(5),
 })
 
 export const orderNumberSchema = z.object({
-    orderNumber : z.string().trim().min(1).max(50)
+    orderNumber : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Characters')
 })
 
 export const trackingCodeSchema = z.object({
-    trackingCode : z.string().trim().min(1).max(100)
+    trackingCode : z.string().trim().min(1, 'At Least A Character Is Required').max(100, 'Max : 100 Characters')
 })
 
 export const ordersAdminQS = z.object({
@@ -67,8 +67,8 @@ export const ordersAdminQS = z.object({
     }
 })
 
-export type checkoutSchemaDto = z.infer<typeof checkoutSchema>
-export type orderQSDtp = z.infer<typeof orderQS>
+export type CheckoutDto = z.infer<typeof checkoutSchema>
+export type OrderQSDto = z.infer<typeof orderQS>
 export type OrdersAdminDto = z.infer<typeof ordersAdminQS>
 export type OrderNumberDto = z.infer<typeof orderNumberSchema>
 export type TrackingCodeDto = z.infer<typeof trackingCodeSchema>

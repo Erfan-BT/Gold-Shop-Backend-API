@@ -8,6 +8,6 @@ const router = express.Router()
 
 router.post('/checkout', authMiddleware, validate({ body : checkoutSchema }), orderController.checkout)
 router.get('/', authMiddleware, validate({ query : orderQS }), orderController.getUserOrders)
-router.get('/:orderNumber', authMiddleware, validate({ params : orderNumberSchema }), orderController.getOrder)
+router.get('/:orderNumber', authMiddleware, validate({ params : orderNumberSchema }), orderController.getUserOrder)
 
 export default router
