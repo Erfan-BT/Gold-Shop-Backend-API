@@ -3,6 +3,8 @@ import { ReturnItem, ReturnRequest } from "../models/return.model.js"
 import { CreateReturnItemType, RefundStatus, ReturnItemStatus, ReturnStatus } from "../types/return.enum.js"
 import { Order, OrderItem } from "../models/order.model.js"
 import User from "../models/user.model.js"
+import Address from "../models/address.model.js"
+import Coupon from "../models/coupon.model.js"
 
 class ReturnRepository {
     async getUserReturnRequests (userId : number)
@@ -12,14 +14,21 @@ class ReturnRepository {
                 {
                     model : Order,
                     as : 'order',
-                    attributes : [],
+                    attributes : ['id', 'orderNumber', 'status', 'paymentStatus', 'finalPrice'],
                     required : true,
                     where : {
                         userId
                     }
                 }
             ],
-            attributes : ['id', 'orderNumber', 'status', 'refundStatus'],
+            attributes : [
+                'id',
+                'status',
+                'reviewedAt',
+                'refundAmount',
+                'refundStatus',
+                'createdAt',
+            ],
             order : ['createdAt', 'DESC']
         })
     }
@@ -31,25 +40,110 @@ class ReturnRepository {
                 where : {
                     id : returnId
                 },
+                attributes : [
+                    'id',
+                    'orderId',
+                    'status',
+                    'reviewedBy',
+                    'reviewedAt',
+                    'adminNote',
+                    'refundAmount',
+                    'refundStatus',
+                    'returnTrackingCode',
+                    'receivedBy',
+                    'receivedAt',
+                    'resolvedAt',
+                    'canceledBy',
+                    'canceledAt',
+                    'cancelReason',
+                    'createdAt',
+                ],
                 include : [
                     {
                         model : ReturnItem,
                         as : 'items',
+                        required : true,
+                        attributes : [
+                            'reason',
+                            'description',
+                            'quantity',
+                            'refundAmount',
+                            'status',
+                            'adminNote',
+                            'reviewedBy',
+                            'reviewedAt',
+                        ],
                         include : [
                             {
                                 model : OrderItem,
                                 as : 'orderItem',
-                                attributes: ['productTitle', 'sku', 'weight', 'karat', 'stoneType', 'color', 'unitPrice']
+                                required : true,
+                                attributes: [
+                                    'id',
+                                    'variantId',
+                                    'productTitle',
+                                    'sku',
+                                    'weight',
+                                    'karat',
+                                    'stoneType',
+                                    'color',
+                                    'quantity',
+                                    'unitPrice',
+                                    'discountAmount',
+                                    'finalPrice',
+                                    'goldPrice18kAtTime',
+                                ]
                             }
                         ]
                     },
                     {
                         model : Order,
                         as : 'order',
-                        attributes : ['orderNumber', 'status'],
+                        required : true,
+                        attributes : [
+                            'id',
+                            'orderNumber',
+                            'addressId',
+                            'couponId',
+                            'subtotal',
+                            'discountAmount',
+                            'shippingMethod',
+                            'shippingCost',
+                            'finalPrice',
+                            'status',
+                            'paymentStatus',
+                            'shippedAt',
+                            'trackingCode',
+                            'deliveredAt',
+                            'createdAt',
+                        ],
                         where : {
                             userId
-                        }
+                        },
+                        include : [
+                            {
+                                model : Address,
+                                as : 'address',
+                                required : true,
+                                attributes : [
+                                    'addressLine',
+                                    'city',
+                                    'postalCode',
+                                    'isDefault',
+                                ]
+                            },
+                            {
+                                model : Coupon,
+                                as : 'coupon',
+                                required : false,
+                                attributes : [
+                                    'id',
+                                    'code',
+                                    'type',
+                                    'value',
+                                ]
+                            }
+                        ]
                     }
                 ]
             }
@@ -61,7 +155,25 @@ class ReturnRepository {
         return await ReturnRequest.findOne({
             where : {
                 orderId
-            }
+            },
+            attributes : [
+                'id',
+                'orderId',
+                'status',
+                'reviewedBy',
+                'reviewedAt',
+                'adminNote',
+                'refundAmount',
+                'refundStatus',
+                'returnTrackingCode',
+                'receivedBy',
+                'receivedAt',
+                'resolvedAt',
+                'canceledBy',
+                'canceledAt',
+                'cancelReason',
+                'createdAt',
+            ],
         })
     }
 
@@ -82,7 +194,7 @@ class ReturnRepository {
     }
 
     async userTrackingCode (returnId : number, returnTrackingCode : string)
-    {
+    : Promise<boolean> {
         const [rows] = await ReturnRequest.update({
             returnTrackingCode
         }, {
@@ -104,7 +216,7 @@ class ReturnRepository {
     }
 
     async userCancelReturnRequest (returnId : number, userId : number, reason : string)
-    {
+    : Promise<boolean> {
         const [rows] = await ReturnRequest.update({
             status : ReturnStatus.CANCELED,
             refundStatus : RefundStatus.CANCELED,
@@ -121,7 +233,9 @@ class ReturnRepository {
                         ReturnStatus.PENDING
                     ]
                 },
-                returnTrackingCode : null,
+                returnTrackingCode : {
+                    [Op.is] : null
+                }
             }
         })
         return rows === 1

@@ -1,26 +1,9 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../middleware/auth.middleware.js";
-import { CancelReturnReasonSchemaDto, ReturnIdSchemaDto, ReturnRequestSchemaDto, ReturnTrackingCodeSchemaDto } from "../validation/return.validation.js";
 import returnService from "../services/return.service.js";
+import { CancelReturnReasonDto, ReturnIdDto, ReturnRequestDto, ReturnTrackingCodeDto } from "../validation/return.validation.js";
 
 class ReturnController {
-    async createReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { userId } = req.user!
-            const returnRequestBody = req.validated.body as ReturnRequestSchemaDto
-
-            const result = await returnService.createReturnRequest(userId, returnRequestBody)
-
-            res.status(201).json({
-                success : true,
-                msg : 'Return Request',
-                data : result
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
     async getUserReturnRequests (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
@@ -28,7 +11,7 @@ class ReturnController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Return Requests',
+                msg : 'User Return Requests Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -36,15 +19,32 @@ class ReturnController {
         }
     }
 
-    async getReturnRequestData (req : AuthRequest, res : Response, next : NextFunction) {
+    async getReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
-            const result = await returnService.getReturnRequestData(userId, returnId)
+            const { returnId } = req.validated.params as ReturnIdDto
+            const result = await returnService.getReturnRequest(userId, returnId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Return Request Data',
+                msg : 'User Return Request Successfully Found',
+                data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+        async createReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const { userId } = req.user!
+            const returnRequestBody = req.validated.body as ReturnRequestDto
+
+            const result = await returnService.createReturnRequest(userId, returnRequestBody)
+
+            res.status(201).json({
+                success : true,
+                msg : 'Return Request Created Successfully',
                 data : result
             })
         } catch (error) {
@@ -55,14 +55,14 @@ class ReturnController {
     async userRegisterTrackingCode (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.user!
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
-            const { trackingCode } = req.validated.body as ReturnTrackingCodeSchemaDto
+            const { returnId } = req.validated.params as ReturnIdDto
+            const { trackingCode } = req.validated.body as ReturnTrackingCodeDto
             await returnService.userRegisterTrackingCode(userId, returnId, trackingCode)
 
             res.status(200).json({
                 success : true,
-                msg : 'User Register Return Request Tracking Code',
-                data : {}
+                msg : 'Return Request Tracking Code Sccessfully Registered',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -71,15 +71,15 @@ class ReturnController {
 
     async cancelReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
             try {
-                const { returnId } = req.validated.params as ReturnIdSchemaDto
-                const { reason } = req.validated.body as CancelReturnReasonSchemaDto
+                const { returnId } = req.validated.params as ReturnIdDto
+                const { reason } = req.validated.body as CancelReturnReasonDto
                 const { userId } = req.user!
                 await returnService.cancelReturnRequest(returnId, userId, reason)
     
                 res.status(200).json({
                     success : true,
-                    msg : 'User Cancel Return Request',
-                    data : {}
+                    msg : 'Return Request Canceled By User Successfully',
+                    data : null
                 })
             } catch (error) {
                 next(error)

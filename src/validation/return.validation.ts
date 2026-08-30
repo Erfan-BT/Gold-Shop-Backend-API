@@ -2,16 +2,16 @@ import z from "zod";
 import { RefundStatus, ReturnItemStatus, ReturnSort, ReturnStatus } from "../types/return.enum.js";
 
 export const returnRequestSchema = z.object({
-    orderNumber : z.string().trim().min(1).max(50),
+    orderNumber : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Characters'),
     items : z.array(
         z.object({
             orderItemId: z.coerce.number().int().positive(),
             quantity: z.coerce.number().int().positive(),
-            reason: z.string().trim().min(3).max(50),
-            description: z.string().trim().max(1000).optional(),
+            reason: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(50, 'Max : 50 Characters'),
+            description: z.string().trim().max(500, 'Max : 500 characters').optional(),
         })
     )
-    .min(1)
+    .min(1, 'At Least One Item Is Required')
     .superRefine((items, ctx) => {
         const ids = new Set<number>();
 
@@ -150,21 +150,21 @@ export const reviewReturnItemsSchema = z.object({
 })
 
 export const adminNoteSchema = z.object({
-    adminNote : z.string().trim().max(200).optional()
+    adminNote : z.string().trim().max(200, 'Max : 200 Characters').optional()
 })
 
 export const returnTrackingCodeSchema = z.object({
-    trackingCode : z.string().trim().min(1).max(100)
+    trackingCode : z.string().trim().min(1, 'At Least A Character Is Required').max(100, 'Max : 100 Characters'),
 })
 
 export const cancelReturnReasonSchema = z.object({
-    reason : z.string().trim().min(1).max(200)
+    reason : z.string().trim().min(1, 'At Least A Character Is Required').max(200, 'Max : 200 Characters')
 })
 
-export type ReturnRequestSchemaDto = z.infer<typeof returnRequestSchema>
-export type ReturnIdSchemaDto = z.infer<typeof returnIdSchema>
+export type ReturnRequestDto = z.infer<typeof returnRequestSchema>
+export type ReturnIdDto = z.infer<typeof returnIdSchema>
 export type ReturnRequestQSDto = z.infer<typeof returnRequestQSSchema>
-export type ReviewReturnItemsSchemaDto = z.infer<typeof reviewReturnItemsSchema>
-export type AdminNoteSchemaDto = z.infer<typeof adminNoteSchema>
-export type ReturnTrackingCodeSchemaDto = z.infer<typeof returnTrackingCodeSchema>
-export type CancelReturnReasonSchemaDto = z.infer<typeof cancelReturnReasonSchema>
+export type ReviewReturnItemsDto = z.infer<typeof reviewReturnItemsSchema>
+export type AdminNoteDto = z.infer<typeof adminNoteSchema>
+export type ReturnTrackingCodeDto = z.infer<typeof returnTrackingCodeSchema>
+export type CancelReturnReasonDto = z.infer<typeof cancelReturnReasonSchema>

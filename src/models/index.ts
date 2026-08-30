@@ -360,14 +360,14 @@ function associations() {
     })
     // Payment - ReturnRequest
     ReturnRequest.belongsTo(Payment, {
-        foreignKey : 'refundId',
+        foreignKey : 'returnRequestId',
         as : 'payment',
         onDelete : 'RESTRICT',
         onUpdate : 'CASCADE'
     })
-    Payment.hasMany(ReturnRequest, {
-        foreignKey : 'refundId',
-        as : 'refunds'
+    Payment.hasOne(ReturnRequest, {
+        foreignKey : 'returnRequestId',
+        as : 'returnRequest'
     })
 }
 

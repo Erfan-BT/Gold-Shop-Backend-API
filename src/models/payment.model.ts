@@ -4,7 +4,8 @@ import {
     ForeignKey,
     InferAttributes,
     InferCreationAttributes,
-    Model
+    Model,
+    NonAttribute
 } from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
 import { Order } from "./order.model.js";
@@ -41,6 +42,9 @@ class Payment extends Model<
     declare refundedAt: CreationOptional<Date | null>;
     declare updatedAt: CreationOptional<Date | null>;
     declare deletedAt: CreationOptional<Date | null>;
+
+    // Associations
+    declare returnRequest?: NonAttribute<ReturnRequest>;
 }
 
 Payment.init(
