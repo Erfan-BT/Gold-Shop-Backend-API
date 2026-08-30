@@ -1,0 +1,46 @@
+export enum AdminAuditAction {
+    CREATE = 'CREATE',
+    UPDATE = 'UPDATE',
+    DELETE = 'DELETE',
+
+    ACTIVATE = 'ACTIVATE',
+    DEACTIVATE = 'DEACTIVATE',
+
+    APPROVE = 'APPROVE',
+    REJECT = 'REJECT',
+    CANCEL = 'CANCEL',
+    FINALIZE = 'FINALIZE',
+    VERIFY = 'VERIFY',
+
+    SHIP = 'SHIP',
+    DELIVER = 'DELIVER',
+
+    REFUND = 'REFUND',
+
+    ROLE_ASSIGN = 'ROLE_ASSIGN',
+    ROLE_REVOKE = 'ROLE_REVOKE',
+
+    PASSWORD_CHANGE = 'PASSWORD_CHANGE',
+    EMAIL_CHANGE = 'EMAIL_CHANGE',
+
+    LOGIN = 'LOGIN',
+    LOGOUT = 'LOGOUT'
+}
+
+export enum AdminAuditEntity {
+    USER = 'USER',
+    ORDER = 'ORDER',
+    PAYMENT = 'PAYMENT',
+    RETURN = 'RETURN',
+    RETURN_ITEM = 'RETURN_ITEM',
+    PRODUCT = 'PRODUCT',
+    VARIANT = 'VARIANT',
+    CATEGORY = 'CATEGORY',
+    COUPON = 'COUPON',
+    REVIEW = 'REVIEW',
+    ADDRESS = 'ADDRESS',
+    ROLE = 'ROLE',
+    SETTING = 'SETTING',
+    INVENTORY = 'INVENTORY',
+    GOLD_PRICE = 'GOLD_PRICE'
+}

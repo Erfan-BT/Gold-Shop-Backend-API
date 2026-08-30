@@ -9,6 +9,7 @@ import { reviewSeeder } from "../seeders/review.seeder.js";
 import { roleSeeder, userRoleSeeder } from "../seeders/role.seeder.js";
 import { userSeeder } from "../seeders/user.seeder.js";
 import Address from "./address.model.js";
+import AdminAuditLog from "./adminAuditLog.js";
 import { Cart, CartItem } from "./cart.model.js";
 import { Category, ProductCategory } from "./category.model.js";
 import Coupon from "./coupon.model.js";
@@ -368,6 +369,17 @@ function associations() {
     Payment.hasOne(ReturnRequest, {
         foreignKey : 'returnRequestId',
         as : 'returnRequest'
+    })
+    // AdminAuditLog - User(Admin)
+    AdminAuditLog.belongsTo(User, {
+        foreignKey: 'adminId',
+        as: 'admin',
+        onDelete : 'RESTRICT',
+        onUpdate : 'CASCADE'
+    })
+    User.hasMany(AdminAuditLog, {
+        foreignKey: 'adminId',
+        as: 'auditLogs'
     })
 }
 
