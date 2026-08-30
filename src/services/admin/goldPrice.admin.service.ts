@@ -1,10 +1,14 @@
+import GoldPrice from "../../models/goldPrice.model.js"
 import goldPriceRepository from "../../repository/goldPrice.repository.js"
 import { ConflictError, InternalServerError, NotFoundError } from "../../utils/appError.js"
 
 class AdminGoldPriceService {
     async getPrice ()
-    {
-        return await goldPriceRepository.getPrice()
+    : Promise<GoldPrice> {
+        const price = await goldPriceRepository.getPrice()
+        if (!price)
+            throw new InternalServerError('Gold Price Not Found !!!')
+        return price
     }
 
     async adminChangePrice (pricePerGram18k : number)

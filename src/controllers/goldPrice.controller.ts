@@ -8,8 +8,10 @@ export class GoldPriceController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Gold Price',
-                data : result?.pricePerGram18k
+                msg : 'Gold Price Per Gram (18 Karat)',
+                data : {
+                    pricePerGram18k : result.pricePerGram18k
+                }
             })
         } catch (error) {
             next(error)
