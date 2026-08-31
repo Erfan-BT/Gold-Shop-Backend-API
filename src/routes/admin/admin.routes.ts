@@ -17,7 +17,7 @@ import { RolesTitle } from '../../types/role.enum.js'
 
 const router = express.Router()
 
-router.use('/orders', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), OrderAdminRoutes)
+router.use('/orders', authMiddleware, OrderAdminRoutes)
 router.use('/users', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), UsersAdminRoutes)
 router.use('/addresses', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), AddressAdminRoutes)
 router.use('/roles', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), RoleAdminRoutes)

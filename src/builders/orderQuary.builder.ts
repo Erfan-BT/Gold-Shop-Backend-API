@@ -8,6 +8,7 @@ import {
 import { OrdersAdminDto } from "../validation/order.validation.js";
 import { OrderItem } from "../models/order.model.js";
 import { OrderSort } from "../types/order.enum.js";
+import { Order as OrderModel } from "../models/order.model.js";
 
 export class OrderQueryBuilder {
 
@@ -35,9 +36,9 @@ export class OrderQueryBuilder {
     private static buildOrderWhere(
         qs: OrdersAdminDto,
         userId ?: number
-    ): WhereOptions {
+    ): WhereOptions<OrderModel> {
 
-        const conditions: WhereOptions[] = []
+        const conditions: WhereOptions<OrderModel>[] = []
 
         if (qs.q) {
 
@@ -62,11 +63,15 @@ export class OrderQueryBuilder {
             })
         }
 
-        if (qs.coupon) {
+        if (qs.coupon !== undefined) {
             conditions.push({
-                couponId : {
-                    [Op.ne] : null
-                }
+                couponId : qs.coupon
+                    ? {
+                        [Op.ne] : null
+                    }
+                    : {
+                        [Op.is] : null
+                    }
             })
         }
 
@@ -122,7 +127,7 @@ export class OrderQueryBuilder {
             })
         }
 
-        if (userId)
+        if (userId !== undefined)
             conditions.push({
                 userId
             })

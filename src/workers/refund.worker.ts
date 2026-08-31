@@ -11,6 +11,8 @@ import { refundQueue } from "../queue/refund.queue.js";
 import orderRepository from "../repository/order.repository.js";
 import returnRepository from "../repository/return.repository.js";
 import { RefundStatus, ReturnStatus } from "../types/return.enum.js";
+import adminAuditLogRepository from "../repository/adminAuditLog.repository.js";
+import { AdminAuditAction, AdminAuditEntity } from "../types/adminAuditLog.enum.js";
 
 let refundWorker: Worker | null = null;
 
@@ -45,6 +47,7 @@ export async function initRefundWorker() {
                         throw new ConflictError('Payment Is Not Refundable')
                     if (payment.refundedAt || payment.status === PaymentStatus.REFUND)
                         throw new ConflictError("Payment Already Refunded")
+
                     // Lock Payment
                     const locked = await sequelize.transaction(async t => {
                         return await paymentRepository.changePaymentStatus(paymentId, PaymentStatus.REFUND_PENDING, PaymentStatus.REFUND_PROCESSING, t)
@@ -60,10 +63,30 @@ export async function initRefundWorker() {
                             // Error In SandBox Mode : {No Access Token}
                         if (refundResult.refund_status !== 'OK')
                             throw new InternalServerError('Failed Refund')
-                        // Add Refund Data To Payment & Change Status
+                        
                         await sequelize.transaction(async t => {
+                            // Add Refund Data To Payment & Change Status
                             if (!(await paymentRepository.refundPayment(payment.id, payment.amount, reason ?? "Automatic Retry", refundResult.id, refundResult.terminal_id, null, t)))
                                 throw new InternalServerError('Refund Data Not Add To DB')
+
+                            // Add Admin Audit
+                            if (adminId !== undefined && !system)
+                                await adminAuditLogRepository.createAdminAuditLog({
+                                    adminId,
+                                    action : AdminAuditAction.REFUND,
+                                    entityId : paymentId,
+                                    entityType : AdminAuditEntity.PAYMENT,
+                                    ipAddress : null,
+                                    reason,
+                                    oldValues : {
+                                        refundAmount : 0,
+                                        status : PaymentStatus.REFUND_PENDING
+                                    },
+                                    newValues : {
+                                        refundAmount : payment.amount,
+                                        status : PaymentStatus.REFUND
+                                    }
+                                } , t) 
                         })
                     } catch (error) {
                         await sequelize.transaction(async t => {
@@ -76,6 +99,8 @@ export async function initRefundWorker() {
                         })
                         throw error
                     }
+
+                    
                     
                     break
                 

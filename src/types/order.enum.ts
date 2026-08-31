@@ -27,7 +27,8 @@ export enum OrderPaymentStatus {
     PAID = 'PAID',
     FAILED = 'FAILED',
     REFUND_PENDING = 'REFUND_PENDING',
-    REFUNDED = 'REFUNDED'
+    REFUNDED = 'REFUNDED',
+    CANCELED = 'CANCELED'
 }
 
 export enum OrderSort {

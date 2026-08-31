@@ -55,12 +55,11 @@ ________________________________________________________________________________
 ________________________________________________________________________________________________________________
 GET    | admin/orders/                          |     Admin    | ............. |    -
 GET    | admin/orders/:orderNumber              |     Admin    |       -       |    -
-PATCH  | admin/orders/:orderNumber/process      |     Admin    |       -       |    -
-PATCH  | admin/orders/:orderNumber/ship         |     Admin    |       -       | trackingCode
-PATCH  | admin/orders/:orderNumber/deliver      |     Admin    |       -       |    -
-PATCH  | admin/orders/:orderNumber/cancel       |     Admin    |       -       | reason
+POST   | admin/orders/:orderNumber/process      |     Admin    |       -       |    -
+POST   | admin/orders/:orderNumber/ship         |     Admin    |       -       | trackingCode
+POST   | admin/orders/:orderNumber/deliver      |     Admin    |       -       |    -
+POST   | admin/orders/:orderNumber/cancel       |     Admin    |       -       | reason
 PATCH  | admin/orders/:orderNumber/tracking-code|     Admin    |       -       | trackingCode
-GET    | admin/orders/stats                     |     Admin    |       -       |    -
 ________________________________________________________________________________________________________________
 GET    | admin/users/                           |     Admin    | ............. |    -
 GET    | admin/users/:userId                    |     Admin    |       -       |    -
@@ -172,3 +171,4 @@ ________________________________________________________________________________
 GET    | /admin/audits                          |     Owner    | .............. |   -
 GET    | /admin/audits/:auditId                 |     Owner    |       -        |   -
 ________________________________________________________________________________________________________________
+stats هارو بررسی نمیکنم فعلا!!!

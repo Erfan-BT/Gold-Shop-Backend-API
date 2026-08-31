@@ -12,6 +12,7 @@ export enum AdminAuditAction {
     FINALIZE = 'FINALIZE',
     VERIFY = 'VERIFY',
 
+    PROCESS = 'PROCESS',
     SHIP = 'SHIP',
     DELIVER = 'DELIVER',
 

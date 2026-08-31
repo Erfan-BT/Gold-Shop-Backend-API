@@ -11,7 +11,7 @@ class AdminOrderController {
 
             res.status(200).json({
                 success : true,
-                msg : 'All Orders',
+                msg : 'All Orders Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -26,7 +26,7 @@ class AdminOrderController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Order',
+                msg : 'Order Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -37,12 +37,13 @@ class AdminOrderController {
     async setOrderStatusProcess (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { orderNumber } = req.validated.params as OrderNumberDto
-            await adminOrderService.setOrderStatusProcess(orderNumber)
+            const adminId = req.user!.userId
+            await adminOrderService.setOrderStatusProcess(orderNumber, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Order Status : Processing',
-                data : {}
+                msg : 'Order Status Changed Successfully : Paid => Processing',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -53,12 +54,14 @@ class AdminOrderController {
         try {
             const { orderNumber } = req.validated.params as OrderNumberDto
             const { trackingCode } = req.validated.body as TrackingCodeDto
-            await adminOrderService.setOrderStatusShipped(orderNumber, trackingCode)
+            const adminId = req.user!.userId
+
+            await adminOrderService.setOrderStatusShipped(orderNumber, trackingCode, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Order Status : Shipped',
-                data : {}
+                msg : 'Order Status Changed Successfully : Processing => Shipped',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -68,12 +71,14 @@ class AdminOrderController {
     async setOrderStatusDelivered (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { orderNumber } = req.validated.params as OrderNumberDto
-            await adminOrderService.setOrderStatusDelivered(orderNumber)
+            const adminId = req.user!.userId
+
+            await adminOrderService.setOrderStatusDelivered(orderNumber, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Order Status : Delivered',
-                data : {}
+                msg : 'Order Status Changed Successfully : Shipped => Delivered',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -89,8 +94,8 @@ class AdminOrderController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Cancel Order',
-                data : {}
+                msg : 'Order Canceled Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -101,25 +106,12 @@ class AdminOrderController {
         try {
             const { orderNumber } = req.validated.params as OrderNumberDto
             const { trackingCode } = req.validated.body as TrackingCodeDto
-            await adminOrderService.changeTrackingCode(orderNumber, trackingCode)
+            const adminId = req.user!.userId
+            const result = await adminOrderService.changeTrackingCode(orderNumber, trackingCode, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Tracking Code',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async statsMain (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const result = await adminOrderService.statsMain()
-
-            res.status(200).json({
-                success : true,
-                msg : 'Orders Stats',
+                msg : 'Tracking Code Changed Successfully',
                 data : result
             })
         } catch (error) {

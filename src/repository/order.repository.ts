@@ -96,6 +96,7 @@ class OrderRepository {
     : Promise<boolean> {
         const [rows] = await Order.update({
             status : OrderStatus.CANCELED,
+            paymentStatus : OrderPaymentStatus.CANCELED
         },
         {
             where : {
@@ -274,13 +275,23 @@ class OrderRepository {
                 {
                     model : Payment,
                     as : 'payment',
-                    attributes : ['id', 'amount', 'status', 'cardPan', 'referenceCode', 'authorityCode', 'paidAt',
+                    attributes : [
+                        'id',
+                        'amount',
+                        'transactionId',
+                        'authorityCode',
+                        'referenceCode',
+                        'cardPan',
+                        'status',
+                        'ipAddress',
                         'refundAmount',
                         'refundReason',
                         'terminal_id',
                         'refundId',
+                        'returnRequestId',
+                        'bankResponse',
+                        'paidAt',
                         'refundedAt',
-                        'bankResponse'
                     ],
                     required : false
                 },
@@ -293,7 +304,7 @@ class OrderRepository {
                 {
                     model : ReturnRequest,
                     as : 'returnRequest',
-                    attributes : ['id', 'status', 'refundStatus', 'reviewedAt'],
+                    attributes : ['id', 'status', 'refundStatus', 'refundAmount'],
                     required : false
                 }
             ]
@@ -322,7 +333,7 @@ class OrderRepository {
         return rows === 1
     }
 
-    async changeTrackingCode (orderNumber : string, trackingCode : string)
+    async changeTrackingCode (orderNumber : string, trackingCode : string, transaction : Transaction)
     : Promise<boolean> {
         const [rows] = await Order.update({
             trackingCode
@@ -330,111 +341,112 @@ class OrderRepository {
             where : {
                 orderNumber,
                 status : OrderStatus.SHIPPED
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async statsMain() {
-        const startOfToday = new Date()
-        startOfToday.setHours(0, 0, 0, 0)
+    // async statsMain() {
+    //     const startOfToday = new Date()
+    //     startOfToday.setHours(0, 0, 0, 0)
 
-        const startOfMonth = new Date()
-        startOfMonth.setDate(1)
-        startOfMonth.setHours(0, 0, 0, 0)
+    //     const startOfMonth = new Date()
+    //     startOfMonth.setDate(1)
+    //     startOfMonth.setHours(0, 0, 0, 0)
 
-        const [
-            pendingOrderCount,
-            processingOrderCount,
-            shippingOrderCount,
-            deliveredOrderCount,
-            refundPendingOrderCount,
-            refundedOrderCount,
-            completedOrderCount,
-            canceledOrderCount,
-            todaySales,
-            monthlySales
-        ] = await Promise.all([
-            Order.count({
-                where: {
-                    status: OrderStatus.PENDING_PAYMENT
-                }
-            }),
+    //     const [
+    //         pendingOrderCount,
+    //         processingOrderCount,
+    //         shippingOrderCount,
+    //         deliveredOrderCount,
+    //         refundPendingOrderCount,
+    //         refundedOrderCount,
+    //         completedOrderCount,
+    //         canceledOrderCount,
+    //         todaySales,
+    //         monthlySales
+    //     ] = await Promise.all([
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.PENDING_PAYMENT
+    //             }
+    //         }),
 
-            Order.count({
-                where: {
-                    status: OrderStatus.PROCESSING
-                }
-            }),
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.PROCESSING
+    //             }
+    //         }),
 
-            Order.count({
-                where: {
-                    status: OrderStatus.SHIPPED
-                }
-            }),
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.SHIPPED
+    //             }
+    //         }),
 
-            Order.count({
-                where: {
-                    status: OrderStatus.DELIVERED
-                }
-            }),
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.DELIVERED
+    //             }
+    //         }),
 
-            Order.count({
-                where: {
-                    status: OrderStatus.REFUND_PENDING
-                }
-            }),
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.REFUND_PENDING
+    //             }
+    //         }),
 
-            Order.count({
-                where: {
-                    status: OrderStatus.REFUNDED
-                }
-            }),
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.REFUNDED
+    //             }
+    //         }),
 
-            Order.count({
-                where: {
-                    status: OrderStatus.COMPLETED
-                }
-            }),
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.COMPLETED
+    //             }
+    //         }),
 
-            Order.count({
-                where: {
-                    status: OrderStatus.CANCELED
-                }
-            }),
+    //         Order.count({
+    //             where: {
+    //                 status: OrderStatus.CANCELED
+    //             }
+    //         }),
 
-            Order.sum('finalPrice', {
-                where: {
-                    paymentStatus: OrderPaymentStatus.PAID,
-                    createdAt: {
-                        [Op.gte]: startOfToday
-                    }
-                }
-            }),
+    //         Order.sum('finalPrice', {
+    //             where: {
+    //                 paymentStatus: OrderPaymentStatus.PAID,
+    //                 createdAt: {
+    //                     [Op.gte]: startOfToday
+    //                 }
+    //             }
+    //         }),
 
-            Order.sum('finalPrice', {
-                where: {
-                    paymentStatus: OrderPaymentStatus.PAID,
-                    createdAt: {
-                        [Op.gte]: startOfMonth
-                    }
-                }
-            })
-        ])
+    //         Order.sum('finalPrice', {
+    //             where: {
+    //                 paymentStatus: OrderPaymentStatus.PAID,
+    //                 createdAt: {
+    //                     [Op.gte]: startOfMonth
+    //                 }
+    //             }
+    //         })
+    //     ])
 
-        return {
-            pendingOrderCount,
-            processingOrderCount,
-            shippingOrderCount,
-            deliveredOrderCount,
-            refundPendingOrderCount,
-            refundedOrderCount,
-            completedOrderCount,
-            canceledOrderCount,
-            todaySales: todaySales ?? 0,
-            monthlySales: monthlySales ?? 0
-        }
-    }
+    //     return {
+    //         pendingOrderCount,
+    //         processingOrderCount,
+    //         shippingOrderCount,
+    //         deliveredOrderCount,
+    //         refundPendingOrderCount,
+    //         refundedOrderCount,
+    //         completedOrderCount,
+    //         canceledOrderCount,
+    //         todaySales: todaySales ?? 0,
+    //         monthlySales: monthlySales ?? 0
+    //     }
+    // }
 }
 
 export default new OrderRepository()
