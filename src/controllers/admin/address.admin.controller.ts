@@ -1,7 +1,8 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AddressDto, AddressesQSDto, AddressIdDto } from "../../validation/address.validation.js";
+import { AddressDto, AddressesQSDto, AddressIdDto, ChangeAddressDto } from "../../validation/address.validation.js";
 import adminAddressService from "../../services/admin/address.admin.service.js";
+import { ReasonDto } from "../../validation/adminAudit.validation.js";
 
 class AdminAddressController {
     async getAllAddresses (req : AuthRequest, res : Response, next : NextFunction) {
@@ -11,7 +12,7 @@ class AdminAddressController {
 
             res.status(200).json({
                 success : true,
-                msg : 'All Addresses',
+                msg : 'All Addresses Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -26,7 +27,7 @@ class AdminAddressController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Address',
+                msg : 'Address Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -37,13 +38,14 @@ class AdminAddressController {
     async changeAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { addressId } = req.validated.params as AddressIdDto
-            const addressData = req.validated.body as AddressDto
-            await adminAddressService.changeAddress(addressId, addressData)
+            const addressData = req.validated.body as ChangeAddressDto
+            const adminId = req.user!.userId
+            const result = await adminAddressService.changeAddress(addressId, addressData, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Address',
-                data : {}
+                msg : 'Address Successfully Chaged',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -53,12 +55,14 @@ class AdminAddressController {
     async deleteAddress (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { addressId } = req.validated.params as AddressIdDto
-            await adminAddressService.deleteAddress(addressId)
+            const { reason } = req.validated.body as ReasonDto
+            const adminId = req.user!.userId
+            await adminAddressService.deleteAddress(addressId, reason, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Address',
-                data : {}
+                msg : 'Address Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

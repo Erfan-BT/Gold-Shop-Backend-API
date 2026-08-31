@@ -104,12 +104,15 @@ class AddressRepository {
 
     // ----- Admin -----
     async getAllAddresses (options : FindAndCountOptions)
-    {
+    : Promise<{
+        rows : Address[],
+        count : number
+    }> {
         return await Address.findAndCountAll(options)
     }
 
     async getAddress (addressId : number)
-    {
+    : Promise<Address | null> {
         return await Address.findOne({
             where : {
                 id : addressId
@@ -141,22 +144,24 @@ class AddressRepository {
         })
     }
 
-    async changeAddress (addressId : number, addressData : AddressDto)
-    {
-        const [rows] = await Address.update(addressData, {
+    async changeAddress (addressId : number, data : Partial<Pick<Address, 'addressLine' | 'city' | 'postalCode'>>, transaction : Transaction)
+    : Promise<boolean> {
+        const [rows] = await Address.update(data, {
             where : {
                 id : addressId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async adminDeleteAddress (addressId : number)
-    {
+    async adminDeleteAddress (addressId : number, transaction : Transaction)
+    : Promise<boolean> {
         const rows = await Address.destroy({
             where : {
                 id : addressId
-            }
+            },
+            transaction
         })
         return rows === 1
     }

@@ -9,6 +9,7 @@ import {
 import { AddressesQSDto } from "../validation/address.validation.js";
 import { AddressSort } from "../types/address.enum.js";
 import User from "../models/user.model.js";
+import Address from "../models/address.model.js";
 
 export class AddressQueryBuilder {
 
@@ -34,9 +35,9 @@ export class AddressQueryBuilder {
 
     private static buildAddressWhere(
         qs: AddressesQSDto
-    ): WhereOptions {
+    ): WhereOptions<Address> {
 
-        const conditions: WhereOptions[] = []
+        const conditions: WhereOptions<Address>[] = []
 
         if (qs.q) {
             conditions.push({
@@ -78,13 +79,13 @@ export class AddressQueryBuilder {
             })
         }
 
-        if (qs.isDefault !== undefined && qs.isDefault !== null) {
+        if (qs.isDefault !== undefined) {
             conditions.push({
                 isDefault : qs.isDefault
             })
         }
 
-        if (qs.userId !== undefined && qs.userId !== null) {
+        if (qs.userId !== undefined) {
             conditions.push({
                 userId : qs.userId
             })

@@ -33,8 +33,8 @@ export const addressesQS = z.object({
     limit : z.coerce.number().int().positive().min(1).max(50).default(20),
     sort : z.enum(AddressSort).default(AddressSort.NEWEST),
 
-    q : z.string().max(200).optional(),
-    userId : z.coerce.number().int().min(1).optional(),
+    q : z.string().trim().max(200, 'Max : 200 Characters').optional(),
+    userId : z.coerce.number().int().positive().optional(),
 
     from : z.coerce.date().optional(),
     to : z.coerce.date().optional(),
