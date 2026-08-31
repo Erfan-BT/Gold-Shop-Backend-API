@@ -3,14 +3,16 @@ import {
     IncludeOptions,
     Op,
     Order,
+    Sequelize,
     WhereOptions
 } from "sequelize";
 
-import { UserQSDto } from "../validation/users.validation.js";
+import { UserQSDto } from "../validation/user.validation.js";
 import { UserSort } from "../types/user.enum.js";
 import { Role, UserRole } from "../models/role.model.js";
 import Address from "../models/address.model.js";
 import { Order as OrderModel } from "../models/order.model.js";
+import User from "../models/user.model.js";
 
 export class UserQueryBuilder {
 
@@ -42,9 +44,9 @@ export class UserQueryBuilder {
 
     private static buildUserWhere(
         qs: UserQSDto
-    ): WhereOptions {
+    ): WhereOptions<User> {
 
-        const conditions: WhereOptions[] = []
+        const conditions: WhereOptions<User>[] = []
 
         if (qs.q) {
             conditions.push({
@@ -86,16 +88,36 @@ export class UserQueryBuilder {
             })
         }
 
-        if (qs.isActive !== undefined && qs.isActive !== null) {
+        if (qs.isActive !== undefined) {
             conditions.push({
                 isActive : qs.isActive
             })
         }
 
-        if (qs.isEmailVerified !== undefined && qs.isEmailVerified !== null) {
+        if (qs.isEmailVerified !== undefined) {
             conditions.push({
                 isEmailVerified : qs.isEmailVerified
             })
+        }
+
+        if (qs.hasOrder !== undefined) {
+            conditions.push(
+                qs.hasOrder
+                    ? Sequelize.literal(`
+                        EXISTS (
+                            SELECT 1
+                            FROM orders
+                            WHERE orders.userId = User.id
+                        )
+                    `)
+                    : Sequelize.literal(`
+                        NOT EXISTS (
+                            SELECT 1
+                            FROM orders
+                            WHERE orders.userId = User.id
+                        )
+                    `)
+            )
         }
 
         return {
@@ -107,29 +129,26 @@ export class UserQueryBuilder {
         qs: UserQSDto
     ): IncludeOptions {
 
-        const include: IncludeOptions[] = [];
-
-        if (qs.roles !== undefined && qs.roles.length > 0) {
-            include.push({
-                model: Role,
-                as: "role",
-                required: true,
-                attributes: [],
-                where: {
-                    name : {
-                        [Op.in] : qs.roles
-                    }
-                }
-            });
-        }
-
         return {
             model: UserRole,
             as: "roles",
-            attributes: [],
+            attributes: ['id'],
             required: true,
-            include
-        };
+            include : [
+                {
+                    model: Role,
+                    as: "role",
+                    required: true,
+                    attributes: ['name'],
+                    where : (qs.roles !== undefined && qs.roles.length > 0)
+                    ? {
+                        name : {
+                            [Op.in] : qs.roles
+                        }
+                    } : {}
+                }
+            ]
+        }
 
     }
 
@@ -137,8 +156,28 @@ export class UserQueryBuilder {
         return {
             model : Address,
             as : 'addresses',
-            attributes : ['id'],
+            attributes : ['id', 'city'],
             required : false,
+            where : qs.q
+            ? {
+                [Op.or]: [
+                    {
+                        city: {
+                            [Op.like]: `%${qs.q}%`
+                        }
+                    },
+                    {
+                        postalCode: {
+                            [Op.like]: `%${qs.q}%`
+                        }
+                    },
+                    {
+                        addressLine: {
+                            [Op.like]: `%${qs.q}%`
+                        }
+                    }
+                ]
+            } : {}
         }
     }
 
@@ -146,8 +185,8 @@ export class UserQueryBuilder {
         return {
             model : OrderModel,
             as : 'orders',
-            attributes : ['id'],
-            required : false,
+            attributes : ['id', 'orderNumber'],
+            required : false
         }
     }
 

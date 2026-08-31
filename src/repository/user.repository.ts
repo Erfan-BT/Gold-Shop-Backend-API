@@ -1,4 +1,4 @@
-import { FindAndCountOptions, Op } from "sequelize"
+import { FindAndCountOptions, Op, Transaction } from "sequelize"
 import Address from "../models/address.model.js"
 import User from "../models/user.model.js"
 import { Order } from "../models/order.model.js"
@@ -56,7 +56,10 @@ class UserRepository {
 
     // ----- Admin -----
     async getAllUsers (options : FindAndCountOptions)
-    {
+    : Promise<{
+        rows: User[];
+        count: number;
+    }> {
         return await User.findAndCountAll(options)
     }
 
@@ -85,7 +88,8 @@ class UserRepository {
                     include : [{
                         model : Role,
                         as : 'role',
-                        attributes : ['id', 'name']
+                        attributes : ['id', 'name'],
+                        required : true
                     }]
                 },
                 {
@@ -123,19 +127,20 @@ class UserRepository {
         })
     }
 
-    async changeUserInfo(userId : number, data : Partial<Pick<User, "name" | "phone">>)
+    async changeUserInfo(userId : number, data : Partial<Pick<User, "name" | "phone">>, transaction : Transaction)
     : Promise<boolean> {
         const [rows] = await User.update(data,
             {
                 where : {
                     id : userId
-                }
+                },
+                transaction
             }
         )
         return rows === 1
     }
 
-    async changeUserEmail (userId : number, email : string)
+    async changeUserEmail (userId : number, email : string, transaction : Transaction)
     : Promise<boolean> {
         const [rows] = await User.update({
             email,
@@ -144,108 +149,111 @@ class UserRepository {
         },{
             where : {
                 id : userId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async changeUserStatus (userId : number, currentStatus : boolean)
-    {
+    async changeUserStatus (userId : number, currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await User.update({
             isActive : !currentStatus
         },{
             where : {
                 id : userId,
                 isActive : currentStatus
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async changeVerifiedEmailStatus (userId : number, currentStatus : boolean)
-    {
+    async changeVerifiedEmailStatus (userId : number, currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await User.update({
             isEmailVerified : !currentStatus,
             emailVerifiedAt : currentStatus ? null : new Date()
         },{
             where : {
                 id : userId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async statsMain() {
-        const startOfToday = new Date()
-        startOfToday.setHours(0, 0, 0, 0)
+    // async statsMain() {
+    //     const startOfToday = new Date()
+    //     startOfToday.setHours(0, 0, 0, 0)
 
-        const startOfMonth = new Date()
-        startOfMonth.setDate(1)
-        startOfMonth.setHours(0, 0, 0, 0)
+    //     const startOfMonth = new Date()
+    //     startOfMonth.setDate(1)
+    //     startOfMonth.setHours(0, 0, 0, 0)
 
-        const [
-            allUsersCount,
-            activeUserCount,
-            verifiedUserCount,
-            newUsersTodayCount,
-            newUsersThisMonth,
-            [rolesCount],
-        ] = await Promise.all([
-            User.count(),
+    //     const [
+    //         allUsersCount,
+    //         activeUserCount,
+    //         verifiedUserCount,
+    //         newUsersTodayCount,
+    //         newUsersThisMonth,
+    //         [rolesCount],
+    //     ] = await Promise.all([
+    //         User.count(),
 
-            User.count({
-                where: {
-                    isActive : true
-                }
-            }),
+    //         User.count({
+    //             where: {
+    //                 isActive : true
+    //             }
+    //         }),
 
-            User.count({
-                where: {
-                    isEmailVerified : true
-                }
-            }),
+    //         User.count({
+    //             where: {
+    //                 isEmailVerified : true
+    //             }
+    //         }),
 
-            User.count({
-                where: {
-                    createdAt : {
-                        [Op.gte] : startOfToday
-                    }
-                }
-            }),
+    //         User.count({
+    //             where: {
+    //                 createdAt : {
+    //                     [Op.gte] : startOfToday
+    //                 }
+    //             }
+    //         }),
 
-            User.count({
-                where: {
-                    createdAt : {
-                        [Op.gte] : startOfMonth
-                    }
-                }
-            }),
+    //         User.count({
+    //             where: {
+    //                 createdAt : {
+    //                     [Op.gte] : startOfMonth
+    //                 }
+    //             }
+    //         }),
 
-            sequelize.query(`
-                SELECT
-                    r.id,
-                    r.name,
-                    COUNT(DISTINCT ur.user_id) AS userCount
-                FROM roles r
-                LEFT JOIN userroles ur
-                    ON ur.role_id = r.id
-                GROUP BY
-                    r.id,
-                    r.name
-                ORDER BY
-                    userCount DESC
-            `)
-        ])
+    //         sequelize.query(`
+    //             SELECT
+    //                 r.id,
+    //                 r.name,
+    //                 COUNT(DISTINCT ur.user_id) AS userCount
+    //             FROM roles r
+    //             LEFT JOIN userroles ur
+    //                 ON ur.role_id = r.id
+    //             GROUP BY
+    //                 r.id,
+    //                 r.name
+    //             ORDER BY
+    //                 userCount DESC
+    //         `)
+    //     ])
 
-        return {
-            allUsersCount,
-            activeUserCount,
-            verifiedUserCount,
-            newUsersTodayCount,
-            newUsersThisMonth,
-            rolesCount,
-        }
-    }
+    //     return {
+    //         allUsersCount,
+    //         activeUserCount,
+    //         verifiedUserCount,
+    //         newUsersTodayCount,
+    //         newUsersThisMonth,
+    //         rolesCount,
+    //     }
+    // }
 }
 
 export default new UserRepository()

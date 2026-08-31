@@ -3,7 +3,7 @@ import { AuthRequest } from "../middleware/auth.middleware.js";
 import usersService from "../services/users.service.js";
 import addressService from "../services/address.service.js";
 import { AddressDto, AddressIdDto, ChangeAddressDto } from "../validation/address.validation.js";
-import { ChangeUserDto } from "../validation/users.validation.js";
+import { ChangeUserDto } from "../validation/user.validation.js";
 import { PasswordDto } from "../validation/auth.validation.js";
 
 class UserController {

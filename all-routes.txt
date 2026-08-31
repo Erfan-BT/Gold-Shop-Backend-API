@@ -65,15 +65,13 @@ GET    | admin/users/                           |     Admin    | ............. |
 GET    | admin/users/:userId                    |     Admin    |       -       |    -
 PATCH  | admin/users/:userId                    |     Admin    |       -       | ?name , ?phone
 PATCH  | admin/users/:userId/email              |     Owner    |       -       | email
-PATCH  | admin/users/:userId/active             |     Admin    |       -       |    -
+PATCH  | admin/users/:userId/active             |     Admin    |       -       | reason
+PATCH  | admin/users/:userId/change-password    |     Owner    |       -       | password, reason
+PATCH  | admin/users/:userId/verify-email       |     Admin    |       -       |    -
+DELETE | admin/users/:userId/revoke-sessions    |     Admin    |       -       |    -
 GET    | admin/users/:userId/roles              |     Admin    |       -       |    -
 POST   | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -
 DELETE | admin/users/:userId/roles/:roleId      |     Admin    |       -       |    -
-PATCH  | admin/users/:userId/change-password    |     Owner    |       -       | password
-PATCH  | admin/users/:userId/verify-email       |     Admin    |       -       |    -
-DELETE | admin/users/:userId/revoke-sessions    |     Admin    |       -       |    -
-GET    | admin/users/:userId/orders             |     Admin    | ............. |    -
-GET    | admin/users/stats                      |     Owner    |       -       |    -
 ________________________________________________________________________________________________________________
 GET    | admin/addresses/                       |     Admin    | ............. |    -
 GET    | admin/addresses/:addressId             |     Admin    |       -       |    -

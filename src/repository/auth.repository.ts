@@ -66,7 +66,7 @@ class AuthRepository {
         return rows === 1
     }
     
-    async changeUserPassword (userId : number, password : string)
+    async changeUserPassword (userId : number, password : string, transaction ?: Transaction)
     : Promise<boolean> {
         const [rows] = await User.update({
             password
@@ -74,7 +74,8 @@ class AuthRepository {
             where : {
                 id : userId,
                 isActive : true
-            }
+            },
+            transaction : transaction ?? null
         })
         return rows === 1
     }

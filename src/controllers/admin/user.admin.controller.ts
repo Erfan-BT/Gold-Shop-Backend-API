@@ -1,19 +1,20 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { ChangeUserInfoDto, ChangeUserRolesDto, UserIdDto, UserQSDto } from "../../validation/users.validation.js";
-import adminUsersService from "../../services/admin/users.admin.service.js";
+import { ChangeUserInfoDto, ChangeUserRolesDto, UserIdDto, UserQSDto } from "../../validation/user.validation.js";
+import adminUserService from "../../services/admin/user.admin.service.js";
 import { EmailDto, PasswordDto } from "../../validation/auth.validation.js";
 import { OrdersAdminDto } from "../../validation/order.validation.js";
+import { AdminChangeUserPasswordDto, ReasonDto } from "../../validation/adminAudit.validation.js";
 
-class AdminUsersController {
+class AdminUserController {
     async getAllUsers (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const qs = req.validated.query as UserQSDto
-            const result = await adminUsersService.getAllUsers(qs)
+            const result = await adminUserService.getAllUsers(qs)
 
             res.status(200).json({
                 success : true,
-                msg : 'All Users',
+                msg : 'All Users Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -24,11 +25,11 @@ class AdminUsersController {
     async getUser (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.validated.params as UserIdDto
-            const result = await adminUsersService.getUser(userId)
+            const result = await adminUserService.getUser(userId)
 
             res.status(200).json({
                 success : true,
-                msg : 'User',
+                msg : 'User Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -40,12 +41,13 @@ class AdminUsersController {
         try {
             const { userId } = req.validated.params as UserIdDto
             const info = req.validated.body as ChangeUserInfoDto
-            await adminUsersService.changeUserInfo(userId, info)
+            const adminId = req.user!.userId
+            const result = await adminUserService.changeUserInfo(userId, info, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change User Info',
-                data : {}
+                msg : 'User Changed Successfully',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -57,12 +59,14 @@ class AdminUsersController {
             const { userId } = req.validated.params as UserIdDto
             const adminId = req.user!.userId
             const { email } = req.validated.body as EmailDto
-            await adminUsersService.changeUserEmail(userId, adminId, email)
+            await adminUserService.changeUserEmail(userId, adminId, email)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change User Email',
-                data : {}
+                msg : 'User Email Changed Successfully',
+                data : {
+                    email
+                }
             })
         } catch (error) {
             next(error)
@@ -72,12 +76,13 @@ class AdminUsersController {
     async changeUserStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.validated.params as UserIdDto
+            const { reason } = req.validated.body as ReasonDto
             const adminId = req.user!.userId
-            const result = await adminUsersService.changeUserStatus(userId, adminId)
+            const result = await adminUserService.changeUserStatus(userId, adminId, reason)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change User Status',
+                msg : 'User Status Changed Successfully',
                 data : {
                     newStatus : result
                 }
@@ -91,13 +96,13 @@ class AdminUsersController {
         try {
             const { userId } = req.validated.params as UserIdDto
             const adminId = req.user!.userId
-            const { password } = req.validated.body as PasswordDto
-            await adminUsersService.adminResetUserPassword(userId, adminId, password)
+            const { reason, password } = req.validated.body as AdminChangeUserPasswordDto
+            await adminUserService.adminResetUserPassword(userId, adminId, password, reason)
 
             res.status(200).json({
                 success : true,
-                msg : 'Admin Reset User Password',
-                data : {}
+                msg : 'User Password Successfully Reseted',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -108,11 +113,11 @@ class AdminUsersController {
         try {
             const { userId } = req.validated.params as UserIdDto
             const adminId = req.user!.userId
-            const result = await adminUsersService.adminChangeVerifiedUserEmail(userId, adminId)
+            const result = await adminUserService.adminChangeVerifiedUserEmail(userId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Admin Change Verified Email Status',
+                msg : 'Email Status Changed Successfully',
                 data : {
                     newStatus : result
                 }
@@ -126,28 +131,12 @@ class AdminUsersController {
     {
         try {
             const { userId } = req.validated.params as UserIdDto
-            await adminUsersService.revokeUserSessions(userId)
+            await adminUserService.revokeUserSessions(userId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Revoke User Sessions',
-                data : {}
-            })
-        } catch (error) {
-            
-        }
-    }
-
-    async getUserOrders (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const { userId } = req.validated.params
-            const qs = req.validated.query as OrdersAdminDto
-            const result = await adminUsersService.getUserOrders(userId, qs)
-
-            res.status(200).json({
-                success : true,
-                msg : 'User Orders',
-                data : result
+                msg : 'User Sessions Revoked Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -158,11 +147,11 @@ class AdminUsersController {
     async getUserRoles (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { userId } = req.validated.params as UserIdDto
-            const result = await adminUsersService.getUserRoles(userId)
+            const result = await adminUserService.getUserRoles(userId)
 
             res.status(200).json({
                 success : true,
-                msg : 'User Roles',
+                msg : 'User Roles Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -174,11 +163,11 @@ class AdminUsersController {
         try {
             const { userId, roleId } = req.validated.params as ChangeUserRolesDto
             const adminId = req.user!.userId
-            const result = await adminUsersService.addRoleToUser(userId, roleId, adminId)
+            const result = await adminUserService.addRoleToUser(userId, roleId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Add Role To User',
+                msg : 'Role Successfully Added To User',
                 data : result
             })
         } catch (error) {
@@ -190,27 +179,12 @@ class AdminUsersController {
         try {
             const { userId, roleId } = req.validated.params as ChangeUserRolesDto
             const adminId = req.user!.userId
-            await adminUsersService.deleteUserRole(userId, roleId, adminId)
+            await adminUserService.deleteUserRole(userId, roleId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete User Role',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    // Stats
-    async stats (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const result = await adminUsersService.stats()
-
-            res.status(200).json({
-                success : true,
-                msg : 'User Stats',
-                data : result
+                msg : 'User Role Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -218,4 +192,4 @@ class AdminUsersController {
     }
 }
 
-export default new AdminUsersController()
+export default new AdminUserController()

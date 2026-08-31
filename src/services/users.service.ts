@@ -2,7 +2,7 @@ import User from "../models/user.model.js"
 import authRepository from "../repository/auth.repository.js"
 import userRepository from "../repository/user.repository.js"
 import { ConflictError, ForbiddenError, NotFoundError, UnauthorizedError } from "../utils/appError.js"
-import { ChangeUserDto } from "../validation/users.validation.js"
+import { ChangeUserDto } from "../validation/user.validation.js"
 import tokenService from "./token.service.js"
 import bcrypt from 'bcrypt'
 

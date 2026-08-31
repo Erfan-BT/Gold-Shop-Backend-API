@@ -2,7 +2,7 @@ import express from 'express'
 import { authMiddleware } from '../middleware/auth.middleware.js'
 import usersController from '../controllers/users.controller.js'
 import { validate } from '../middleware/validation.js'
-import { changeUserInfoSchema } from '../validation/users.validation.js'
+import { changeUserInfoSchema } from '../validation/user.validation.js'
 import { addressIdSchema, addressSchema, changeAddressSchema } from '../validation/address.validation.js'
 import { passwordSchema } from '../validation/auth.validation.js'
 

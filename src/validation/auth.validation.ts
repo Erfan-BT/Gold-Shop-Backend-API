@@ -4,7 +4,7 @@ import { normalizeIranPhone } from '../utils/normalizeIranPhone.js'
 export const registerSchema = z.object({
     name: z.string().trim().min(3, 'At Least 3 Characters Are Required').max(100),
     email: z.string().trim().toLowerCase().email('Invalid Email'),
-    phone: z.string().trim().regex(/^(\+989|989|09|9)\d{9}$/, 'Invalid Phone')
+    phone: z.string().trim().regex(/(\+989|989|09|9)\d{9}/, 'Invalid Phone')
     .transform(normalizeIranPhone),
     password: z.string().min(8, 'At Least 8 Characters Are Required').max(128)
 })
