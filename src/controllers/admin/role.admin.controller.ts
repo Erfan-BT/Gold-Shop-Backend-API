@@ -9,7 +9,7 @@ class AdminRoleController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Roles',
+                msg : 'All Roles Successfully Found',
                 data : result
             })
         } catch (error) {
