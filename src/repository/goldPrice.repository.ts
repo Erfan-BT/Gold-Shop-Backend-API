@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import GoldPrice from "../models/goldPrice.model.js";
 
 class GoldPriceRepository {
@@ -6,8 +7,8 @@ class GoldPriceRepository {
         return await GoldPrice.findOne()
     }
 
-    async changePrice (pricePerGram18k : number, source : 'system' | 'admin')
-    {
+    async changePrice (pricePerGram18k : number, source : 'system' | 'admin', transaction : Transaction | null)
+    : Promise<boolean> {
         const [rows] = await GoldPrice.update({
             pricePerGram18k,
             effectiveDate : new Date(),
@@ -15,20 +16,22 @@ class GoldPriceRepository {
         },{
             where : {
                 id : 1
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async changeAutoUpdateStatus (currentStatus : boolean)
-    {
+    async changeAutoUpdateStatus (currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await GoldPrice.update({
             isAutoUpdateEnabled : !currentStatus
         },{
             where : {
                 id : 1,
                 isAutoUpdateEnabled : currentStatus
-            }
+            },
+            transaction
         })
         return rows === 1
     }

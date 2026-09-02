@@ -1,52 +1,128 @@
+import sequelize from "../../configs/sequelize.config.js"
 import GoldPrice from "../../models/goldPrice.model.js"
+import adminAuditLogRepository from "../../repository/adminAuditLog.repository.js"
 import goldPriceRepository from "../../repository/goldPrice.repository.js"
-import { ConflictError, InternalServerError, NotFoundError } from "../../utils/appError.js"
+import { AdminAuditAction, AdminAuditEntity } from "../../types/adminAuditLog.enum.js"
+import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js"
 
 class AdminGoldPriceService {
     async getPrice ()
     : Promise<GoldPrice> {
+        // Get Price
         const price = await goldPriceRepository.getPrice()
         if (!price)
             throw new InternalServerError('Gold Price Not Found !!!')
+
         return price
     }
 
-    async adminChangePrice (pricePerGram18k : number)
-    {
-        if (!(await goldPriceRepository.changePrice(pricePerGram18k, 'admin')))
-            throw new InternalServerError('Gold Price Not Changed !!!')
+    async adminChangePrice (pricePerGram18k : number, adminId : number, reason : string, ipAddress : string)
+    : Promise<void> {
+        // Get Price
+        const price = await goldPriceRepository.getPrice()
+        if (!price)
+            throw new InternalServerError('Gold Price Not Found !!!')
+
+        await sequelize.transaction(async t => {
+            // Change Price
+            if (!(await goldPriceRepository.changePrice(pricePerGram18k, 'admin', t)))
+                throw new InternalServerError('Gold Price Not Changed !!!')
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.UPDATE,
+                entityType : AdminAuditEntity.GOLD_PRICE,
+                entityId : 1,
+                ipAddress,
+                oldValues : {
+                    pricePerGram18k : price.pricePerGram18k,
+                    effectiveDate : price.effectiveDate,
+                    source : price.source
+                },
+                newValues : {
+                    pricePerGram18k,
+                    effectiveDate : new Date(),
+                    source : 'admin'
+                },
+                reason 
+            }, t)
+        })
         return
     }
 
-    async changeAutoUpdateStatus ()
-    {
+    async changeAutoUpdateStatus (adminId : number, ipAddress : string)
+    : Promise<boolean> {
         // Get Price
         const goldPrice = await goldPriceRepository.getPrice()
         if (!goldPrice)
-            throw new NotFoundError(`Gold Price Not Found`);
-        // Change Status
-        if (!(await goldPriceRepository.changeAutoUpdateStatus(goldPrice!.isAutoUpdateEnabled)))
-            throw new ConflictError('Gold Price Auto Update Status Not Changed')
-        return
+            throw new InternalServerError('Gold Price Not Found !!!')
+
+        await sequelize.transaction(async t => {
+            // Change Status
+            if (!(await goldPriceRepository.changeAutoUpdateStatus(goldPrice.isAutoUpdateEnabled, t)))
+                throw new ConflictError('Gold Price Auto Update Status Not Changed')
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.UPDATE,
+                entityType : AdminAuditEntity.GOLD_PRICE,
+                entityId : 1,
+                oldValues : {
+                    isAutoUpdateEnabled : goldPrice.isAutoUpdateEnabled
+                },
+                newValues : {
+                    isAutoUpdateEnabled : !goldPrice.isAutoUpdateEnabled
+                },
+                ipAddress,
+                reason : null
+            }, t)
+        })
+        
+        return !goldPrice.isAutoUpdateEnabled
     }
 
-    async syncPrice ()
-    {
+    async syncPrice (adminId : number, ipAddress : string)
+    : Promise<number> {
         // Get Price
         const goldPrice = await goldPriceRepository.getPrice();
         if (!goldPrice)
-            throw new NotFoundError(`Gold Price Not Found`);
+            throw new InternalServerError('Gold Price Not Found !!!')
 
         if (!goldPrice.isAutoUpdateEnabled)
-            throw new ConflictError('Automatic Gold Price Update Is Disabled');
+            throw new BadRequestError('Automatic Gold Price Update Is Disabled');
 
         // Get New Price By Api
         const price = 1000
         if (!price || price <= 0)
             throw new InternalServerError("Invalid Gold Price");
 
-        if (!(await goldPriceRepository.changePrice(price, 'system')))
-            throw new InternalServerError("Gold Price Not Changed");
+        await sequelize.transaction(async t => {
+            // Change Price
+            if (!(await goldPriceRepository.changePrice(price, 'system', t)))
+                throw new InternalServerError('Gold Price Not Changed !!!')
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.UPDATE,
+                entityType : AdminAuditEntity.GOLD_PRICE,
+                entityId : 1,
+                ipAddress,
+                oldValues : {
+                    pricePerGram18k : goldPrice.pricePerGram18k,
+                    effectiveDate : goldPrice.effectiveDate,
+                    source : goldPrice.source
+                },
+                newValues : {
+                    pricePerGram18k : price,
+                    effectiveDate : new Date(),
+                    source : 'system'
+                },
+                reason : null,
+            }, t)
+        })
 
         return price;
     }

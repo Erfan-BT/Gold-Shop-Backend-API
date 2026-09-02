@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
 import adminGoldPriceService from "../../services/admin/goldPrice.admin.service.js";
-import { ChangePriceSchemaDto } from "../../validation/goldPrice.validation.js";
+import { ChangePriceDto } from "../../validation/goldPrice.validation.js";
 
 class AdminGoldPriceController {
     async getPrice (req : AuthRequest, res : Response, next : NextFunction) {
@@ -10,7 +10,7 @@ class AdminGoldPriceController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Gold Price',
+                msg : 'Gold Price Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -20,13 +20,14 @@ class AdminGoldPriceController {
 
     async adminChangePrice (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { pricePerGram18k } = req.validated.body as ChangePriceSchemaDto
-            await adminGoldPriceService.adminChangePrice(pricePerGram18k)
+            const { pricePerGram18k, reason } = req.validated.body as ChangePriceDto
+            const adminId = req.user!.userId
+            await adminGoldPriceService.adminChangePrice(pricePerGram18k, adminId, reason, req.ip ?? '-0-')
             
             res.status(200).json({
                 success : true,
-                msg : 'Change Price',
-                data : {}
+                msg : 'Gold Price Changed Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -35,12 +36,15 @@ class AdminGoldPriceController {
 
     async changeAutoUpdateStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            await adminGoldPriceService.changeAutoUpdateStatus()
+            const adminId = req.user!.userId
+            const result = await adminGoldPriceService.changeAutoUpdateStatus(adminId, req.ip ?? '-0-')
             
             res.status(200).json({
                 success : true,
-                msg : 'Change Auto Update Price Status',
-                data : {}
+                msg : 'Auto Update Price Status Changed Successfully',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)
@@ -49,11 +53,12 @@ class AdminGoldPriceController {
 
     async syncPrice (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const result = await adminGoldPriceService.syncPrice()
+            const adminId = req.user!.userId
+            const result = await adminGoldPriceService.syncPrice(adminId, req.ip ?? '-0-')
             
             res.status(200).json({
                 success : true,
-                msg : 'Sync Gold Price',
+                msg : 'Sync Gold Price Successfully',
                 data : result
             })
         } catch (error) {
