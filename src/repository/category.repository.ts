@@ -1,25 +1,27 @@
-import { FindAndCountOptions } from "sequelize";
+import { FindAndCountOptions, Transaction } from "sequelize";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { CategorySchemaDto } from "../validation/category.vallidation.js";
+import { CategoryDto } from "../validation/category.vallidation.js";
 
 class CategoryRepository {
     async getCategories (options : FindAndCountOptions)
-    {
+    : Promise<{
+        rows: Category[];
+        count: number;
+    }> {
         return await Category.findAndCountAll(options)
     }
 
     async getCategory (categoryId : number)
-    {
+    : Promise<Category | null> {
         return await Category.findByPk(categoryId)
     }
 
     async getCategoryChildren (categoryId : number)
-    {
+    : Promise<Category[]> {
         return await Category.findAll({
             where : {
                 parentId : categoryId
             }
-            
         })
     }
 
@@ -56,8 +58,8 @@ class CategoryRepository {
         }) !== null
     }
 
-    async createCategory (categoryData : CategorySchemaDto)
-    {
+    async createCategory (categoryData : CategoryDto)
+    : Promise<Category> {
         return await Category.create({
             title : categoryData.title,
             slug : categoryData.slug,
@@ -66,39 +68,38 @@ class CategoryRepository {
         })
     }
 
-    async changeCategory (categoryId : number, categoryData : CategorySchemaDto)
-    {
-        const [rows] = await Category.update({
-            title : categoryData.title,
-            slug : categoryData.slug,
-            ...(categoryData.parentId !== undefined ? { parentId : categoryData.parentId } : {})
-        },{
+    async changeCategory (categoryId : number, data : Partial<Pick<Category, 'title' | 'slug' | 'parentId'>>, transaction : Transaction)
+    : Promise<boolean> {
+        const [rows] = await Category.update(data ,{
             where : {
                 id : categoryId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async changeCategoryStatus (categoryId : number, currentStatus : boolean)
-    {
+    async changeCategoryStatus (categoryId : number, currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await Category.update({
             isActive : !currentStatus
         },{
             where : {
                 id : categoryId,
                 isActive : currentStatus
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async deleteCategory (categoryId : number)
-    {
+    async deleteCategory (categoryId : number, transaction : Transaction)
+    : Promise<boolean> {
         const rows = await Category.destroy({
             where : {
                 id : categoryId
-            }
+            },
+            transaction
         })
         return rows === 1
     }

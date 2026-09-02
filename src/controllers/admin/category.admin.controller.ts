@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { CategoryIdDto, CategoryQSDto, CategorySchemaDto } from "../../validation/category.vallidation.js";
+import { CategoryIdDto, CategoryQSDto, CategoryDto, ChangeCategoryDto } from "../../validation/category.vallidation.js";
 import adminCategoryService from "../../services/admin/category.admin.service.js";
 import { ProductCategoryIdsDto, ProductIdDto } from "../../validation/product.validation.js";
 
@@ -12,7 +12,7 @@ class AdminCategoryController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Categories',
+                msg : 'All Categories Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -22,12 +22,13 @@ class AdminCategoryController {
 
     async createCategory (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const categoryData = req.validated.body as CategorySchemaDto
-            const result = await adminCategoryService.createCategory(categoryData)
+            const categoryData = req.validated.body as CategoryDto
+            const adminId = req.user!.userId
+            const result = await adminCategoryService.createCategory(categoryData, adminId)
 
-            res.status(200).json({
+            res.status(201).json({
                 success : true,
-                msg : 'Create Category',
+                msg : 'Category Successfully Created',
                 data : result
             })
         } catch (error) {
@@ -37,14 +38,15 @@ class AdminCategoryController {
 
     async changeCategory (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const categoryData = req.validated.body as CategorySchemaDto
+            const categoryData = req.validated.body as ChangeCategoryDto
             const { categoryId } = req.validated.params as CategoryIdDto
-            await adminCategoryService.changeCategory(categoryId, categoryData)
+            const adminId = req.user!.userId
+            const result = await adminCategoryService.changeCategory(categoryId, categoryData, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Category',
-                data : {}
+                msg : 'Category Changed Successfully',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -54,12 +56,15 @@ class AdminCategoryController {
     async changeCategoryStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { categoryId } = req.validated.params as CategoryIdDto
-            await adminCategoryService.changeCategoryStatus(categoryId)
+            const adminId = req.user!.userId
+            const result = await adminCategoryService.changeCategoryStatus(categoryId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Category Status',
-                data : {}
+                msg : 'Category Status Changed Succesfully',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)
@@ -73,7 +78,7 @@ class AdminCategoryController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Category Children',
+                msg : 'Category Children Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -89,8 +94,8 @@ class AdminCategoryController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Category',
-                data : {}
+                msg : 'Category Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

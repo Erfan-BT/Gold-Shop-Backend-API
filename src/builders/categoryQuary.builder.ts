@@ -8,6 +8,7 @@ import {
 
 import { CategoryQSDto } from "../validation/category.vallidation.js";
 import { CategorySort } from "../types/category.enum.js";
+import { Category } from "../models/category.model.js";
 
 export class CategoryQueryBuilder {
 
@@ -25,9 +26,9 @@ export class CategoryQueryBuilder {
 
     private static buildCategoryWhere(
         qs: CategoryQSDto
-    ): WhereOptions {
+    ): WhereOptions<Category> {
 
-        const conditions: WhereOptions[] = []
+        const conditions: WhereOptions<Category>[] = []
 
         if (qs.q) {
             conditions.push({
@@ -64,19 +65,19 @@ export class CategoryQueryBuilder {
             })
         }
 
-        if (qs.isActive !== undefined && qs.isActive !== null) {
+        if (qs.isActive !== undefined) {
             conditions.push({
                 isActive : qs.isActive
             })
         }
 
-        if (qs.parentId !== undefined && qs.parentId !== null) {
+        if (qs.parentId !== undefined) {
             conditions.push({
                 parentId : qs.parentId
             })
         }
 
-        if (qs.isRoot !== undefined && qs.isRoot !== null) {
+        if (qs.isRoot !== undefined) {
             conditions.push({
                 parentId : {
                     ...(

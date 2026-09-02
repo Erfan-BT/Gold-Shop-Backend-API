@@ -38,15 +38,22 @@ export const categoryQS = z.object({
 })
 
 export const categorySchema = z.object({
-    title : z.string().trim().min(1).max(100),
-    slug : z.string().trim().min(1).max(100),
-    parentId : z.coerce.number().int().min(1).nullable().optional()
+    title : z.string().trim().min(1, 'At Least A Character Is Required').max(100, 'Max : 100 Characters'),
+    slug : z.string().trim().min(1, 'At Least A Character Is Required').max(100, 'Max : 100 Characters'),
+    parentId : z.coerce.number().int().positive().nullable().optional()
+})
+
+export const changeCategorySchema = z.object({
+    title : z.string().trim().min(1, 'At Least A Character Is Required').max(100, 'Max : 100 Characters').optional(),
+    slug : z.string().trim().min(1, 'At Least A Character Is Required').max(100, 'Max : 100 Characters').optional(),
+    parentId : z.coerce.number().int().positive().nullable().optional()
 })
 
 export const categoryIdSchema = z.object({
-    categoryId : z.coerce.number().int().min(1)
+    categoryId : z.coerce.number().int().positive()
 })
 
 export type CategoryQSDto = z.infer<typeof categoryQS>
-export type CategorySchemaDto = z.infer<typeof categorySchema>
+export type CategoryDto = z.infer<typeof categorySchema>
+export type ChangeCategoryDto = z.infer<typeof changeCategorySchema>
 export type CategoryIdDto = z.infer<typeof categoryIdSchema>
