@@ -4,9 +4,74 @@ import { CouponSort } from "../types/coupon.enum.js";
 export const couponSchema = z.object({
     code : z.string().trim().min(3, 'At Least 3 Characters Are Required').max(50),
     type : z.enum(["fixed", "percent"]),
-    value : z.coerce.number().int().min(1),
-    usageLimit : z.coerce.number().int().min(1),
+    value : z.coerce.number().int().positive(),
+    usageLimit : z.coerce.number().int().positive(),
     expiresAt : z.coerce.date()
+})
+.superRefine((data, ctx) => {
+    if (
+        data.type === "percent" &&
+        data.value > 100
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['value'],
+            message : 'Type Is Percentage, Value Can Not Be Greater Than 100'
+        })
+    }
+
+    if (data.expiresAt.getTime() < new Date().getTime()) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['expiresAt'],
+            message : 'Expiration Time Has Expired'
+        })
+    }
+})
+
+export const changeCouponSchema = z.object({
+    code : z.string().trim().min(3, 'At Least 3 Characters Are Required').max(50).optional(),
+    type : z.enum(["fixed", "percent"]).optional(),
+    value : z.coerce.number().int().positive().optional(),
+    usageLimit : z.coerce.number().int().positive().optional(),
+    expiresAt : z.coerce.date().optional()
+})
+.superRefine((data, ctx) => {
+    if (
+        data.code === undefined &&
+        data.type === undefined &&
+        data.value === undefined &&
+        data.usageLimit === undefined &&
+        data.expiresAt === undefined
+    ) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "At Least One Of The Fields Is Required"
+        })
+    }
+
+    if (
+        data.value !== undefined &&
+        data.type === "percent" &&
+        data.value > 100
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['value'],
+            message : 'Type Is Percentage, Value Can Not Be Greater Than 100'
+        })
+    }
+
+    if (
+        data.expiresAt !== undefined &&
+        data.expiresAt.getTime() < new Date().getTime()
+    ) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ['expiresAt'],
+            message : 'Expiration Time Has Expired'
+        })
+    }
 })
 
 export const couponIdSchema = z.object({
@@ -18,11 +83,11 @@ export const couponsQS = z.object({
     limit : z.coerce.number().int().positive().min(1).max(50).default(20),
     sort : z.enum(CouponSort).default(CouponSort.NEWEST),
 
-    q : z.string().max(200).optional(),
+    q : z.string().max(50).optional(),
     type : z.enum(["fixed", "percent"]).optional(),
 
-    minUsageLimit : z.coerce.number().int().min(1).optional(),
-    maxUsageLimit : z.coerce.number().int().min(1).optional(),
+    minUsageLimit : z.coerce.number().int().positive().optional(),
+    maxUsageLimit : z.coerce.number().int().positive().optional(),
 
     from : z.coerce.date().optional(),
     to : z.coerce.date().optional(),
@@ -72,5 +137,6 @@ export const couponsQS = z.object({
 })
 
 export type CouponIdDto = z.infer<typeof couponIdSchema>
-export type CouponSchemaDto = z.infer<typeof couponSchema>
+export type CouponDto = z.infer<typeof couponSchema>
+export type ChangeCouponDto = z.infer<typeof changeCouponSchema>
 export type CouponsQSDto = z.infer<typeof couponsQS>

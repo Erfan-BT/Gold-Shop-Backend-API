@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { CouponIdDto, CouponSchemaDto, CouponsQSDto } from "../../validation/coupon.validation.js";
+import { CouponIdDto, CouponDto, CouponsQSDto, ChangeCouponDto } from "../../validation/coupon.validation.js";
 import couponAdminService from "../../services/admin/coupon.admin.service.js";
 
 class AdminCouponController {
@@ -11,7 +11,7 @@ class AdminCouponController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get All Coupons',
+                msg : 'All Coupons Successfulyy Found',
                 data : result
             })
         } catch (error) {
@@ -26,7 +26,7 @@ class AdminCouponController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Coupon',
+                msg : 'Coupon Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -36,12 +36,13 @@ class AdminCouponController {
 
     async createCoupon (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const couponData = req.validated.body as CouponSchemaDto
-            const result = await couponAdminService.createCoupon(couponData)
+            const couponData = req.validated.body as CouponDto
+            const adminId = req.user!.userId
+            const result = await couponAdminService.createCoupon(couponData, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Craete Coupon',
+                msg : 'Coupon Successfulyy Created',
                 data : result
             })
         } catch (error) {
@@ -51,14 +52,15 @@ class AdminCouponController {
 
     async changeCoupon (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const couponData = req.validated.body as CouponSchemaDto
+            const couponData = req.validated.body as ChangeCouponDto
             const { couponId } = req.validated.params as CouponIdDto
-            await couponAdminService.changeCoupon(couponId, couponData)
+            const adminId = req.user!.userId
+            const result = await couponAdminService.changeCoupon(couponId, couponData, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Coupon',
-                data : {}
+                msg : 'Coupon Changed Successfully',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -68,12 +70,15 @@ class AdminCouponController {
     async changeCouponStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { couponId } = req.validated.params as CouponIdDto
-            await couponAdminService.changeCouponStatus(couponId)
+            const adminId = req.user!.userId
+            const result = await couponAdminService.changeCouponStatus(couponId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Coupon Status',
-                data : {}
+                msg : 'Coupon Status Successfully Changed',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)
@@ -88,22 +93,8 @@ class AdminCouponController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Coupon',
-                data : {}
-            })
-        } catch (error) {
-            next(error)
-        }
-    }
-
-    async stats (req : AuthRequest, res : Response, next : NextFunction) {
-        try {
-            const result = await couponAdminService.stats()
-
-            res.status(200).json({
-                success : true,
-                msg : 'Coupon Stats',
-                data : result
+                msg : 'Coupon Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

@@ -9,6 +9,7 @@ import {
 
 import { CouponsQSDto } from "../validation/coupon.validation.js";
 import { CouponSort } from "../types/coupon.enum.js";
+import Coupon from "../models/coupon.model.js";
 
 export class CouponQueryBuilder {
 
@@ -26,9 +27,9 @@ export class CouponQueryBuilder {
 
     private static buildCouponWhere(
         qs: CouponsQSDto
-    ): WhereOptions {
+    ): WhereOptions<Coupon> {
 
-        const conditions: WhereOptions[] = []
+        const conditions: WhereOptions<Coupon>[] = []
 
         if (qs.q) {
             conditions.push({
@@ -51,13 +52,13 @@ export class CouponQueryBuilder {
         const dateCondition: {
             [Op.gte]?: Date;
             [Op.lte]?: Date;
-        } = {};
+        } = {}
 
         if (qs.from !== undefined)
-            dateCondition[Op.gte] = qs.from;
+            dateCondition[Op.gte] = qs.from
 
         if (qs.to !== undefined)
-            dateCondition[Op.lte] = qs.to;
+            dateCondition[Op.lte] = qs.to
 
         if (Object.keys(dateCondition).length) {
             conditions.push({
@@ -99,13 +100,13 @@ export class CouponQueryBuilder {
             })
         }
 
-        if (qs.isActive !== undefined && qs.isActive !== null) {
+        if (qs.isActive !== undefined) {
             conditions.push({
                 isActive : qs.isActive
             })
         }
 
-        if (qs.isExhausted !== undefined && qs.isExhausted !== null) {
+        if (qs.isExhausted !== undefined) {
             conditions.push(
                 qs.isExhausted
                     ? Sequelize.literal("usedCount >= usageLimit")
