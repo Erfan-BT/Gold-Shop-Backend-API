@@ -1,6 +1,6 @@
 import { CategoryQueryBuilder } from "../../builders/categoryQuary.builder.js";
 import sequelize from "../../configs/sequelize.config.js";
-import { Category } from "../../models/category.model.js";
+import { Category, ProductCategory } from "../../models/category.model.js";
 import adminAuditLogRepository from "../../repository/adminAuditLog.repository.js";
 import categoryRepository from "../../repository/category.repository.js";
 import productRepository from "../../repository/product.repository.js";
@@ -161,36 +161,92 @@ class AdminCategoryService {
 
     // Product-Variant Categories
     async getProductCategories (productId : number)
-    {
+    : Promise<ProductCategory[]> {
         // Get Product
-        const product = await productRepository.getProduct(productId)
+        const product = await productRepository.findProduct(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
-        // Get P-Categories
+
+        // Get Product-Categories
         return await categoryRepository.getProductCategories(productId)
     }
 
-    async setCategoryForProduct (productId : number, categoryId : number)
-    {
+    async setCategoryForProduct (productId : number, categoryId : number, adminId : number)
+    : Promise<ProductCategory> {
         // Get Product
-        const product = await productRepository.getProduct(productId)
+        const product = await productRepository.findProduct(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        
         // Get Category
         const category = await categoryRepository.getCategory(categoryId)
         if (!category)
             throw new NotFoundError(`Category Not Found { ID : ${categoryId} }`)
+
         // Check Exists Category
         if (await categoryRepository.checkExists(productId, categoryId))
             throw new ConflictError('Product Already Has This Category')
-        // Set
-        return await categoryRepository.setProductCategory(productId, categoryId)
+
+        return await sequelize.transaction(async t => {
+            // Set
+            const productCategory = await categoryRepository.setProductCategory(productId, categoryId, t)
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.CATEGORY_ASSIGN,
+                entityType : AdminAuditEntity.CATEGORY,
+                entityId : productCategory.id,
+                ipAddress : null,
+                reason : null,
+                oldValues : null,
+                newValues : {
+                    productId,
+                    categoryId
+                }
+            }, t)
+
+            return productCategory
+        })
     }
 
-    async deleteCategoryFromProduct (productId : number, categoryId : number)
-    {
-        if (!(await categoryRepository.deleteProductCategory(productId, categoryId)))
-            throw new NotFoundError('Category Not Found In Product')
+    async deleteCategoryFromProduct (productId : number, categoryId : number, adminId : number)
+    : Promise<void> {
+        // Get Product
+        const product = await productRepository.findProduct(productId)
+        if (!product)
+            throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+        
+        // Get Category
+        const category = await categoryRepository.getCategory(categoryId)
+        if (!category)
+            throw new NotFoundError(`Category Not Found { ID : ${categoryId} }`)
+
+        // Check Exists Category
+        if (!await categoryRepository.checkExists(productId, categoryId))
+            throw new ConflictError('Product Has Not This Category Already')
+
+        await sequelize.transaction(async t => {
+            // Delete Category
+            if (!(await categoryRepository.deleteProductCategory(productId, categoryId, t)))
+                throw new ConflictError('Category Not Deleted')
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.CATEGORY_REVOKE,
+                entityType : AdminAuditEntity.CATEGORY,
+                entityId : null,
+                ipAddress : null,
+                reason : null,
+                oldValues : {
+                    productId,
+                    categoryId
+                },
+                newValues : null
+            }, t)
+        })
+        
         return
     }
 }

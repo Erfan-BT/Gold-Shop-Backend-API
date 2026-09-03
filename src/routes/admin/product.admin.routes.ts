@@ -23,6 +23,7 @@ router.delete('/:productId', roleMiddleware([RolesTitle.OWNER]), validate({ para
 
 // ----- Categories -----
 router.use('/:productId/categories', ProductCategoryRoutes)
+
 // ----- Variants -----
 router.use('/:productId/variants', ProductVariantRoutes)
 // ----- Images -----

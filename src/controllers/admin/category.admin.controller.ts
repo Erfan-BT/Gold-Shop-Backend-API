@@ -1,8 +1,8 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { CategoryIdDto, CategoryQSDto, CategoryDto, ChangeCategoryDto } from "../../validation/category.vallidation.js";
+import { CategoryIdDto, CategoryQSDto, CategoryDto, ChangeCategoryDto, ProductCategoryIdsDto } from "../../validation/category.vallidation.js";
 import adminCategoryService from "../../services/admin/category.admin.service.js";
-import { ProductCategoryIdsDto, ProductIdDto } from "../../validation/product.validation.js";
+import { ProductIdDto } from "../../validation/product.validation.js";
 
 class AdminCategoryController {
     async getAllCategories (req : AuthRequest, res : Response, next : NextFunction) {
@@ -110,7 +110,7 @@ class AdminCategoryController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Product Categories',
+                msg : 'Product Categories Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -121,11 +121,12 @@ class AdminCategoryController {
     async setCategoryForProduct (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId, categoryId } = req.validated.params as ProductCategoryIdsDto
-            const result = await adminCategoryService.setCategoryForProduct(productId, categoryId)
+            const adminId = req.user!.userId
+            const result = await adminCategoryService.setCategoryForProduct(productId, categoryId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Set Category For Product',
+                msg : 'Category For Product Seted Successfully',
                 data : result
             })
         } catch (error) {
@@ -136,12 +137,13 @@ class AdminCategoryController {
     async deleteCategoryFromProduct (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId, categoryId } = req.validated.params as ProductCategoryIdsDto
-            await adminCategoryService.deleteCategoryFromProduct(productId, categoryId)
+            const adminId = req.user!.userId
+            await adminCategoryService.deleteCategoryFromProduct(productId, categoryId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Category From Product',
-                data : {}
+                msg : 'Category From Product Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

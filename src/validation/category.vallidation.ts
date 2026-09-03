@@ -53,7 +53,13 @@ export const categoryIdSchema = z.object({
     categoryId : z.coerce.number().int().positive()
 })
 
+export const productCategoryIdsSchema = z.object({
+    productId : z.coerce.number().int().positive(),
+    categoryId : z.coerce.number().int().positive(),
+})
+
 export type CategoryQSDto = z.infer<typeof categoryQS>
 export type CategoryDto = z.infer<typeof categorySchema>
 export type ChangeCategoryDto = z.infer<typeof changeCategorySchema>
 export type CategoryIdDto = z.infer<typeof categoryIdSchema>
+export type ProductCategoryIdsDto = z.infer<typeof productCategoryIdsSchema>

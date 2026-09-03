@@ -26,7 +26,7 @@ class CategoryRepository {
     }
 
     async getProductCategories (productId : number)
-    {
+    : Promise<ProductCategory[]> {
         return await ProductCategory.findAll({
             where: {
                 productId
@@ -49,7 +49,7 @@ class CategoryRepository {
     }
 
     async checkExists (productId : number, categoryId : number)
-    {
+    : Promise<boolean> {
         return await ProductCategory.findOne({
             where : {
                 productId,
@@ -104,21 +104,24 @@ class CategoryRepository {
         return rows === 1
     }
 
-    async setProductCategory (productId : number, categoryId : number)
-    {
+    async setProductCategory (productId : number, categoryId : number, transaction : Transaction)
+    : Promise<ProductCategory> {
         return await ProductCategory.create({
             productId,
             categoryId
+        }, {
+            transaction
         })
     }
 
-    async deleteProductCategory (productId : number, categoryId : number)
-    {
+    async deleteProductCategory (productId : number, categoryId : number, transaction : Transaction)
+    : Promise<boolean> {
         const rows = await ProductCategory.destroy({
             where : {
                 productId,
                 categoryId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
