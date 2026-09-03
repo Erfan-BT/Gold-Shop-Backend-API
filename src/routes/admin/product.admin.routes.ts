@@ -26,8 +26,10 @@ router.use('/:productId/categories', ProductCategoryRoutes)
 
 // ----- Variants -----
 router.use('/:productId/variants', ProductVariantRoutes)
+
 // ----- Images -----
-router.use('/:productId/variants/:variantId/images', ProductVariantImageRoutes)
+router.use('/:productId/variants/:variantId/images', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ProductVariantImageRoutes)
+
 // ----- Pricing -----
 router.use('/:productId/variants/:variantId/pricing', ProductVariantPricingRoutes)
 // ----- Discount -----

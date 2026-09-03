@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express"
 import { AuthRequest } from "../../middleware/auth.middleware.js"
 import { ProductVariantIdsDto } from "../../validation/product.validation.js"
 import adminImageService from "../../services/admin/image.admin.service.js"
-import { ImageAltTextDto, ImageIdsSchemaDto, ProductVariantImageIdsDto } from "../../validation/image.validation.js"
+import { ImageAltTextDto, ImageIdsDto, ProductVariantImageIdsDto } from "../../validation/image.validation.js"
 
 class AdminImageController {
     async getVariantImages (req : AuthRequest, res : Response, next : NextFunction) {
@@ -12,7 +12,7 @@ class AdminImageController {
             
             res.status(200).json({
                 success : true,
-                msg : 'Get Variant Images',
+                msg : 'Product Variant Images Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -23,12 +23,13 @@ class AdminImageController {
     async addVariantImages (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const files: Express.Multer.File[] = Array.isArray(req.files) ? req.files : [];
-            const result = await adminImageService.addVariantImages(productId, variantId, files)
+            const files : Express.Multer.File[] = Array.isArray(req.files) ? req.files : []
+            const adminId = req.user!.userId
+            const result = await adminImageService.uploadVariantImages(productId, variantId, files, adminId)
             
-            res.status(201).json({
+            res.status(200).json({
                 success : true,
-                msg : 'Add Variant Images',
+                msg : 'Product Variant Images Successfully Uploaded',
                 data : result
             })
         } catch (error) {
@@ -40,12 +41,13 @@ class AdminImageController {
         try {
             const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
             const { altText } = req.validated.body as ImageAltTextDto
-            await adminImageService.changeImageAltText(productId, variantId, imageId, altText)
+            const adminId = req.user!.userId
+            await adminImageService.changeImageAltText(productId, variantId, imageId, altText, adminId)
             
             res.status(200).json({
                 success : true,
-                msg : 'Change Image Alt Text',
-                data : {}
+                msg : 'Image Alt Text Changed Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -55,12 +57,13 @@ class AdminImageController {
     async changeVariantImagePrimary (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
-            await adminImageService.changeVariantImagePrimary(productId, variantId, imageId)
+            const adminId = req.user!.userId
+            await adminImageService.changeVariantImagePrimary(productId, variantId, imageId, adminId)
             
             res.status(200).json({
                 success : true,
-                msg : 'Change Variant Image Primary',
-                data : {}
+                msg : 'Product Variant Image Seted Primary Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -70,13 +73,14 @@ class AdminImageController {
     async changeVariantImagesOrder (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const { imageIds } = req.validated.body as ImageIdsSchemaDto
-            await adminImageService.changeVariantImagesOrder(productId, variantId, imageIds)
+            const { imageIds } = req.validated.body as ImageIdsDto
+            const adminId = req.user!.userId
+            await adminImageService.changeVariantImagesOrder(productId, variantId, imageIds, adminId)
             
             res.status(200).json({
                 success : true,
-                msg : 'Change Variant Images Order',
-                data : {}
+                msg : 'Product Variant Images Order Successfully Changed',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -86,12 +90,13 @@ class AdminImageController {
     async deleteImage (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId, imageId } = req.validated.params as ProductVariantImageIdsDto
-            await adminImageService.deleteImage(productId, variantId, imageId)
+            const adminId = req.user!.userId
+            await adminImageService.deleteImage(productId, variantId, imageId, adminId)
             
             res.status(200).json({
                 success : true,
-                msg : 'Delete Variant Image',
-                data : {}
+                msg : 'Product Variant Image Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

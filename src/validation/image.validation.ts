@@ -6,8 +6,8 @@ export const productVariantImageIdsSchema = z.object({
     imageId : z.coerce.number().int().positive(),
 })
 
-export const imageAltText = z.object({
-    altText : z.string().trim().min(1).max(200)
+export const imageAltTextSchema = z.object({
+    altText : z.string().trim().min(1, 'At Least A Character Is Required').max(200, 'Max : 200 Characters')
 })
 
 export const imageIdsSchema = z.object({
@@ -15,5 +15,5 @@ export const imageIdsSchema = z.object({
 })
 
 export type ProductVariantImageIdsDto = z.infer<typeof productVariantImageIdsSchema>
-export type ImageAltTextDto = z.infer<typeof imageAltText>
-export type ImageIdsSchemaDto = z.infer<typeof imageIdsSchema>
+export type ImageAltTextDto = z.infer<typeof imageAltTextSchema>
+export type ImageIdsDto = z.infer<typeof imageIdsSchema>

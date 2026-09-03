@@ -3,7 +3,7 @@ import { ProductImage } from "../models/product.model.js"
 
 class ImageRepository {
     async getVariantImage (variantId : number, imageId : number)
-    {
+    : Promise<ProductImage | null> {
         return ProductImage.findOne({
             where : {
                 variantId,
@@ -13,7 +13,7 @@ class ImageRepository {
     }
     
     async getVariantImages (variantId : number)
-    {
+    : Promise<ProductImage[]> {
         return await ProductImage.findAll({
             where : {
                 variantId
@@ -26,7 +26,7 @@ class ImageRepository {
     }
 
     async createVariantImage (variantId : number, imageUrl : string, fileName : string, altText : string, sortOrder : number, isPrimary : boolean = false)
-    {
+    : Promise<ProductImage> {
         return await ProductImage.create({
             variantId,
             altText,
@@ -38,7 +38,7 @@ class ImageRepository {
     }
 
     async hasPrimaryImage (variantId : number)
-    {
+    : Promise<boolean> {
         return await ProductImage.findOne({
             where : {
                 variantId,
@@ -48,7 +48,7 @@ class ImageRepository {
     }
 
     async changeImageAltText (variantId : number, imageId : number, altText : string)
-    {
+    : Promise<boolean> {
         const [rows] = await ProductImage.update({
             altText,
         },{
@@ -60,20 +60,19 @@ class ImageRepository {
         return rows === 1
     }
 
-    async isPrimaryImage (variantId : number, imageId : number, transaction ?: Transaction)
-    {
+    async isPrimaryImage (variantId : number, imageId : number)
+    : Promise<boolean> {
         return await ProductImage.findOne({
             where : {
                 variantId,
                 id : imageId,
                 isPrimary : true
             },
-            transaction : transaction ?? null
         }) !== null
     }
 
     async setVariantImagesPrimaryFalse (variantId : number, transaction : Transaction)
-    {
+    : Promise<number> {
         const [rows] = await ProductImage.update({
             isPrimary : false
         },{
@@ -86,7 +85,7 @@ class ImageRepository {
     }
     
     async setVariantImagePrimary (variantId : number, imageId : number, transaction : Transaction)
-    {
+    : Promise<boolean> {
         const [rows] = await ProductImage.update({
             isPrimary : true
         },{
@@ -100,7 +99,7 @@ class ImageRepository {
     }
 
     async changeImageSortOrder(variantId: number, imageId: number, sortOrder: number, transaction: Transaction)
-    {
+    : Promise<boolean> {
         const [rows] = await ProductImage.update(
             {
                 sortOrder
@@ -116,14 +115,15 @@ class ImageRepository {
         return rows === 1;
     }
 
-    async deleteImage (variantId : number, imageId : number)
-    {
+    async deleteImage (variantId : number, imageId : number, transaction : Transaction)
+    : Promise<boolean> {
         const rows = await ProductImage.destroy({
             where : {
                 variantId,
                 id : imageId,
                 isPrimary : false
-            }
+            },
+            transaction
         })
         return rows === 1
     }

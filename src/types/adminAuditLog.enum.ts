@@ -3,6 +3,8 @@ export enum AdminAuditAction {
     UPDATE = 'UPDATE',
     DELETE = 'DELETE',
 
+    IMAGE_UPLOAD = 'IMAGE_UPLOAD',
+
     ACTIVATE = 'ACTIVATE',
     DEACTIVATE = 'DEACTIVATE',
 
@@ -39,6 +41,7 @@ export enum AdminAuditEntity {
     RETURN_ITEM = 'RETURN_ITEM',
     PRODUCT = 'PRODUCT',
     VARIANT = 'VARIANT',
+    IMAGE = 'IMAGE',
     CATEGORY = 'CATEGORY',
     COUPON = 'COUPON',
     REVIEW = 'REVIEW',
