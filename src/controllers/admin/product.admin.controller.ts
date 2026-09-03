@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminProductQSDto, ChangeProductSchemaDto, CreateProductSchemaDto, ProductIdDto } from "../../validation/product.validation.js";
+import { AdminProductQSDto, ChangeProductDto, CreateProductDto, ProductIdDto } from "../../validation/product.validation.js";
 import adminProductService from "../../services/admin/product.admin.service.js";
 
 class AdminProductController {
@@ -11,7 +11,7 @@ class AdminProductController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get All Products',
+                msg : 'All Products Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -26,7 +26,7 @@ class AdminProductController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Product',
+                msg : 'Product Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -36,12 +36,13 @@ class AdminProductController {
 
     async createProduct (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const productData = req.validated.body as CreateProductSchemaDto
-            const result = await adminProductService.createProduct(productData)
+            const productData = req.validated.body as CreateProductDto
+            const adminId = req.user!.userId
+            const result = await adminProductService.createProduct(productData, adminId)
 
             res.status(201).json({
                 success : true,
-                msg : 'Create Product',
+                msg : 'Product Successfully Created',
                 data : result
             })
         } catch (error) {
@@ -51,14 +52,15 @@ class AdminProductController {
 
     async changeProduct (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const productData = req.validated.body as ChangeProductSchemaDto
+            const productData = req.validated.body as ChangeProductDto
             const { productId } = req.validated.params as ProductIdDto
-            await adminProductService.changeProduct(productId, productData)
+            const adminId = req.user!.userId
+            const result = await adminProductService.changeProduct(productId, productData, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Product',
-                data : {}
+                msg : 'Product Changed Successfully',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -68,12 +70,15 @@ class AdminProductController {
     async changeProductStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId } = req.validated.params as ProductIdDto
-            const result = await adminProductService.changeProductStatus(productId)
+            const adminId = req.user!.userId
+            const result = await adminProductService.changeProductStatus(productId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Product Status',
-                data : result
+                msg : 'Product Status Changed Successfully',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)
@@ -88,8 +93,8 @@ class AdminProductController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Product',
-                data : {}
+                msg : 'Product Deleted Successfully',
+                data : null
             })
         } catch (error) {
             next(error)

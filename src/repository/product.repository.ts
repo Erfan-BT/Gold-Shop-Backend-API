@@ -1,8 +1,8 @@
-import { FindAndCountOptions, Op } from "sequelize";
+import { FindAndCountOptions, Op, Transaction } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { CreateProductSchemaDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
+import { CreateProductDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getAllProducts(options: FindAndCountOptions<Product>)
@@ -160,17 +160,17 @@ class ProductRepository {
     }
 
     // ----- Admin -----
-    async getProduct (productId : number)
-    {
+    async findProduct (productId : number)
+    : Promise<Product | null> {
         return await Product.findOne({
             where : {
                 id : productId
-            }
+            },
         })
     }
 
-    async getProductAdmin (productId : number)
-    {
+    async getProduct (productId : number)
+    : Promise<Product | null> {
         return await Product.findOne({
             where : {
                 id : productId
@@ -253,8 +253,8 @@ class ProductRepository {
         })
     }
 
-    async createProduct (productData : CreateProductSchemaDto)
-    {
+    async createProduct (productData : CreateProductDto)
+    : Promise<Product> {
         return await Product.create({
             ...productData,
             lowestPrice : 0,
@@ -264,37 +264,39 @@ class ProductRepository {
         })
     }
 
-    async changeProduct (productId : number, data : Partial<Pick<Product, "title" | "slug" | "description">>)
-    {
-        const [rows] = await Product.update({
-            ...data
-        },{
-            where : {
-                id : productId
-            }
-        })
+    async changeProduct (productId : number, data : Partial<Pick<Product, "title" | "slug" | "description">>, transaction : Transaction)
+    : Promise<boolean> {
+        const [rows] = await Product.update(data
+            ,{
+                where : {
+                    id : productId
+                },
+                transaction
+            })
         return rows === 1 
     }
 
-    async changeProductStatus (productId : number, currentStatus : boolean)
-    {
+    async changeProductStatus (productId : number, currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await Product.update({
             isActive : !currentStatus
         },{
             where : {
                 id : productId,
                 isActive : currentStatus
-            }
+            },
+            transaction
         })
         return rows === 1 
     }
 
-    async deleteProduct (productId : number)
-    {
+    async deleteProduct (productId : number, transaction : Transaction)
+    : Promise<boolean> {
         const rows = await Product.destroy({
             where : {
                 id : productId
-            }
+            },
+            transaction
         })
         return rows === 1
     }

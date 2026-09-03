@@ -54,9 +54,9 @@ export class AdminProductQueryBuilder {
 
     private static buildProductWhere(
         qs: AdminProductQSDto
-    ): WhereOptions {
+    ): WhereOptions<Product> {
 
-        const conditions: WhereOptions[] = []
+        const conditions: WhereOptions<Product>[] = []
 
         if (qs.q) {
 
@@ -210,7 +210,7 @@ export class AdminProductQueryBuilder {
             include.push({
                 model: ProductDiscount,
                 as: "discounts",
-                required: false,
+                required: true,
                 attributes: [],
                 where: {
                     isActive: true,
@@ -228,7 +228,7 @@ export class AdminProductQueryBuilder {
         return {
             model: ProductVariant,
             as: "variants",
-            attributes: [],
+            attributes: ['id'],
             required: false,
             where,
             include
@@ -246,7 +246,7 @@ export class AdminProductQueryBuilder {
         return {
             model: ProductCategory,
             as: "categories",
-            required: false,
+            required: true,
             attributes: [],
             include: [
                 {

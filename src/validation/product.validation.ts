@@ -57,12 +57,12 @@ export const adminProductQS = z.object({
 
     q : z.string().trim().max(200).optional(),
 
-    category : z.array(z.string().trim().max(100)).optional(),
-    karat : z.array(z.enum(ProductKarat)).optional(),
+    category : z.array(z.string().trim().max(100)).min(1).optional(),
+    karat : z.array(z.enum(ProductKarat)).min(1).optional(),
     color : z.string().trim().max(30).optional(),
     stone : z.string().trim().max(50).optional(),
 
-    minWeight : z.coerce.number().nonnegative().min(0).optional(),
+    minWeight : z.coerce.number().nonnegative().optional(),
     maxWeight : z.coerce.number().nonnegative().max(50).optional(),
 
     minPrice : z.coerce.number().nonnegative().optional(),
@@ -133,16 +133,16 @@ export const adminProductQS = z.object({
 })
 
 export const createProductSchema = z.object({
-    title : z.string().trim().min(1).max(200),
-    slug : z.string().trim().min(1).max(200),
-    description : z.string().trim().min(1).max(500),
-    isActive : z.coerce.boolean()
+    title : z.string().trim().min(1, 'At Least A Character Is Required').max(200, 'Max : 200 Characters'),
+    slug : z.string().trim().min(1, 'At Least A Character Is Required').max(200, 'Max : 200 Characters'),
+    description : z.string().trim().min(1, 'At Least A Character Is Required').max(500, 'Max : 500 Characters'),
+    isActive : z.coerce.boolean().default(true)
 })
 
 export const changeProductSchema = z.object({
-    title : z.string().trim().min(1).max(200).optional(),
-    slug : z.string().trim().min(1).max(200).optional(),
-    description : z.string().trim().min(1).max(500).optional(),
+    title : z.string().trim().min(1, 'At Least A Character Is Required').max(200, 'Max : 200 Characters').optional(),
+    slug : z.string().trim().min(1, 'At Least A Character Is Required').max(200, 'Max : 200 Characters').optional(),
+    description : z.string().trim().min(1, 'At Least A Character Is Required').max(500, 'Max : 500 Characters').optional(),
 })
 .superRefine((data, ctx) => {
     if (
@@ -152,7 +152,7 @@ export const changeProductSchema = z.object({
     ) {
         ctx.addIssue({
             code : z.ZodIssueCode.custom,
-            message : "All Params Can Not Empty"
+            message: "At Least One Of The Fields Is Required"
         })
     }
 })
@@ -192,16 +192,16 @@ export const variantIdSchema = z.object({
     variantId : z.coerce.number().int().positive()
 })
 
-export const productId = z.object({
+export const productIdSchema = z.object({
     productId : z.coerce.number().int().positive()
 })
 
-export const productCategoryIds = z.object({
+export const productCategoryIdsSchema = z.object({
     productId : z.coerce.number().int().positive(),
     categoryId : z.coerce.number().int().positive(),
 })
 
-export const productVariantIds = z.object({
+export const productVariantIdsSchema = z.object({
     productId : z.coerce.number().int().positive(),
     variantId : z.coerce.number().int().positive(),
 })
@@ -214,10 +214,10 @@ export type ProductQSDto = z.infer<typeof productQS>
 export type AdminProductQSDto = z.infer<typeof adminProductQS>
 export type ProductSlugDto = z.infer<typeof productSlugSchema>
 export type VariantIdDto = z.infer<typeof variantIdSchema>
-export type ProductIdDto = z.infer<typeof productId>
-export type ProductCategoryIdsDto = z.infer<typeof productCategoryIds>
-export type ProductVariantIdsDto = z.infer<typeof productVariantIds>
-export type CreateProductSchemaDto = z.infer<typeof createProductSchema>
-export type ChangeProductSchemaDto = z.infer<typeof changeProductSchema>
+export type ProductIdDto = z.infer<typeof productIdSchema>
+export type ProductCategoryIdsDto = z.infer<typeof productCategoryIdsSchema>
+export type ProductVariantIdsDto = z.infer<typeof productVariantIdsSchema>
+export type CreateProductDto = z.infer<typeof createProductSchema>
+export type ChangeProductDto = z.infer<typeof changeProductSchema>
 export type CreateVariantSchemaDto = z.infer<typeof createVariantSchema>
 export type ChangeVariantSchemaDto = z.infer<typeof changeVariantSchema>
