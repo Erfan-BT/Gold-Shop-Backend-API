@@ -160,18 +160,19 @@ export const changeProductSchema = z.object({
 export const createVariantSchema = z.object({
     weight : z.coerce.number().positive(),
     karat : z.enum(ProductKarat),
-    stoneType : z.string().trim().min(1).max(50),
-    color : z.string().trim().min(1).max(30),
-    sku : z.string().trim().min(1).max(50),
+    stoneType : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Character'),
+    color : z.string().trim().min(1, 'At Least A Character Is Required').max(30, 'Max : 30 Character'),
+    sku : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Character'),
     isActive : z.coerce.boolean().default(true),
+    quantity : z.coerce.number().int().nonnegative().default(0)
 })
 
 export const changeVariantSchema = z.object({
     weight : z.coerce.number().positive().optional(),
     karat : z.enum(ProductKarat).optional(),
-    stoneType : z.string().trim().min(1).max(50).optional(),
-    color : z.string().trim().min(1).max(30).optional(),
-    sku : z.string().trim().min(1).max(50).optional(),
+    stoneType : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Character').optional(),
+    color : z.string().trim().min(1, 'At Least A Character Is Required').max(30, 'Max : 30 Character').optional(),
+    sku : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Character').optional(),
 })
 .superRefine((data, ctx) => {
     if (
@@ -183,7 +184,7 @@ export const changeVariantSchema = z.object({
     ) {
         ctx.addIssue({
             code : z.ZodIssueCode.custom,
-            message : "All Params Can Not Empty"
+            message: "At Least One Of The Fields Is Required"
         })
     }
 })
@@ -213,5 +214,5 @@ export type ProductIdDto = z.infer<typeof productIdSchema>
 export type ProductVariantIdsDto = z.infer<typeof productVariantIdsSchema>
 export type CreateProductDto = z.infer<typeof createProductSchema>
 export type ChangeProductDto = z.infer<typeof changeProductSchema>
-export type CreateVariantSchemaDto = z.infer<typeof createVariantSchema>
-export type ChangeVariantSchemaDto = z.infer<typeof changeVariantSchema>
+export type CreateVariantDto = z.infer<typeof createVariantSchema>
+export type ChangeVariantDto = z.infer<typeof changeVariantSchema>

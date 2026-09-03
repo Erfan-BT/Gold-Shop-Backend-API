@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express"
 import { AuthRequest } from "../../middleware/auth.middleware.js"
-import { ChangeVariantSchemaDto, CreateVariantSchemaDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js"
+import { ChangeVariantDto, CreateVariantDto, ProductIdDto, ProductVariantIdsDto } from "../../validation/product.validation.js"
 import adminVariantService from "../../services/admin/variant.admin.service.js"
 
 class AdminVariantController {
@@ -11,7 +11,7 @@ class AdminVariantController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Product Variants',
+                msg : 'Product Variants Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -19,14 +19,14 @@ class AdminVariantController {
         }
     }
 
-    async getVariant (req : AuthRequest, res : Response, next : NextFunction) {
+    async getProductVariant (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId, variantId } = req.validated.params as ProductVariantIdsDto
-            const result = await adminVariantService.getVariant(productId, variantId)
+            const result = await adminVariantService.getProductVariant(productId, variantId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Product Variant',
+                msg : 'Product Variant Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -37,12 +37,13 @@ class AdminVariantController {
     async createVariant (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId } = req.validated.params as ProductIdDto
-            const variantData = req.validated.body as CreateVariantSchemaDto
-            const result = await adminVariantService.createVariant(productId, variantData)
+            const variantData = req.validated.body as CreateVariantDto
+            const adminId = req.user!.userId
+            const result = await adminVariantService.createVariant(productId, variantData, adminId)
 
             res.status(201).json({
                 success : true,
-                msg : 'Create Product Variant',
+                msg : 'Product Variant Successfully Created',
                 data : result
             })
         } catch (error) {
@@ -53,13 +54,14 @@ class AdminVariantController {
     async changeVariant (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const variantData = req.validated.body as ChangeVariantSchemaDto
-            await adminVariantService.changeVariant(productId, variantId, variantData)
+            const variantData = req.validated.body as ChangeVariantDto
+            const adminId = req.user!.userId
+            const result = await adminVariantService.changeVariant(productId, variantId, variantData, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Product Variant',
-                data : {}
+                msg : 'Product Variant Successfully Changed',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -69,12 +71,15 @@ class AdminVariantController {
     async changeVariantStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            await adminVariantService.changeVariantStatus(productId, variantId)
+            const adminId = req.user!.userId
+            const result = await adminVariantService.changeVariantStatus(productId, variantId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Product Variant Status',
-                data : {}
+                msg : 'Product Variant Status Changed Successfully',
+                data : {
+                    newStatus : result 
+                }
             })
         } catch (error) {
             next(error)
@@ -85,12 +90,12 @@ class AdminVariantController {
         try {
             const { productId , variantId } = req.validated.params as ProductVariantIdsDto
             const adminId = req.user!.userId
-            await adminVariantService.deleteVariant(adminId, productId, variantId)
+            await adminVariantService.deleteVariant(productId, variantId, adminId, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Product Variant',
-                data : {}
+                msg : 'Product Variant Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

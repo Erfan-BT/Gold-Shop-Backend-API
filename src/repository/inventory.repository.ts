@@ -46,6 +46,17 @@ class InventoryRepository {
     }
 
     // --- Admin ---
+    async createInventory (variantId : number, quantity : number, transaction : Transaction)
+    : Promise<Inventory> {
+        return await Inventory.create({
+            variantId,
+            quantity,
+            minThreshold : 1
+        }, {
+            transaction
+        })
+    }
+
     async getVariantInventory (variantId : number)
     {
         return await Inventory.findOne({

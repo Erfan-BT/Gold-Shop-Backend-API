@@ -2,7 +2,7 @@ import { FindAndCountOptions, Op, Transaction } from "sequelize";
 import { Product, ProductDiscount, ProductImage, ProductPricing, ProductVariant } from "../models/product.model.js";
 import Inventory from "../models/inventory.model.js";
 import { Category, ProductCategory } from "../models/category.model.js";
-import { CreateProductDto, CreateVariantSchemaDto } from "../validation/product.validation.js";
+import { CreateProductDto, CreateVariantDto } from "../validation/product.validation.js";
 
 class ProductRepository {
     async getAllProducts(options: FindAndCountOptions<Product>)
@@ -303,7 +303,7 @@ class ProductRepository {
 
     // --- Variants ---
     async findVariant (variantId : number, productId ?: number)
-    {
+    : Promise<ProductVariant | null> {
         return await ProductVariant.findOne({
             where : {
                 id : variantId,
@@ -313,12 +313,12 @@ class ProductRepository {
     }
 
     async getProductVariants (productId : number)
-    {
+    : Promise<ProductVariant[]> {
         return await ProductVariant.findAll({
             where : {
                 productId
             },
-            attributes : ['id' ,'weight', 'karat', 'stoneType', 'color', 'sku', 'soldCount', 'currentPrice', 'isActive'],
+            attributes : ['id' ,'weight', 'karat', 'stoneType', 'color', 'sku', 'soldCount', 'currentPrice', 'isActive', 'createdAt'],
             include : [
                 {
                     model : Inventory,
@@ -327,13 +327,14 @@ class ProductRepository {
                 }
             ],
             order: [
-                ['id', 'ASC']
+                ['id', 'ASC'],
+                ['currentPrice', 'ASC']
             ]
         })
     }
 
     async getProductVariant (productId : number, variantId : number)
-    {
+    : Promise<ProductVariant | null> {
         return await ProductVariant.findOne({
             where : {
                 productId,
@@ -390,7 +391,7 @@ class ProductRepository {
     }
 
     async checkExistsSku (sku : string, excludeVariantId ?: number)
-    {
+    : Promise<boolean> {
         return await ProductVariant.findOne({
             where : {
                 sku,
@@ -400,19 +401,26 @@ class ProductRepository {
         }) !== null
     }
 
-    async createVariant (productId : number, variantData : CreateVariantSchemaDto)
-    {
+    async createVariant (productId : number, variantData : CreateVariantDto, transaction : Transaction)
+    : Promise<ProductVariant> {
         return await ProductVariant.create({
-            ...variantData,
+            weight : variantData.weight ,
+            karat : variantData.karat ,
+            stoneType : variantData.stoneType ,
+            color : variantData.color ,
+            sku : variantData.sku ,
+            isActive :variantData.isActive ,
             currentPrice : 0,
             soldCount : 0,
             productId,
+        }, {
+            transaction
         })
     }
 
-    async changeVariant (productId : number, variantId : number, variantData : Partial<Pick<ProductVariant, 'weight' | 'karat' | 'stoneType' | 'color' | 'sku' >>)
-    {
-        const [rows] = await ProductVariant.update(variantData ,{
+    async changeVariant (productId : number, variantId : number, data : Partial<Pick<ProductVariant, 'weight' | 'karat' | 'stoneType' | 'color' | 'sku' >>, transaction : Transaction)
+    : Promise<boolean> {
+        const [rows] = await ProductVariant.update(data ,{
             where : {
                 productId,
                 id : variantId
@@ -421,8 +429,8 @@ class ProductRepository {
         return rows === 1
     }
 
-    async changeVariantStatus (productId : number, variantId : number, currentStatus : boolean)
-    {
+    async changeVariantStatus (productId : number, variantId : number, currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await ProductVariant.update({
             isActive : !currentStatus,
         },{
@@ -430,18 +438,20 @@ class ProductRepository {
                 id : variantId,
                 productId,
                 isActive : currentStatus
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async deleteVariant (productId : number, variantId : number)
-    {
+    async deleteVariant (productId : number, variantId : number, transaction : Transaction)
+    : Promise<boolean> {
         const rows = await ProductVariant.destroy({
             where : {
                 id : variantId,
                 productId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
