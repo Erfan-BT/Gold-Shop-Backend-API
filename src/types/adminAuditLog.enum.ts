@@ -42,6 +42,7 @@ export enum AdminAuditEntity {
     PRODUCT = 'PRODUCT',
     VARIANT = 'VARIANT',
     IMAGE = 'IMAGE',
+    PRICING = 'PRICING',
     CATEGORY = 'CATEGORY',
     COUPON = 'COUPON',
     REVIEW = 'REVIEW',

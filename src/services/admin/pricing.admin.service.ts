@@ -3,33 +3,40 @@ import productRepository from "../../repository/product.repository.js"
 import { BadRequestError, ConflictError, NotFoundError } from "../../utils/appError.js"
 import { ProductPricing } from "../../models/product.model.js"
 import pricingRepository from "../../repository/pricing.repository.js"
-import { ChangeVariantPricing, CreateVariantPricing } from "../../validation/pricing.validation.js"
+import { ChangeVariantPricingDto, CreateVariantPricingDto } from "../../validation/pricing.validation.js"
+import sequelize from "../../configs/sequelize.config.js"
+import adminAuditLogRepository from "../../repository/adminAuditLog.repository.js"
+import { AdminAuditAction, AdminAuditEntity } from "../../types/adminAuditLog.enum.js"
 
 class AdminPricingService {
     async getVariantPricing (productId : number, variantId : number)
-    {
+    : Promise<ProductPricing[]> {
         // Get Product
         const product = await productRepository.getProduct(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+
         // Get Variant
         const variant = await productRepository.findVariant(variantId, productId)
         if (!variant)
-            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
+
         // Get Pricing
         return await pricingRepository.getVariantPricing(variantId)
     }
 
-    async createVariantPricing (productId : number, variantId : number, pricingData : CreateVariantPricing)
-    {
+    async createVariantPricing (productId : number, variantId : number, pricingData : CreateVariantPricingDto, adminId : number, ipAddress : string)
+    : Promise<ProductPricing> {
         // Get Product
         const product = await productRepository.getProduct(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+
         // Get Variant
         const variant = await productRepository.findVariant(variantId, productId)
         if (!variant)
-            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
+
         // Get Variant Pricing
         const now = new Date()
         const pricing = await pricingRepository.getVariantPricing(variantId,
@@ -48,9 +55,9 @@ class AdminPricingService {
                     }
                 ]
             })
+
         // Check Pricing
-        if (pricingData.isActive) {
-            if (pricing.length > 0) {
+        if (pricingData.isActive && pricing.length > 0) {
             const hasPriorityOverlap = pricing.some(
                 existingPricing =>
                     existingPricing.priority === pricingData.priority &&
@@ -61,46 +68,104 @@ class AdminPricingService {
             )
             if (hasPriorityOverlap)
                 throw new ConflictError('Another Pricing With The Same Priority Has An Overlapping Date Range')
-            }
         }
-        // Create
-        return await pricingRepository.createVariantPricing(variantId, pricingData)
+
+        return await sequelize.transaction(async t => {
+            // Create
+            const pricing = await pricingRepository.createVariantPricing(variantId, pricingData, t)
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.CREATE,
+                entityType : AdminAuditEntity.PRICING,
+                entityId : pricing.id,
+                ipAddress,
+                reason : null,
+                oldValues : null,
+                newValues : {
+                    variantId,
+                    ...pricingData
+                }
+            }, t)
+
+            return pricing
+        })
     }
 
-    async changeVariantPricing (productId : number, variantId : number, pricingId : number, pricingData : ChangeVariantPricing)
-    {
+    async changeVariantPricing (productId : number, variantId : number, pricingId : number, pricingData : ChangeVariantPricingDto, adminId : number, ipAddress : string)
+    : Promise<ChangeVariantPricingDto> {
         // Get Product
         const product = await productRepository.getProduct(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+
         // Get Variant
         const variant = await productRepository.findVariant(variantId, productId)
         if (!variant)
-            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
+
         // Get This Pricing
         const [pricing] = await pricingRepository.getVariantPricing(variantId, {id : pricingId})
         if (!pricing)
-            throw new NotFoundError(`Pricing Not Found { ID : ${pricingId} }`)
-        // Check Data
-        const finalWageType = pricingData.wageType ?? pricing.wageType
-        const finalWageValue = pricingData.wageValue ?? pricing.wageValue
-        const finalProfitType = pricingData.profitType ?? pricing.profitType
-        const finalProfitValue = pricingData.profitValue ?? pricing.profitValue
+            throw new NotFoundError(`Product Variant Pricing Not Found { ID : ${pricingId} }`)
+
+        // Create Data
+        const data: Partial<Pick<
+            ProductPricing,
+              'wageType'
+            | 'wageValue'
+            | 'profitType'
+            | 'profitValue'
+            | 'taxPercent'
+            | 'priority'
+            | 'validFrom'
+            | 'validTo'
+        >> = {};
+
+        if (pricingData.wageType !== undefined && pricingData.wageType !== pricing.wageType)
+            data.wageType = pricingData.wageType;
+
+        if (pricingData.wageValue !== undefined && pricingData.wageValue !== pricing.wageValue)
+            data.wageValue = pricingData.wageValue;
+
+        if (pricingData.profitType !== undefined && pricingData.profitType !== pricing.profitType)
+            data.profitType = pricingData.profitType;
+
+        if (pricingData.profitValue !== undefined && pricingData.profitValue !== pricing.profitValue)
+            data.profitValue = pricingData.profitValue;
+
+        if (pricingData.taxPercent !== undefined && pricingData.taxPercent !== pricing.taxPercent)
+            data.taxPercent = pricingData.taxPercent;
+
+        if (pricingData.priority !== undefined && pricingData.priority !== pricing.priority)
+            data.priority = pricingData.priority;
+
+        if (pricingData.validFrom !== undefined && pricingData.validFrom !== pricing.validFrom)
+            data.validFrom = pricingData.validFrom;
+
+        if (pricingData.validTo !== undefined && pricingData.validTo !== pricing.validTo)
+            data.validTo = pricingData.validTo;
+
+
+        const finalWageType = data.wageType ?? pricing.wageType
+        const finalWageValue = data.wageValue ?? pricing.wageValue
+        const finalProfitType = data.profitType ?? pricing.profitType
+        const finalProfitValue = data.profitValue ?? pricing.profitValue
+        const finalPriority = pricingData.priority ?? pricing.priority
+        const finalValidFrom = pricingData.validFrom ?? pricing.validFrom
+        const finalValidTo = pricingData.validTo !== undefined ? pricingData.validTo : pricing.validTo
 
         if (finalWageType === 'percent' && finalWageValue > 100)
             throw new BadRequestError('Wage Percent Must Be Between 0 And 100')
 
         if (finalProfitType === 'percent' && finalProfitValue > 100)
             throw new BadRequestError('Profit Percent Must Be Between 0 And 100')
-
-        const finalValidFrom = pricingData.validFrom ?? pricing.validFrom;
-        const finalValidTo = pricingData.validTo !== undefined ? pricingData.validTo : pricing.validTo;
-
+        
         if (finalValidTo !== null && finalValidFrom.getTime() > finalValidTo.getTime())
             throw new BadRequestError('Valid To Date Must Be Greater Than Or Equal To Valid From Date')
-
-        const finalPriority = pricingData.priority ?? pricing.priority;
-        // Get Variant Pricing && Overlap
+        
+        // Check Pricing Overlap
         if (pricing.isActive) {
             const now = new Date()
             const allPricing = await pricingRepository.getVariantPricing(variantId,
@@ -123,76 +188,66 @@ class AdminPricingService {
                     ]
                 })
             if (allPricing.length > 0) {
-            const hasPriorityOverlap = allPricing.some(
-                existingPricing =>
-                    existingPricing.priority === finalPriority &&
-                    (
-                        (existingPricing.validTo === null || existingPricing.validTo.getTime() >= finalValidFrom.getTime()) &&
-                        (finalValidTo === null || finalValidTo.getTime() >= existingPricing.validFrom.getTime())
-                    )
-            )
-            if (hasPriorityOverlap)
-                throw new ConflictError('Another Pricing With The Same Priority Has An Overlapping Date Range')
+                const hasPriorityOverlap = allPricing.some(
+                    existingPricing =>
+                        existingPricing.priority === finalPriority &&
+                        (
+                            (existingPricing.validTo === null || existingPricing.validTo.getTime() >= finalValidFrom.getTime()) &&
+                            (finalValidTo === null || finalValidTo.getTime() >= existingPricing.validFrom.getTime())
+                        )
+                )
+                if (hasPriorityOverlap)
+                    throw new ConflictError('Another Pricing With The Same Priority Has An Overlapping Date Range')
             }
         }
         
-        // Change
-        const data: Partial<Pick<
-            ProductPricing,
-              'wageType'
-            | 'wageValue'
-            | 'profitType'
-            | 'profitValue'
-            | 'taxPercent'
-            | 'priority'
-            | 'validFrom'
-            | 'validTo'
-        >> = {};
+        await sequelize.transaction(async t => {
+            // Change Pricing
+            if (!(await pricingRepository.changeVariantPricing(variantId, pricingId, data, t)))
+                throw new ConflictError(`Product Variant Pricing NoT Changed`)
 
-        if (pricingData.wageType !== undefined)
-            data.wageType = pricingData.wageType;
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.UPDATE,
+                entityType : AdminAuditEntity.PRICING,
+                entityId : pricingId,
+                ipAddress,
+                reason : null,
+                oldValues : {
+                    wageType : pricing.wageType,
+                    wageValue : pricing.wageValue,
+                    profitType : pricing.profitType,
+                    profitValue : pricing.profitValue,
+                    taxPercent : pricing.taxPercent,
+                    priority : pricing.priority,
+                    validFrom : pricing.validFrom,
+                    validTo : pricing.validTo
+                },
+                newValues : data
+            }, t)
+        })
 
-        if (pricingData.wageValue !== undefined)
-            data.wageValue = pricingData.wageValue;
-
-        if (pricingData.profitType !== undefined)
-            data.profitType = pricingData.profitType;
-
-        if (pricingData.profitValue !== undefined)
-            data.profitValue = pricingData.profitValue;
-
-        if (pricingData.taxPercent !== undefined)
-            data.taxPercent = pricingData.taxPercent;
-
-        if (pricingData.priority !== undefined)
-            data.priority = pricingData.priority;
-
-        if (pricingData.validFrom !== undefined)
-            data.validFrom = pricingData.validFrom;
-
-        if (pricingData.validTo !== undefined)
-            data.validTo = pricingData.validTo;
-
-
-        if (!(await pricingRepository.changeVariantPricing(variantId, pricingId, data)))
-            throw new ConflictError(`Variant Pricing NoT Changed`)
-        return
+        return data
     }
 
-    async changeVariantPricingStatus (productId : number, variantId : number, pricingId : number)
-    {
+    async changeVariantPricingStatus (productId : number, variantId : number, pricingId : number, adminId : number)
+    : Promise<boolean> {
         // Get Product
         const product = await productRepository.getProduct(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+
         // Get Variant
         const variant = await productRepository.findVariant(variantId, productId)
         if (!variant)
-            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
+
         // Get This Pricing
         const [pricing] = await pricingRepository.getVariantPricing(variantId, {id : pricingId})
         if (!pricing)
-            throw new NotFoundError(`Pricing Not Found { ID : ${pricingId} }`)
+            throw new NotFoundError(`Product Variant Pricing Not Found { ID : ${pricingId} }`)
+
         // Get Other Pricing
         const now = new Date()
         const allPricing = await pricingRepository.getVariantPricing(variantId,
@@ -220,9 +275,25 @@ class AdminPricingService {
             throw new BadRequestError('The Product Requires At Least One Active Pricing')
 
         if (pricing.isActive) {
-            if (!(await pricingRepository.changeVariantPricingStatus(variantId, pricingId, true)))
-                throw new ConflictError('Product Variant Pricing Status Not Changed')
-            return
+            await sequelize.transaction(async t => {
+                // Change Status
+                if (!(await pricingRepository.changeVariantPricingStatus(variantId, pricingId, true, t)))
+                    throw new ConflictError('Product Variant Pricing Status Not Changed')
+
+                // Add Admin Audit
+                await adminAuditLogRepository.createAdminAuditLog({
+                    adminId,
+                    action : AdminAuditAction.DEACTIVATE,
+                    entityType : AdminAuditEntity.PRICING,
+                    entityId : pricingId,
+                    ipAddress : null,
+                    reason : null,
+                    oldValues : null,
+                    newValues : null
+                }, t)
+            })
+            
+            return false
         }
         
         // Change Status To True
@@ -241,33 +312,70 @@ class AdminPricingService {
             if (hasPriorityOverlap)
                 throw new ConflictError('Another Active Pricing With The Same Priority Has An Overlapping Date Range')
         }
-        if (!(await pricingRepository.changeVariantPricingStatus(variantId, pricingId, false)))
-            throw new ConflictError('Product Variant Pricing Status Not Changed')
-        return
+
+        await sequelize.transaction(async t => {
+            // Change Status
+            if (!(await pricingRepository.changeVariantPricingStatus(variantId, pricingId, false, t)))
+                throw new ConflictError('Product Variant Pricing Status Not Changed')
+
+            // Add Admin Audit
+                await adminAuditLogRepository.createAdminAuditLog({
+                    adminId,
+                    action : AdminAuditAction.ACTIVATE,
+                    entityType : AdminAuditEntity.PRICING,
+                    entityId : pricingId,
+                    ipAddress : null,
+                    reason : null,
+                    oldValues : null,
+                    newValues : null
+                }, t)
+        })
+        
+        return true
     }
 
-    async deleteVariantPricing (productId : number, variantId : number, pricingId : number)
-    {
+    async deleteVariantPricing (productId : number, variantId : number, pricingId : number, adminId : number)
+    : Promise<void> {
         // Get Product
         const product = await productRepository.getProduct(productId)
         if (!product)
             throw new NotFoundError(`Product Not Found { ID : ${productId} }`)
+
         // Get Variant
         const variant = await productRepository.findVariant(variantId, productId)
         if (!variant)
-            throw new NotFoundError(`Variant Not Found { ID : ${variantId} }`)
+            throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
+
         // Get This Pricing
         const [pricing] = await pricingRepository.getVariantPricing(variantId, {id : pricingId})
         if (!pricing)
-            throw new NotFoundError(`Pricing Not Found { ID : ${pricingId} }`)
+            throw new NotFoundError(`Product Variant Pricing Not Found { ID : ${pricingId} }`)
         
         // Delete InActive Pricing
         if (!pricing.isActive) {
-            if (!(await pricingRepository.deletePricing(variantId, pricingId)))
-                throw new ConflictError('Product Variant Pricing Not Deleted')
+            await sequelize.transaction(async t => {
+                // Delete Pricing
+                if (!(await pricingRepository.deletePricing(variantId, pricingId)))
+                    throw new ConflictError('Product Variant Pricing Not Deleted')
+
+                // Add Admin Audit
+                await adminAuditLogRepository.createAdminAuditLog({
+                    adminId,
+                    action : AdminAuditAction.DELETE,
+                    entityType : AdminAuditEntity.PRICING,
+                    entityId : pricingId,
+                    oldValues : null,
+                    newValues : null,
+                    ipAddress : null,
+                    reason : null
+                }, t)
+            })
+            
             return
         }
+
         // Delete Active Pricing
+
         // Get Other Pricing
         const now = new Date()
         const allPricing = await pricingRepository.getVariantPricing(variantId,
@@ -293,8 +401,24 @@ class AdminPricingService {
         if (allPricing.length === 0)
             throw new BadRequestError('The Product Requires At Least One Active Pricing')
 
-        if (!(await pricingRepository.deletePricing(variantId, pricingId)))
-            throw new ConflictError('Product Variant Pricing Not Deleted')     
+        await sequelize.transaction(async t => {
+            // Delete Pricing
+            if (!(await pricingRepository.deletePricing(variantId, pricingId)))
+                throw new ConflictError('Product Variant Pricing Not Deleted')
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.DELETE,
+                entityType : AdminAuditEntity.PRICING,
+                entityId : pricingId,
+                oldValues : null,
+                newValues : null,
+                ipAddress : null,
+                reason : null
+            }, t)
+        })
+
         return   
     }
 

@@ -1,12 +1,12 @@
 import z from "zod";
 
-export const createVariantPricing = z.object({
+export const createVariantPricingSchema = z.object({
     wageType : z.enum(["fixed" , "percent"]),
     wageValue : z.coerce.number().nonnegative(),
     profitType : z.enum(["fixed" , "percent"]),
     profitValue : z.coerce.number().nonnegative(),
-    taxPercent : z.coerce.number().min(0).max(100),
-    priority : z.coerce.number().int().min(1).max(10),
+    taxPercent : z.coerce.number().nonnegative().max(100, 'Max : 100'),
+    priority : z.coerce.number().int().positive().max(10, 'Max : 10'),
     validFrom : z.coerce.date(),    
     validTo : z.coerce.date().nullable(),
     isActive : z.coerce.boolean().default(true)
@@ -48,13 +48,13 @@ export const createVariantPricing = z.object({
     }
 })
 
-export const changeVariantPricing = z.object({
+export const changeVariantPricingSchema = z.object({
     wageType : z.enum(["fixed" , "percent"]).optional(),
     wageValue : z.coerce.number().nonnegative().optional(),
     profitType : z.enum(["fixed" , "percent"]).optional(),
     profitValue : z.coerce.number().nonnegative().optional(),
-    taxPercent : z.coerce.number().min(0).max(100).optional(),
-    priority : z.coerce.number().int().min(1).max(10).optional(),
+    taxPercent : z.coerce.number().nonnegative().max(100, 'Max : 100').optional(),
+    priority : z.coerce.number().int().positive().max(10, 'Max : 10').optional(),
     validFrom : z.coerce.date().optional(),    
     validTo : z.coerce.date().nullable().optional(),
 })
@@ -71,9 +71,10 @@ export const changeVariantPricing = z.object({
     ) {
         ctx.addIssue({
             code : z.ZodIssueCode.custom,
-            message : "All Params Can Not Empty"
+            message: "At Least One Of The Fields Is Required"
         })
     }
+
     if (
         data.validFrom !== undefined &&
         data.validTo !== undefined &&
@@ -122,6 +123,6 @@ export const productVariantPricingIds = z.object({
     pricingId : z.coerce.number().int().positive(),
 })
 
-export type CreateVariantPricing = z.infer<typeof createVariantPricing>
-export type ChangeVariantPricing = z.infer<typeof changeVariantPricing>
+export type CreateVariantPricingDto = z.infer<typeof createVariantPricingSchema>
+export type ChangeVariantPricingDto = z.infer<typeof changeVariantPricingSchema>
 export type ProductVariantPricingIdsDto = z.infer<typeof productVariantPricingIds>

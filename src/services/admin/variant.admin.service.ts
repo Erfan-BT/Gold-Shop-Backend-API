@@ -163,17 +163,13 @@ class AdminVariantService {
             // Add Admin Audit
             await adminAuditLogRepository.createAdminAuditLog({
                 adminId,
-                action : AdminAuditAction.UPDATE,
+                action : variant.isActive ? AdminAuditAction.DEACTIVATE : AdminAuditAction.ACTIVATE,
                 entityType : AdminAuditEntity.VARIANT,
                 entityId : variantId,
                 ipAddress : null,
                 reason : null,
-                oldValues : {
-                    isActive : variant.isActive
-                },
-                newValues : {
-                    isActive : !variant.isActive
-                }
+                oldValues : null,
+                newValues : null
             }, t)
         })
 

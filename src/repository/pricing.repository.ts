@@ -1,10 +1,10 @@
-import { WhereOptions } from "sequelize"
+import { Transaction, WhereOptions } from "sequelize"
 import { ProductPricing } from "../models/product.model.js"
-import { CreateVariantPricing } from "../validation/pricing.validation.js"
+import { CreateVariantPricingDto } from "../validation/pricing.validation.js"
 
 class PricingRepository {
     async getVariantPricing (variantId : number, where?: WhereOptions<ProductPricing>)
-    {
+    : Promise<ProductPricing[]> {
         return await ProductPricing.findAll({
             where : {
                 variantId,
@@ -16,15 +16,17 @@ class PricingRepository {
         })
     }
 
-    async createVariantPricing (variantId : number, pricingData : CreateVariantPricing)
-    {
+    async createVariantPricing (variantId : number, pricingData : CreateVariantPricingDto, transaction : Transaction)
+    : Promise<ProductPricing> {
         return await ProductPricing.create({
             variantId,
             ...pricingData,
+        }, {
+            transaction
         })
     }
 
-    async changeVariantPricing (variantId : number, pricingId : number, pricingData : Partial<Pick<
+    async changeVariantPricing (variantId : number, pricingId : number, data : Partial<Pick<
             ProductPricing,
             | 'wageType'
             | 'wageValue'
@@ -34,19 +36,20 @@ class PricingRepository {
             | 'priority'
             | 'validFrom'
             | 'validTo'
-        >>)
-    {
-        const [rows] = await ProductPricing.update(pricingData ,{
+        >>, transaction : Transaction)
+    : Promise<boolean> {
+        const [rows] = await ProductPricing.update(data ,{
             where : {
                 variantId,
                 id : pricingId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async changeVariantPricingStatus (variantId : number, pricingId : number, currentStatus : boolean)
-    {
+    async changeVariantPricingStatus (variantId : number, pricingId : number, currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await ProductPricing.update({
             isActive : !currentStatus
         }, {
@@ -54,13 +57,14 @@ class PricingRepository {
                 id : pricingId,
                 variantId,
                 isActive : currentStatus
-            }            
+            },
+            transaction     
         })
         return rows === 1
     }
 
     async deletePricing (variantId : number, pricingId : number)
-    {
+    : Promise<boolean> {
         const rows = await ProductPricing.destroy({
             where : {
                 id : pricingId,

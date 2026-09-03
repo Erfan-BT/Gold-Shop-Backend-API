@@ -31,9 +31,10 @@ router.use('/:productId/variants', ProductVariantRoutes)
 router.use('/:productId/variants/:variantId/images', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ProductVariantImageRoutes)
 
 // ----- Pricing -----
-router.use('/:productId/variants/:variantId/pricing', ProductVariantPricingRoutes)
+router.use('/:productId/variants/:variantId/pricing', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ProductVariantPricingRoutes)
+
 // ----- Discount -----
-router.use('/:productId/variants/:variantId/discounts', ProductVariantDiscountRoutes)
+router.use('/:productId/variants/:variantId/discounts', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ProductVariantDiscountRoutes)
 // ----- Inventory -----
 router.use('/:productId/variants/:variantId/inventory', ProductVariantInventoryRoutes)
 
