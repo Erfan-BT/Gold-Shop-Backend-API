@@ -2,7 +2,7 @@ import { NextFunction, Response } from "express"
 import { AuthRequest } from "../../middleware/auth.middleware.js"
 import { ProductVariantIdsDto } from "../../validation/product.validation.js"
 import adminDiscountService from "../../services/admin/discount.admin.service.js"
-import { ChangeVariantDiscount, CreateVariantDiscount, ProductVariantDiscountIdsDto } from "../../validation/discount.validation.js"
+import { ChangeVariantDiscountDto, CreateVariantDiscountDto, ProductVariantDiscountIdsDto } from "../../validation/discount.validation.js"
 
 class AdminDiscountController {
     async getVariantDiscounts (req : AuthRequest, res : Response, next : NextFunction) {
@@ -12,7 +12,7 @@ class AdminDiscountController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Variant Discounts',
+                msg : 'Product Variant Discounts Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -23,12 +23,13 @@ class AdminDiscountController {
     async createVariantDiscount (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId } = req.validated.params as ProductVariantIdsDto
-            const discountData = req.validated.body as CreateVariantDiscount
-            const result = await adminDiscountService.createVariantDiscount(productId, variantId, discountData)
+            const discountData = req.validated.body as CreateVariantDiscountDto
+            const adminId = req.user!.userId
+            const result = await adminDiscountService.createVariantDiscount(productId, variantId, discountData, adminId, req.ip ?? '-0-')
 
             res.status(201).json({
                 success : true,
-                msg : 'Create Variant Discount',
+                msg : 'Product Variant Discount Created Successfully',
                 data : result
             })
         } catch (error) {
@@ -39,13 +40,14 @@ class AdminDiscountController {
     async changeVariantDiscount (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
-            const discountData = req.validated.body as ChangeVariantDiscount
-            await adminDiscountService.changeVariantDiscount(productId, variantId, discountId, discountData)
+            const discountData = req.validated.body as ChangeVariantDiscountDto
+            const adminId = req.user!.userId
+            const result = await adminDiscountService.changeVariantDiscount(productId, variantId, discountId, discountData, adminId, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Variant Discount',
-                data : {}
+                msg : 'Product Variant Discount Successfully Changed',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -55,12 +57,15 @@ class AdminDiscountController {
     async changeVariantDiscountStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
-            await adminDiscountService.changeVariantDiscountStatus(productId, variantId, discountId)
+            const adminId = req.user!.userId
+            const result = await adminDiscountService.changeVariantDiscountStatus(productId, variantId, discountId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Variant Discount Status',
-                data : {}
+                msg : 'Product Variant Discount Status Changed Successfully',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)
@@ -70,12 +75,13 @@ class AdminDiscountController {
     async deleteDiscount (req : AuthRequest, res : Response, next : NextFunction) {
         try {
             const { productId , variantId, discountId } = req.validated.params as ProductVariantDiscountIdsDto
-            await adminDiscountService.deleteDiscount(productId, variantId, discountId)
+            const adminId = req.user!.userId
+            await adminDiscountService.deleteDiscount(productId, variantId, discountId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Variant Discount',
-                data : {}
+                msg : 'Product Variant Discount Successfully Deleted',
+                data : null
             })
         } catch (error) {
             next(error)

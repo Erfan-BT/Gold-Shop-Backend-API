@@ -35,6 +35,7 @@ router.use('/:productId/variants/:variantId/pricing', roleMiddleware([RolesTitle
 
 // ----- Discount -----
 router.use('/:productId/variants/:variantId/discounts', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ProductVariantDiscountRoutes)
+
 // ----- Inventory -----
 router.use('/:productId/variants/:variantId/inventory', ProductVariantInventoryRoutes)
 

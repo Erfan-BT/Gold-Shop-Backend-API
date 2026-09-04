@@ -1,6 +1,6 @@
 import z from "zod"
 
-export const createVariantDiscount = z.object({
+export const createVariantDiscountSchema = z.object({
     type : z.enum(["fixed" , "percent"]),
     value : z.coerce.number().nonnegative(),
     startDate : z.coerce.date(),
@@ -31,7 +31,7 @@ export const createVariantDiscount = z.object({
     }
 })
 
-export const changeVariantDiscount = z.object({
+export const changeVariantDiscountSchema = z.object({
     type : z.enum(["fixed" , "percent"]).optional(),
     value : z.coerce.number().nonnegative().optional(),
     startDate : z.coerce.date().optional(),
@@ -46,7 +46,7 @@ export const changeVariantDiscount = z.object({
     ) {
         ctx.addIssue({
             code : z.ZodIssueCode.custom,
-            message : "All Params Can Not Empty"
+            message: "At Least One Of The Fields Is Required"
         })
     }
     if (
@@ -76,12 +76,12 @@ export const changeVariantDiscount = z.object({
     }
 })
 
-export const productVariantDiscountIds = z.object({
+export const productVariantDiscountIdsSchema = z.object({
     productId : z.coerce.number().int().positive(),
     variantId : z.coerce.number().int().positive(),
     discountId : z.coerce.number().int().positive(),
 })
 
-export type CreateVariantDiscount = z.infer<typeof createVariantDiscount>
-export type ChangeVariantDiscount = z.infer<typeof changeVariantDiscount>
-export type ProductVariantDiscountIdsDto = z.infer<typeof productVariantDiscountIds>
+export type CreateVariantDiscountDto = z.infer<typeof createVariantDiscountSchema>
+export type ChangeVariantDiscountDto = z.infer<typeof changeVariantDiscountSchema>
+export type ProductVariantDiscountIdsDto = z.infer<typeof productVariantDiscountIdsSchema>
