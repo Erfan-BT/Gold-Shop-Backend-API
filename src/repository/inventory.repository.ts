@@ -2,11 +2,7 @@ import { literal, Op, Transaction } from "sequelize";
 import Inventory from "../models/inventory.model.js"
 
 class InventoryRepository {
-    async decreaseStock(
-        variantId: number,
-        quantity: number,
-        transaction: Transaction
-    )
+    async decreaseStock(variantId: number, quantity: number, transaction: Transaction)
     : Promise<boolean> {
         const [rows] = await Inventory.update(
             {
@@ -25,11 +21,7 @@ class InventoryRepository {
         return rows === 1;
     }
 
-    async increaseStock(
-        variantId: number,
-        quantity: number,
-        transaction: Transaction
-    )
+    async increaseStock(variantId: number, quantity: number, transaction: Transaction)
     : Promise<boolean> {
         const [rows] = await Inventory.update(
             {
@@ -58,7 +50,7 @@ class InventoryRepository {
     }
 
     async getVariantInventory (variantId : number)
-    {
+    : Promise<Inventory | null> {
         return await Inventory.findOne({
             where : {
                 variantId
@@ -67,12 +59,13 @@ class InventoryRepository {
         })
     }
 
-    async changeInventory (variantId : number, data : Partial<Pick<Inventory, 'quantity' | 'minThreshold'>>)
-    {
+    async changeInventory (variantId : number, data : Partial<Pick<Inventory, 'quantity' | 'minThreshold'>>, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await Inventory.update(data, {
             where : {
                 variantId
-            }
+            },
+            transaction
         })
         return rows === 1
     }

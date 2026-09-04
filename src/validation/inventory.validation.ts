@@ -11,9 +11,9 @@ export const adminChangeInventorySchema = z.object({
     ) {
         ctx.addIssue({
             code : z.ZodIssueCode.custom,
-            message : 'All Params Can Not Empty'
+            message: "At Least One Of The Fields Is Required"
         })
     }
 })
 
-export type adminChangeInventorySchemaDto = z.infer<typeof adminChangeInventorySchema>
+export type AdminChangeInventoryDto = z.infer<typeof adminChangeInventorySchema>
