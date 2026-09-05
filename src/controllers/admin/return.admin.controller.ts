@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminNoteSchemaDto, CancelReturnReasonSchemaDto, ReturnIdSchemaDto, ReturnRequestQSDto, ReturnTrackingCodeSchemaDto, ReviewReturnItemsSchemaDto } from "../../validation/return.validation.js";
+import { AdminNoteDto, CancelReturnReasonDto, ReturnIdDto, ReturnRequestQSDto, ReturnTrackingCodeDto, ReviewReturnItemsDto } from "../../validation/return.validation.js";
 import adminReturnService from "../../services/admin/return.admin.service.js";
 
 class AdminReturnController {
@@ -11,7 +11,7 @@ class AdminReturnController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get All Return Requests',
+                msg : 'All Return Requests Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -21,12 +21,12 @@ class AdminReturnController {
 
     async getReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const { returnId } = req.validated.params as ReturnIdDto
             const result = await adminReturnService.getReturnRequest(returnId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Return Request',
+                msg : 'Return Request Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -36,15 +36,15 @@ class AdminReturnController {
 
     async reviewReturnItems (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
-            const reviewData = req.validated.body as ReviewReturnItemsSchemaDto
+            const { returnId } = req.validated.params as ReturnIdDto
+            const reviewData = req.validated.body as ReviewReturnItemsDto
             const adminId = req.user!.userId
-            await adminReturnService.reviewReturnItems(returnId, adminId, reviewData)
+            const result = await adminReturnService.reviewReturnItems(returnId, adminId, reviewData)
 
             res.status(200).json({
                 success : true,
-                msg : 'Review Return Items',
-                data : {}
+                msg : 'Return Items Successfully Checked',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -53,14 +53,14 @@ class AdminReturnController {
 
     async finalizeReturn (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
-            const { adminNote } = req.validated.body as AdminNoteSchemaDto
+            const { returnId } = req.validated.params as ReturnIdDto
+            const { adminNote } = req.validated.body as AdminNoteDto
             const adminId = req.user!.userId
-            const result = await adminReturnService.finalizeReturn(returnId, adminId, adminNote)
+            const result = await adminReturnService.finalizeReturn(returnId, adminId, adminNote ?? null, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Finalize Return Request',
+                msg : 'Return Request Successfully Finalized',
                 data : result
             })
         } catch (error) {
@@ -70,15 +70,15 @@ class AdminReturnController {
 
     async adminChangeTrackingCode (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
-            const { trackingCode } = req.validated.body as ReturnTrackingCodeSchemaDto
+            const { returnId } = req.validated.params as ReturnIdDto
+            const { trackingCode, reason } = req.validated.body as ReturnTrackingCodeDto
             const adminId = req.user!.userId
-            await adminReturnService.adminChangeTrackingCode(returnId, adminId, trackingCode)
+            await adminReturnService.adminChangeTrackingCode(returnId, adminId, trackingCode, reason ?? null, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Admin Change Return Tracking Code',
-                data : {}
+                msg : 'Return Tracking Code Successfully Changed',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -87,14 +87,14 @@ class AdminReturnController {
 
     async verifyReturnedItems (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
+            const { returnId } = req.validated.params as ReturnIdDto
             const adminId = req.user!.userId
-            await adminReturnService.verifyReturnedItems(returnId, adminId)
+            await adminReturnService.verifyReturnedItems(returnId, adminId, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Verify Return Process',
-                data : {}
+                msg : 'Return Process Verified Successfully',
+                data : null
             })
         } catch (error) {
             next(error)
@@ -103,15 +103,15 @@ class AdminReturnController {
 
     async cancelReturnRequest (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { returnId } = req.validated.params as ReturnIdSchemaDto
-            const { reason } = req.validated.body as CancelReturnReasonSchemaDto
+            const { returnId } = req.validated.params as ReturnIdDto
+            const { reason } = req.validated.body as CancelReturnReasonDto
             const adminId = req.user!.userId
-            await adminReturnService.cancelReturnRequest(returnId, adminId, reason)
+            await adminReturnService.cancelReturnRequest(returnId, adminId, reason, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Admin Cancel Return Request',
-                data : {}
+                msg : 'Return Request Successfully Canceled',
+                data : null
             })
         } catch (error) {
             next(error)

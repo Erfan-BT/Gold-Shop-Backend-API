@@ -243,12 +243,15 @@ class ReturnRepository {
 
     // --- Admin ---
     async getAllReturnRequests (options : FindAndCountOptions)
-    {
+    : Promise<{
+        rows: ReturnRequest[];
+        count: number;
+    }> {
         return await ReturnRequest.findAndCountAll(options)
     }
 
     async getReturnRequest (returnId : number)
-    {
+    : Promise<ReturnRequest | null> {
         return await ReturnRequest.findOne({
             where : {
                 id : returnId
@@ -263,8 +266,14 @@ class ReturnRepository {
                 'refundAmount',
                 'refundStatus',
                 'returnTrackingCode',
+                'receivedBy',
+                'receivedAt',
                 'resolvedAt',
+                'canceledBy',
+                'canceledAt',
+                'cancelReason',
                 'createdAt',
+                'updatedAt',
             ],
             include : [
                 {
@@ -273,6 +282,7 @@ class ReturnRepository {
                     required : true,
                     attributes : [
                         'id',
+                        'returnRequestId',
                         'orderItemId',
                         'reason',
                         'description',
@@ -280,6 +290,8 @@ class ReturnRepository {
                         'refundAmount',
                         'status',
                         'adminNote',
+                        'reviewedBy',
+                        'reviewedAt',
                         'createdAt',
                     ],
                     include : [
@@ -337,7 +349,7 @@ class ReturnRepository {
     }
     
     async reviewReturnItem (returnId : number, itemId : number, adminId : number, status : ReturnItemStatus, refundAmount : number, adminNote : string | null, transaction : Transaction)
-    {
+    : Promise<boolean> {
         const [rows] = await ReturnItem.update({
             status,
             refundAmount,
@@ -354,11 +366,11 @@ class ReturnRepository {
         return rows === 1
     }
     
-    async finalizeReturnRequest (returnId : number, adminId : number, status : ReturnStatus, refundAmount : number, adminNote ?: string)
-    {
+    async finalizeReturnRequest (returnId : number, adminId : number, status : ReturnStatus, refundAmount : number, adminNote : string | null, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await ReturnRequest.update({
             status,
-            adminNote : adminNote ?? null,
+            adminNote,
             reviewedBy : adminId,
             reviewedAt : new Date(),
             refundAmount,
@@ -367,13 +379,14 @@ class ReturnRepository {
                 id : returnId,
                 status : ReturnStatus.PENDING,
                 refundStatus : RefundStatus.PENDING
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async adminChangeTrackingCode (returnId : number, returnTrackingCode : string)
-    {
+    async adminChangeTrackingCode (returnId : number, returnTrackingCode : string, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await ReturnRequest.update({
             returnTrackingCode
         }, {
@@ -385,13 +398,14 @@ class ReturnRepository {
                         ReturnStatus.PARTIALLY_APPROVED
                     ]
                 }
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
     async receiveReturnItems (returnId : number, adminId : number, transaction : Transaction)
-    {
+    : Promise<boolean> {
         const [rows] = await ReturnRequest.update({
             status : ReturnStatus.RECEIVED,
             receivedBy : adminId,
@@ -412,7 +426,7 @@ class ReturnRepository {
     }
 
     async completeReturn (returnId : number, transaction : Transaction)
-    {
+    : Promise<boolean> {
         const [rows] = await ReturnRequest.update({
             status : ReturnStatus.COMPLETED,
             refundStatus : RefundStatus.COMPLETED,
@@ -428,8 +442,8 @@ class ReturnRepository {
         return rows === 1
     }
 
-    async adminCancelReturn (returnId : number, adminId : number, reason : string)
-    {
+    async adminCancelReturn (returnId : number, adminId : number, reason : string, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await ReturnRequest.update({
             status : ReturnStatus.CANCELED,
             refundStatus : RefundStatus.CANCELED,
@@ -447,7 +461,8 @@ class ReturnRepository {
                     ]
                 },
                 returnTrackingCode : null,
-            }
+            },
+            transaction
         })
         return rows === 1
     }

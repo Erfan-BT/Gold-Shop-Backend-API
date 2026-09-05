@@ -133,31 +133,34 @@ export async function initRefundWorker() {
                     const returnPayment = await paymentRepository.getPayment(returnOrderId, null)
                     if (!returnPayment)
                         throw new ConflictError('Payment Is Not Refundable')
+
                     if (returnPayment.refundedAt || returnPayment.refundAmount !== null)
                         throw new ConflictError("Payment Already Refunded")
+
                     // Lock Payment
                     const lock = await sequelize.transaction(async t => {
                         return await paymentRepository.changePaymentStatus(returnPayment.id, PaymentStatus.REFUND_PENDING, PaymentStatus.REFUND_PROCESSING, t)
                     })
                     if (!lock)
                         return
+
                     // Get Return Request
                     const returnRequest = await returnRepository.getReturnRequest(returnId)
-
                     if (!returnRequest)
-                        throw new NotFoundError('Return Request Not Found')
+                        throw new NotFoundError(`Return Request Not Found { ID : ${returnId} }`)
 
                     if (returnRequest.orderId !== returnOrderId)
-                        throw new ConflictError('Return Request Does Not Belong To Order')
+                        throw new BadRequestError('Return Request Does Not Belong To Order')
 
                     if (returnRequest.status !== ReturnStatus.RECEIVED)
-                        throw new ConflictError('Return Request Is Not Ready For Refund')
+                        throw new BadRequestError('Return Request Is Not Ready For Refund')
 
                     if (returnRequest.refundStatus !== RefundStatus.PENDING)
-                        throw new ConflictError('Return Refund Is Not Pending')
+                        throw new BadRequestError('Return Refund Is Not Pending')
 
                     if (returnRequest.refundAmount !== refundAmount)
                         throw new ConflictError('Refund Amount Mismatch')
+
                     try {
                         // Refund
                         const description = `Refund For Order ${returnOrderId} And Payment ${returnPayment.id} And Return Request ${returnId} And Amount ${refundAmount}`
@@ -183,17 +186,10 @@ export async function initRefundWorker() {
                         })
                         throw error
                     }
-
-
                 
                 default:
                     break;
-
-
             }
-            
-
-            
         },
         {
             connection: await connectBullmqRedis(),

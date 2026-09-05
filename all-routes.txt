@@ -152,11 +152,11 @@ GET    | admin/payments/:paymentId              |     Admin    |       -        
 ________________________________________________________________________________________________________________
 GET    | admin/returns                          |     Admin    | .............. |   -
 GET    | admin/returns/:returnId                |     Admin    |       -        |   -
-PATCH  | admin/returns/:returnId/review         |     Admin    |       -        | items:{itemId, status, adminNote, refundAmount}[]
-PATCH  | admin/returns/:returnId/finalize       |     Admin    |       -        | adminNote?
+POST   | admin/returns/:returnId/review         |     Admin    |       -        | items:{itemId, status, adminNote, refundAmount}[]
+POST   | admin/returns/:returnId/finalize       |     Admin    |       -        | adminNote?
 PATCH  | admin/returns/:returnId/tracking-code  |     Admin    |       -        | trackingCode
-PATCH  | admin/returns/:returnId/verify         |     Admin    |       -        |   -
-PATCH  | admin/returns/:returnId/cancel         |     Admin    |       -        | reason
+POST   | admin/returns/:returnId/verify         |     Admin    |       -        |   -
+POST   | admin/returns/:returnId/cancel         |     Admin    |       -        | reason
 ________________________________________________________________________________________________________________
 GET    | admin/settings                         |     Owner    | .............. |   -
 GET    | admin/settings/:settingId              |     Owner    |       -        |   -

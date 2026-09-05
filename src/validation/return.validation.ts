@@ -120,7 +120,7 @@ export const reviewReturnItemsSchema = z.object({
         ]),
         refundAmount : z.coerce.number().nonnegative().optional(),
         adminNote : z.string().trim().max(200).optional()
-    })).min(1)
+    })).min(1, 'At Least A Item Is Required')
 })
 .superRefine((data, ctx) => {
     data.items.forEach((item, index) => {
@@ -143,7 +143,7 @@ export const reviewReturnItemsSchema = z.object({
             ctx.addIssue({
                 code: z.ZodIssueCode.custom,
                 path: ['items', index, 'refundAmount'],
-                message: 'Rejected Item Cannot Have Refund Amount'
+                message: 'Rejected Item Can Not Have Refund Amount'
             })
         }
     })
@@ -155,6 +155,7 @@ export const adminNoteSchema = z.object({
 
 export const returnTrackingCodeSchema = z.object({
     trackingCode : z.string().trim().min(1, 'At Least A Character Is Required').max(100, 'Max : 100 Characters'),
+    reason : z.string().trim().max(200, 'Max : 200 Characters').optional()
 })
 
 export const cancelReturnReasonSchema = z.object({
