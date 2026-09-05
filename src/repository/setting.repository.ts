@@ -1,6 +1,6 @@
-import { Op } from "sequelize"
+import { Op, Transaction } from "sequelize"
 import Setting from "../models/setting.model.js"
-import { CreateSettingSchemaDto, SettingQSDto } from "../validation/setting.validation.js"
+import { CreateSettingDto, SettingQSDto } from "../validation/setting.validation.js"
 
 class SettingRepository {
     async getAllSettings (qs : SettingQSDto)
@@ -80,7 +80,7 @@ class SettingRepository {
         })
     }
 
-    async createSetting (settingData : CreateSettingSchemaDto)
+    async createSetting (settingData : CreateSettingDto, transaction : Transaction)
     : Promise<Setting> {
         return await Setting.create({
             key : settingData.key,
@@ -88,21 +88,24 @@ class SettingRepository {
             type : settingData.type,
             group : settingData.group,
             isPublic : settingData.isPublic,
-            description : settingData.description ?? null
+            description : settingData.description ?? ''
+        }, { 
+            transaction
         })
     }
 
-    async changeSetting (settingId : number, data : Partial<Pick<Setting, 'key' | 'value' | 'type' | 'group' | 'description'>>)
+    async changeSetting (settingId : number, data : Partial<Pick<Setting, 'key' | 'value' | 'type' | 'group' | 'description'>>, transaction : Transaction)
     : Promise<boolean> {
         const [rows] = await Setting.update(data,{
             where : {
                 id : settingId
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async changeSettingStatus (settingId : number, currentStatus : boolean)
+    async changeSettingStatus (settingId : number, currentStatus : boolean, transaction : Transaction)
     : Promise<boolean> {
         const [rows] = await Setting.update({
             isPublic : !currentStatus
@@ -110,12 +113,13 @@ class SettingRepository {
             where : {
                 id : settingId,
                 isPublic : currentStatus
-            }
+            },
+            transaction
         })
         return rows === 1
     }
 
-    async deleteSetting (settingId : number)
+    async deleteSetting (settingId : number, transaction : Transaction)
     : Promise<boolean> {
         const rows = await Setting.destroy({
             where : {

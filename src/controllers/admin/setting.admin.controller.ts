@@ -1,17 +1,17 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
 import adminSettingService from "../../services/admin/setting.admin.service.js";
-import { ChangeSettingSchemaDto, CreateSettingSchemaDto, SettingIdSchemaDto, SettingQSDto } from "../../validation/setting.validation.js";
+import { ChangeSettingDto, CreateSettingDto, SettingIdDto, SettingQSDto } from "../../validation/setting.validation.js";
 
 class AdminSettingController {
     async getAllSettings (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { settingId } = req.validated.params as SettingIdSchemaDto
-            const result = await adminSettingService.getSetting(settingId)
+            const qs = req.validated.query as SettingQSDto
+            const result = await adminSettingService.getAllSettings(qs)
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Setting',
+                msg : 'All Setting Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -21,12 +21,12 @@ class AdminSettingController {
     
     async getSetting (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const qs = req.validated.query as SettingQSDto
-            const result = await adminSettingService.getAllSettings(qs)
+            const { settingId } = req.validated.params as SettingIdDto
+            const result = await adminSettingService.getSetting(settingId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Get All Settings',
+                msg : 'Setting Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -36,12 +36,13 @@ class AdminSettingController {
 
     async createSetting (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const settingData = req.validated.body as CreateSettingSchemaDto
-            const result = await adminSettingService.createSetting(settingData)
+            const settingData = req.validated.body as CreateSettingDto
+            const adminId = req.user!.userId
+            const result = await adminSettingService.createSetting(settingData, adminId)
 
             res.status(201).json({
                 success : true,
-                msg : 'Create Setting',
+                msg : 'Setting Successfully Created',
                 data : result
             })
         } catch (error) {
@@ -51,14 +52,15 @@ class AdminSettingController {
 
     async changeSetting (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const settingData = req.validated.body as ChangeSettingSchemaDto
-            const { settingId } = req.validated.params as SettingIdSchemaDto
-            await adminSettingService.changeSetting(settingId, settingData)
+            const settingData = req.validated.body as ChangeSettingDto
+            const { settingId } = req.validated.params as SettingIdDto
+            const adminId = req.user!.userId
+            const result = await adminSettingService.changeSetting(settingId, settingData, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Setting',
-                data : {}
+                msg : 'Setting Successfully Changed',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -67,13 +69,16 @@ class AdminSettingController {
 
     async changeSettingStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { settingId } = req.validated.params as SettingIdSchemaDto
-            await adminSettingService.changeSettingStatus(settingId)
+            const { settingId } = req.validated.params as SettingIdDto
+            const adminId = req.user!.userId
+            const result = await adminSettingService.changeSettingStatus(settingId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Setting Status',
-                data : {}
+                msg : 'Setting Visibility Status Successfully Changed',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)
@@ -82,13 +87,14 @@ class AdminSettingController {
 
     async deleteSetting (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { settingId } = req.validated.params as SettingIdSchemaDto
-            await adminSettingService.deleteSetting(settingId)
+            const { settingId } = req.validated.params as SettingIdDto
+            const adminId = req.user!.userId
+            await adminSettingService.deleteSetting(settingId, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Setting',
-                data : {}
+                msg : 'Setting Deleted Successfully',
+                data : null
             })
         } catch (error) {
             next(error)

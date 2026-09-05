@@ -165,7 +165,7 @@ PATCH  | admin/settings/:settingId              |     Owner    |       -        
 PATCH  | admin/settings/:settingId/visibility   |     Owner    |       -        |   -
 DELETE | admin/settings/:settingId              |     Owner    |       -        |   -
 ________________________________________________________________________________________________________________
-GET    | /admin/audits                          |     Owner    | .............. |   -
-GET    | /admin/audits/:auditId                 |     Owner    |       -        |   -
+GET    | /admin/audits                          |     Admin    | .............. |   -
+GET    | /admin/audits/:auditId                 |     Admin    |       -        |   -
 ________________________________________________________________________________________________________________
 stats هارو بررسی نمیکنم فعلا!!!

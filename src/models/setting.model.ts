@@ -20,7 +20,7 @@ class Setting extends Model<
     declare group: SettingGroup;
     declare isPublic: boolean;
 
-    declare description: CreationOptional<string | null>;
+    declare description: string;
     declare createdAt: CreationOptional<Date>;
 }
 
@@ -52,7 +52,8 @@ Setting.init(
             allowNull: false
         },
         description: {
-            type: DataTypes.TEXT
+            type: DataTypes.TEXT,
+            allowNull : false
         },
         createdAt: {
             type: DataTypes.DATE
