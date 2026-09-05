@@ -53,3 +53,14 @@ export enum AdminAuditEntity {
     INVENTORY = 'INVENTORY',
     GOLD_PRICE = 'GOLD_PRICE'
 }
+
+export enum AdminAuditSort {
+    NEWEST = 'NEWEST',
+    OLDEST = 'OLDEST',
+    ACTION_ASC = 'ACTION_ASC',
+    ACTION_DESC = 'ACTION_DESC',
+    ENTITY_TYPE_ASC = 'ENTITY_TYPE_ASC',
+    ENTITY_TYPE_DESC = 'ENTITY_TYPE_DESC',
+    ADMIN_ID_ASC = 'ADMIN_ID_ASC',
+    ADMIN_ID_DESC = 'ADMIN_ID_DESC',
+}
