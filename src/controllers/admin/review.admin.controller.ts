@@ -1,7 +1,8 @@
 import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
-import { AdminChangeReviewSchemaDto, AdminReviewQSDto, ReviewIdSchemaDto } from "../../validation/review.validation.js";
+import { AdminChangeReviewDto, AdminReviewQSDto, ReviewIdDto } from "../../validation/review.validation.js";
 import adminReviewService from "../../services/admin/review.admin.service.js";
+import { ReasonDto } from "../../validation/adminAudit.validation.js";
 
 class AdminReviewController {
     async getAllReviews (req : AuthRequest, res : Response, next : NextFunction) {
@@ -11,7 +12,7 @@ class AdminReviewController {
 
             res.status(200).json({
                 success : true,
-                msg : 'Get All Reviews',
+                msg : 'All Reviews Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -21,12 +22,12 @@ class AdminReviewController {
 
     async getReview (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { reviewId } = req.validated.params as ReviewIdSchemaDto
+            const { reviewId } = req.validated.params as ReviewIdDto
             const result = await adminReviewService.getReview(reviewId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Get Review',
+                msg : 'Review Successfully Found',
                 data : result
             })
         } catch (error) {
@@ -36,14 +37,15 @@ class AdminReviewController {
 
     async changeReview (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { reviewId } = req.validated.params as ReviewIdSchemaDto
-            const reviewData = req.validated.body as AdminChangeReviewSchemaDto
-            await adminReviewService.changeReview(reviewId, reviewData)
+            const { reviewId } = req.validated.params as ReviewIdDto
+            const reviewData = req.validated.body as AdminChangeReviewDto
+            const adminId = req.user!.userId
+            const result = await adminReviewService.changeReview(reviewId, reviewData, adminId, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Review',
-                data : {}
+                msg : 'Review Changed Successfully',
+                data : result
             })
         } catch (error) {
             next(error)
@@ -52,13 +54,16 @@ class AdminReviewController {
 
     async changeReviewStatus (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { reviewId } = req.validated.params as ReviewIdSchemaDto
-            await adminReviewService.changeReviewStatus(reviewId)
+            const { reviewId } = req.validated.params as ReviewIdDto
+            const adminId = req.user!.userId
+            const result = await adminReviewService.changeReviewStatus(reviewId, adminId, req.ip ?? '-0-')
 
             res.status(200).json({
                 success : true,
-                msg : 'Change Review Status',
-                data : {}
+                msg : 'Review Status Changed Successfully',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)
@@ -67,14 +72,15 @@ class AdminReviewController {
 
     async deleteReview (req : AuthRequest, res : Response, next : NextFunction) {
         try {
-            const { reviewId } = req.validated.params as ReviewIdSchemaDto
+            const { reviewId } = req.validated.params as ReviewIdDto
+            const { reason } = req.validated.body as ReasonDto
             const adminId = req.user!.userId
-            await adminReviewService.deleteReview(reviewId, adminId)
+            await adminReviewService.deleteReview(reviewId, reason, adminId)
 
             res.status(200).json({
                 success : true,
-                msg : 'Delete Review',
-                data : {}
+                msg : 'Review Deleted Successfully',
+                data : null
             })
         } catch (error) {
             next(error)

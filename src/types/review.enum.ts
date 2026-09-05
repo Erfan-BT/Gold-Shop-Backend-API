@@ -1,6 +1,6 @@
 export enum ReviewSort {
-    NEWEST = 'newest',
-    OLDEST = 'oldest',
-    RATING_ASC = 'ratingAsc',
-    RATING_DESC = 'ratingDesc',
+    NEWEST = 'NEWEST',
+    OLDEST = 'OLDEST',
+    RATING_ASC = 'RATING_ASC',
+    RATING_DESC = 'RATING_DESC',
 }

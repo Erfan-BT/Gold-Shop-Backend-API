@@ -1,4 +1,4 @@
-import { FindAndCountOptions } from "sequelize";
+import { FindAndCountOptions, Transaction } from "sequelize";
 import Review from "../models/review.model.js";
 import { Product, ProductVariant } from "../models/product.model.js";
 import { ChangeReviewDto, ReviewDto } from "../validation/review.validation.js";
@@ -96,12 +96,15 @@ class ReviewRepository {
 
     // ----- Admin -----
     async getAllReviews (options : FindAndCountOptions)
-    {
+    : Promise<{
+        rows: Review[];
+        count: number;
+    }> {
         return await Review.findAndCountAll(options)
     }
 
     async getReview (reviewId : number)
-    {
+    : Promise<Review | null> {
         return await Review.findOne({
             where : {
                 id : reviewId
@@ -122,24 +125,38 @@ class ReviewRepository {
                 {
                     model : User,
                     as : 'user',
-                    attributes : ['id', 'name'],
+                    attributes : ['id', 'name', 'email'],
+                },
+                {
+                    model : ProductVariant,
+                    as : 'variant',
+                    attributes : [
+                        'productId',
+                        'weight',
+                        'karat',
+                        'stoneType',
+                        'color',
+                        'currentPrice',
+                        'isActive',
+                        'createdAt',
+                    ]
                 }
             ]
         })
     }
 
-    async adminChangeReview (reviewId : number, data : Partial<Pick<Review, 'comment' | 'rating' | 'adminReply' | 'repliedAt'>>)
-    {
+    async adminChangeReview (reviewId : number, data : Partial<Pick<Review, 'comment' | 'rating' | 'adminReply' | 'repliedAt'>>, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await Review.update(data, {
             where : {
                 id : reviewId
-            }
+            }, transaction
         })
         return rows === 1
     }
 
-    async changeReviewStatus (reviewId : number, currentStatus : boolean)
-    {
+    async changeReviewStatus (reviewId : number, currentStatus : boolean, transaction : Transaction)
+    : Promise<boolean> {
         const [rows] = await Review.update({
             isApproved : !currentStatus
         }, {
@@ -151,12 +168,13 @@ class ReviewRepository {
         return rows === 1
     }
 
-    async adminDeleteReview (reviewId : number)
-    {
+    async adminDeleteReview (reviewId : number, transaction : Transaction)
+    : Promise<boolean> {
         const rows = await Review.destroy({
             where : {
                 id : reviewId
-            }
+            },
+            transaction
         })
         return rows === 1
     }

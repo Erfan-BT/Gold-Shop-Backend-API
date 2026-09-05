@@ -25,7 +25,19 @@ export class AdminReviewQueryBuilder {
             limit: qs.limit,
             offset: (qs.page - 1) * qs.limit,
             distinct: true,
-            subQuery: false
+            subQuery: false,
+            attributes : [
+                'id',
+                'userId',
+                'varianId',
+                'rating',
+                'comment',
+                'isApproved',
+                'isVerifiedPurchase',
+                'adminReply',
+                'repliedAt',
+                'createdAt'
+            ],
         };
     }
 

@@ -145,7 +145,7 @@ GET    | admin/reviews                          |     Admin    | .............. 
 GET    | admin/reviews/:reviewId                |     Admin    |       -        |   -
 PATCH  | admin/reviews/:reviewId/               |     Admin    |       -        | reting, comment, adminReplay
 PATCH  | admin/reviews/:reviewId/status         |     Admin    |       -        |   -
-DELETE | admin/reviews/:reviewId                |     Owner    |       -        |   -
+DELETE | admin/reviews/:reviewId                |     Owner    |       -        | reason
 ________________________________________________________________________________________________________________
 GET    | admin/payments                         |     Admin    | .............. |   -
 GET    | admin/payments/:paymentId              |     Admin    |       -        |   -

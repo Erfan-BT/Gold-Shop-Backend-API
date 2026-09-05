@@ -67,9 +67,10 @@ export const adminReviewQS = z.object({
 })
 
 export const adminChangeReviewSchema = z.object({
-    rating : z.coerce.number().int().min(0).max(5).optional() ,
-    comment : z.string().trim().min(1).optional() ,
-    adminReply : z.string().trim().nullable().optional() ,
+    rating : z.coerce.number().int().nonnegative().max(5).optional(),
+    comment : z.string().trim().min(1, 'At Least A Character Is Required').optional(),
+    adminReply : z.string().trim().nullable().optional(),
+    reason : z.string().trim().min(1, 'At Least A Character Is Required').optional()
 })
 .superRefine ((data, ctx) => {
     if (
@@ -79,7 +80,7 @@ export const adminChangeReviewSchema = z.object({
     ) {
         ctx.addIssue({
             code : z.ZodIssueCode.custom,
-            message : 'All Params Can Not Empty'
+            message: "At Least One Of The Fields Is Required"
         })
     }
 })
@@ -93,5 +94,5 @@ export type ReviewDto = z.infer<typeof reviewSchema>
 export type ChangeReviewDto = z.infer<typeof changeReviewSchema>
 export type ProductSlugReviewIdDto = z.infer<typeof productSlugReviewIdSchema>
 export type AdminReviewQSDto = z.infer<typeof adminReviewQS>
-export type AdminChangeReviewSchemaDto = z.infer<typeof adminChangeReviewSchema> 
-export type ReviewIdSchemaDto = z.infer<typeof reviewIdSchema>
+export type AdminChangeReviewDto = z.infer<typeof adminChangeReviewSchema> 
+export type ReviewIdDto = z.infer<typeof reviewIdSchema>
