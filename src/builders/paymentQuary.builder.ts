@@ -25,14 +25,19 @@ export class PaymentQueryBuilder {
                 'amount',
                 'transactionId',
                 'authorityCode',
+                'referenceCode',
                 'cardPan',
                 'status',
+                'ipAddress',
                 'refundAmount',
                 'refundReason',
+                'terminal_id',
                 'refundId',
+                'returnRequestId',
+                'bankResponse',
                 'paidAt',
                 'refundedAt',
-                'updatedAt'
+                'updatedAt',
             ],
             include : qs.q
                 ? [
@@ -40,6 +45,7 @@ export class PaymentQueryBuilder {
                         model : OrderModel,
                         as : 'order',
                         attributes : [],
+                        required : true,
                         where : {
                             orderNumber: {
                                 [Op.like]: `%${qs.q}%`

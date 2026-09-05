@@ -1,20 +1,29 @@
 import { PaymentQueryBuilder } from "../../builders/paymentQuary.builder.js";
+import Payment from "../../models/payment.model.js";
 import paymentRepository from "../../repository/payment.repository.js";
 import { NotFoundError } from "../../utils/appError.js";
 import { PaymentQSDto } from "../../validation/payment.validation.js";
 
 class AdminPaymentService {
     async getAllPayments (qs : PaymentQSDto)
-    {
+    : Promise<{
+        rows: Payment[];
+        count: number;
+    }> {
+        // Create Options
         const options = PaymentQueryBuilder.build(qs)
+
+        // Get Payments
         return await paymentRepository.getAllPayments(options)
     }
 
     async getPayment (paymentId : number)
-    {
+    : Promise<Payment> {
+        // Get Payment
         const payment = await paymentRepository.adminGetPayment(paymentId)
         if (!payment)
             throw new NotFoundError(`Payment Not Found { ID : ${paymentId} }`)
+        
         return payment
     }
 }

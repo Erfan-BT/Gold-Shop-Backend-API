@@ -74,12 +74,15 @@ class PaymentRepository {
 
     // --- Admin ---
     async getAllPayments (options : FindAndCountOptions)
-    {
+    : Promise<{
+        rows: Payment[];
+        count: number;
+    }> {
         return await Payment.findAndCountAll(options)
     }
 
     async adminGetPayment (paymentId : number)
-    {
+    : Promise<Payment | null> {
         return await Payment.findOne({
             where : {
                 id : paymentId
@@ -98,6 +101,7 @@ class PaymentRepository {
                 'refundReason',
                 'terminal_id',
                 'refundId',
+                'returnRequestId',
                 'bankResponse',
                 'paidAt',
                 'refundedAt',

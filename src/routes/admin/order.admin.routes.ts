@@ -7,8 +7,8 @@ import { RolesTitle } from '../../types/role.enum.js'
 
 const router = express.Router()
 
-router.get('/', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.SUPPORT]), validate({ query : ordersAdminQS }), adminOrderController.getOrders)
-router.get('/:orderNumber', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.SUPPORT]), validate({ params : orderNumberSchema }), adminOrderController.getOrder)
+router.get('/', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.FINANCE, RolesTitle.SUPPORT]), validate({ query : ordersAdminQS }), adminOrderController.getOrders)
+router.get('/:orderNumber', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.FINANCE, RolesTitle.SUPPORT]), validate({ params : orderNumberSchema }), adminOrderController.getOrder)
 router.post('/:orderNumber/process', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.SUPPORT]), validate({ params : orderNumberSchema }), adminOrderController.setOrderStatusProcess)
 router.post('/:orderNumber/ship', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.SUPPORT, RolesTitle.INVENTORY]), validate({ params : orderNumberSchema, body : trackingCodeSchema }), adminOrderController.setOrderStatusShipped)
 router.post('/:orderNumber/deliver', roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.SUPPORT]), validate({ params : orderNumberSchema }), adminOrderController.setOrderStatusDelivered)

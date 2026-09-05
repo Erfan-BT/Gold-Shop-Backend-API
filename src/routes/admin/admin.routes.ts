@@ -26,7 +26,7 @@ router.use('/coupons', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTi
 router.use('/gold-prices', authMiddleware, roleMiddleware([RolesTitle.OWNER]), PricesAdminRoutes)
 router.use('/products', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.INVENTORY, RolesTitle.SUPPORT]), ProductAdminRoutes)
 router.use('/reviews', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.SUPPORT]), ReviewAdminRoutes)
-router.use('/payments', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), PaymentAdminRoutes)
+router.use('/payments', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN, RolesTitle.ORDERMANAGER, RolesTitle.FINANCE]), PaymentAdminRoutes)
 router.use('/returns', authMiddleware, roleMiddleware([RolesTitle.OWNER, RolesTitle.ADMIN]), ReturnAdminRoutes)
 router.use('/settings', authMiddleware, roleMiddleware([RolesTitle.OWNER]), SettingAdminRoutes)
 
