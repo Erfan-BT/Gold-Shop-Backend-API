@@ -163,7 +163,6 @@ export const createVariantSchema = z.object({
     stoneType : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Character'),
     color : z.string().trim().min(1, 'At Least A Character Is Required').max(30, 'Max : 30 Character'),
     sku : z.string().trim().min(1, 'At Least A Character Is Required').max(50, 'Max : 50 Character'),
-    isActive : z.coerce.boolean().default(true),
     quantity : z.coerce.number().int().nonnegative().default(0)
 })
 

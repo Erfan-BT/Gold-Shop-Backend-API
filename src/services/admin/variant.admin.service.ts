@@ -1,10 +1,12 @@
+import { Op } from "sequelize"
 import sequelize from "../../configs/sequelize.config.js"
 import { ProductVariant } from "../../models/product.model.js"
 import adminAuditLogRepository from "../../repository/adminAuditLog.repository.js"
 import inventoryRepository from "../../repository/inventory.repository.js"
+import pricingRepository from "../../repository/pricing.repository.js"
 import productRepository from "../../repository/product.repository.js"
 import { AdminAuditAction, AdminAuditEntity } from "../../types/adminAuditLog.enum.js"
-import { ConflictError, NotFoundError } from "../../utils/appError.js"
+import { BadRequestError, ConflictError, NotFoundError } from "../../utils/appError.js"
 import { ChangeVariantDto, CreateVariantDto } from "../../validation/product.validation.js"
 
 class AdminVariantService {
@@ -155,6 +157,32 @@ class AdminVariantService {
         if (!variant)
             throw new NotFoundError(`Product Variant Not Found { ID : ${variantId} }`)
 
+        // Check Variant Pricing
+        if (!variant.isActive) {
+            const now = new Date()
+            const [pricing] = await pricingRepository.getVariantPricing(variantId, {
+                isActive : true,
+                [Op.or] : [
+                    {
+                        validTo : {
+                            [Op.gte]: now
+                        }
+                    },
+                    {
+                        validTo : {
+                            [Op.is]: null
+                        }
+                    }
+                ],
+                validFrom : {
+                    [Op.lte] : now
+                }
+            })
+
+            if (!pricing)
+                throw new BadRequestError('To Be Activated, Product Variant Must Have An Active Pricing')
+        }
+        
         await sequelize.transaction(async t => {
             // Change Status
             if (!(await productRepository.changeVariantStatus(productId, variantId, variant.isActive, t)))

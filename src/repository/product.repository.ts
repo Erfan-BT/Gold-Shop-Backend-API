@@ -409,7 +409,7 @@ class ProductRepository {
             stoneType : variantData.stoneType ,
             color : variantData.color ,
             sku : variantData.sku ,
-            isActive :variantData.isActive ,
+            isActive : false ,
             currentPrice : 0,
             soldCount : 0,
             productId,
