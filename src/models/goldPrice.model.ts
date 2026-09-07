@@ -6,6 +6,7 @@ import {
     Model
 } from "sequelize";
 import sequelize from "../configs/sequelize.config.js";
+import { FluctuationStatus } from "../types/goldPrice.enum.js";
 
 class GoldPrice extends Model<
     InferAttributes<GoldPrice>,
@@ -16,6 +17,7 @@ class GoldPrice extends Model<
     declare effectiveDate: CreationOptional<Date>;
     declare isAutoUpdateEnabled: boolean;
     declare source: CreationOptional<string>;
+    declare fluctuationStatus : FluctuationStatus;
 }
 
 GoldPrice.init(
@@ -39,6 +41,11 @@ GoldPrice.init(
         source : {
             type : DataTypes.STRING(),
             defaultValue: "external-api"
+        },
+        fluctuationStatus : {
+            type : DataTypes.ENUM(...Object.values(FluctuationStatus)),
+            defaultValue : FluctuationStatus.LOW,
+            allowNull : false
         }
     },
     {

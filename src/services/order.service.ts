@@ -55,7 +55,7 @@ class OrderService {
                 throw new ConflictError('Not Enough Stock')
 
             // Pricing
-            const pricing = cartHelper.calculatePricing(item)
+            const pricing = await cartHelper.calculatePricing(item)
             if (!pricing)
                 throw new InternalServerError("Pricing Calculation Failed")
 

@@ -4,6 +4,7 @@ import adminAuditLogRepository from "../../repository/adminAuditLog.repository.j
 import goldPriceRepository from "../../repository/goldPrice.repository.js"
 import { AdminAuditAction, AdminAuditEntity } from "../../types/adminAuditLog.enum.js"
 import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../../utils/appError.js"
+import goldPriceService from "../goldPrice.service.js"
 
 class AdminGoldPriceService {
     async getPrice ()
@@ -94,9 +95,7 @@ class AdminGoldPriceService {
             throw new BadRequestError('Automatic Gold Price Update Is Disabled');
 
         // Get New Price By Api
-        const price = 1000
-        if (!price || price <= 0)
-            throw new InternalServerError("Invalid Gold Price");
+        const price = await goldPriceService.getNewPrice()
 
         await sequelize.transaction(async t => {
             // Change Price

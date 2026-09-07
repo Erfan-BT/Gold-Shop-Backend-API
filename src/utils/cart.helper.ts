@@ -1,16 +1,17 @@
 import { CartItem } from "../models/cart.model.js";
+import variantPriceService from "../services/variantPrice.service.js";
 import { CartItemDTO } from "../types/cart.type.js";
 import { Pricing } from "../types/order.type.js";
 
 class CartHelper {
-    toCartItemDTO (cartItem : CartItem) 
-    : {
+    async toCartItemDTO (cartItem : CartItem) 
+    : Promise<{
         cartItemDto : CartItemDTO,
         pricing : {
             subtotal : number;
             discountAmount : number
         }
-    } | null {
+    } | null> {
         const variant = cartItem.variant
         if (!variant
             || !variant.product
@@ -19,7 +20,7 @@ class CartHelper {
             )
             return null
         const image = variant.images[0]
-        const calculatePricing = this.calculatePricing(cartItem) 
+        const calculatePricing = await this.calculatePricing(cartItem) 
         if (!calculatePricing)
             return null
         const cartItemDto = {
@@ -49,14 +50,15 @@ class CartHelper {
         }        
     }
 
-    calculatePricing (cartItem : CartItem)
-    : Pricing | null {
+    async calculatePricing (cartItem : CartItem)
+    : Promise<Pricing | null> {
         const variant = cartItem.variant
         const inventory = variant?.inventory
         if (!variant || !inventory)
             return null
 
-        const unitPrice = variant.currentPrice
+        const unitPrice = await variantPriceService.calculateVariantPrice(variant.id)
+
         const activeDiscount = variant.discounts?.[0];
         const cartDiscount = activeDiscount
             ? {

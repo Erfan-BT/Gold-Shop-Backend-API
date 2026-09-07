@@ -5,6 +5,21 @@ export class RedisCache {
         const serialized = JSON.stringify(value)
         await redisClient.setEx(key, ttlSeconds, serialized)
     }
+
+    static async push(key : string, value : any) : Promise<void> {
+        const serialized = JSON.stringify(value)
+        await redisClient.lPush(key, serialized)
+    }
+
+    static async trim(key : string, start : number, stop : number) : Promise<void> {
+        await redisClient.lTrim(key, start, stop)
+    }
+
+    static async range<T>(key : string, start : number, stop : number) : Promise<T[] | null> {
+        const result = await redisClient.lRange(key, start, stop)
+        if (result.length === 0) return null
+        return result.map(item => JSON.parse(item)) as T[]
+    }
     
     static async get<T>(key : string) : Promise<T | null> {
         const data = await redisClient.get(key)

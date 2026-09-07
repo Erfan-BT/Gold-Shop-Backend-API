@@ -28,6 +28,6 @@ export function errorHandler(
     res.status(err.statusCode).json({
         success : false,
         msg : err.message,
-        data : {}
+        data : null
     })
 }

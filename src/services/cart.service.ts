@@ -26,7 +26,7 @@ class CartService {
         const cartItems = cart.items ?? []
         // Create Items & Calculate subtotal,discount
         for (const item of cartItems) {
-            const cartItem = cartHelper.toCartItemDTO(item)
+            const cartItem = await cartHelper.toCartItemDTO(item)
             // Add Item
             if (cartItem) {
                 items.push(cartItem.cartItemDto)

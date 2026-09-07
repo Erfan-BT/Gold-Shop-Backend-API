@@ -1,5 +1,6 @@
 import { Transaction } from "sequelize";
 import GoldPrice from "../models/goldPrice.model.js";
+import { FluctuationStatus } from "../types/goldPrice.enum.js";
 
 class GoldPriceRepository {
     async getPrice ()
@@ -12,10 +13,12 @@ class GoldPriceRepository {
         const [rows] = await GoldPrice.update({
             pricePerGram18k,
             effectiveDate : new Date(),
-            source
+            source,
+            isAutoUpdateEnabled : source === "admin" ? false : true
         },{
             where : {
-                id : 1
+                id : 1,
+                isAutoUpdateEnabled : source === "admin" ? false : true
             },
             transaction
         })
@@ -30,6 +33,20 @@ class GoldPriceRepository {
             where : {
                 id : 1,
                 isAutoUpdateEnabled : currentStatus
+            },
+            transaction
+        })
+        return rows === 1
+    }
+
+    async changeFluctuationStatus (currentStatus : FluctuationStatus, newStatus : FluctuationStatus, transaction : Transaction)
+    : Promise<boolean> {
+        const [rows] = await GoldPrice.update({
+            fluctuationStatus : newStatus
+        },{
+            where : {
+                id : 1,
+                fluctuationStatus : currentStatus
             },
             transaction
         })
