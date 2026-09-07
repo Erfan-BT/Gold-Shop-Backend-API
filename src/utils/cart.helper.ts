@@ -20,7 +20,7 @@ class CartHelper {
             )
             return null
         const image = variant.images[0]
-        const calculatePricing = await this.calculatePricing(cartItem) 
+        const [calculatePricing] = await this.calculatePricing(cartItem) ?? [null]
         if (!calculatePricing)
             return null
         const cartItemDto = {
@@ -51,13 +51,13 @@ class CartHelper {
     }
 
     async calculatePricing (cartItem : CartItem)
-    : Promise<Pricing | null> {
+    : Promise<[Pricing, number] | null> {
         const variant = cartItem.variant
         const inventory = variant?.inventory
         if (!variant || !inventory)
             return null
 
-        const unitPrice = await variantPriceService.calculateVariantPrice(variant.id)
+        const [unitPrice, goldPrice] = await variantPriceService.calculateVariantPrice(variant.id)
 
         const activeDiscount = variant.discounts?.[0];
         const cartDiscount = activeDiscount
@@ -78,7 +78,7 @@ class CartHelper {
         const discountAmount = discountPerItem * cartItem.quantity;
         const lineTotal = finalPrice * cartItem.quantity;
 
-        return {
+        return [{
             unitPrice,
             discount : cartDiscount,
             discountPerItem,
@@ -86,7 +86,7 @@ class CartHelper {
             subtotal,
             discountAmount,
             lineTotal
-        }
+        }, goldPrice]
     }
 }
 

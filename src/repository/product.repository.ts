@@ -159,6 +159,86 @@ class ProductRepository {
         })
     }
 
+    async getPriceBatch(lastId : number, batchSize : number)
+    : Promise<ProductVariant[]> {
+        const now = new Date()
+        return ProductVariant.findAll({
+            where: {
+                id: {
+                    [Op.gt]: lastId
+                }
+            },
+
+            include: [
+                {
+                    model : ProductPricing,
+                    as : 'prices',
+                    required : true,
+                    where : {
+                        isActive : true,
+                        [Op.or] : [
+                            {
+                                validTo : {
+                                    [Op.gte]: now
+                                }
+                            },
+                            {
+                                validTo : {
+                                    [Op.is]: null
+                                }
+                            }
+                        ],
+                        validFrom : {
+                            [Op.lte] : now
+                        }
+                    }
+                }
+            ],
+
+            order : [
+                ['id', 'ASC']
+            ],
+
+            limit : batchSize
+        })
+    }
+
+    async bulkUpdatePrices(
+        updates : {
+            id : number;
+            currentPrice : number;
+        }[],
+        transaction : Transaction
+    ) : Promise<void> {
+        if (updates.length === 0)
+            return
+
+        const ids = updates.map(item => item.id);
+
+        const priceCase = updates
+            .map(item => {
+                return `WHEN ${item.id} THEN ${item.currentPrice}`;
+            })
+            .join(' ');
+
+        await ProductVariant.update(
+            {
+                currentPrice : ProductVariant.sequelize!.literal(`
+                    CASE id
+                        ${priceCase}
+                    END
+                `),
+            },
+            {
+                where: {
+                    id: ids
+                },
+
+                transaction
+            }
+        )
+    }
+
     // ----- Admin -----
     async findProduct (productId : number)
     : Promise<Product | null> {

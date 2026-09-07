@@ -37,6 +37,7 @@ class OrderService {
         let discountAmount = 0
         let lineTotal = 0
         let checkoutItems : CheckoutItem[] = []
+        let goldPrice18kAtTime : number | undefined;
         for (let item of cartItems) {
             // Get Variant
             const variant = item.variant
@@ -55,13 +56,14 @@ class OrderService {
                 throw new ConflictError('Not Enough Stock')
 
             // Pricing
-            const pricing = await cartHelper.calculatePricing(item)
+            const [pricing, goldPrice] = await cartHelper.calculatePricing(item) ?? [null]
             if (!pricing)
                 throw new InternalServerError("Pricing Calculation Failed")
 
             subtotal += pricing.subtotal
             discountAmount += pricing.discountAmount
             lineTotal += pricing.lineTotal
+            goldPrice18kAtTime = goldPrice
 
             checkoutItems.push({
                 item,
@@ -92,8 +94,8 @@ class OrderService {
         const total =
             Math.max(lineTotal - (couponData?.couponDiscount ?? 0), 0)
             + shippingCost
-        const goldPriceAtTime = await goldPriceRepository.getPrice()
-        if (!goldPriceAtTime)
+
+        if (!goldPrice18kAtTime)
             throw new InternalServerError('GOLD PRICE ERROR')
         
         const checkoutSession : CheckoutSession = {
@@ -109,7 +111,7 @@ class OrderService {
             total,
 
             createdAt : now,
-            goldPrice18kAtTime : goldPriceAtTime.pricePerGram18k,
+            goldPrice18kAtTime,
             expiresAt : new Date(now.getTime() + 10 * 60 * 1000)
         }
         // Set On Redis

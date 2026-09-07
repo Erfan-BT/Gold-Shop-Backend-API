@@ -5,7 +5,7 @@ export async function initGoldPriceScheduler() {
 
     const existingJob = await goldPriceQueue.getJob(
         "update-gold-price-initial"
-    );
+    )
 
     if (!existingJob) {
 
@@ -17,11 +17,11 @@ export async function initGoldPriceScheduler() {
             }
         );
 
-        logger.info("Initial Gold Price Job Created");
+        logger.info("Initial Gold Price Job Created")
 
     } else {
 
-        logger.info("Gold Price Job Already Exists");
+        logger.info("Gold Price Job Already Exists")
 
     }
 

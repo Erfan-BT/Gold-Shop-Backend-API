@@ -1,5 +1,6 @@
 .env
 dist/
 node_modules/
+tests/
 package-lock.json
 test.ts
