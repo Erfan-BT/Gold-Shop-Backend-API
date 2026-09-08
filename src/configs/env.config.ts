@@ -3,9 +3,13 @@ import { z } from 'zod';
 import { logger } from './pino.config.js';
 
 const envSchema = z.object({
+    // FrontEnd
+    FRONTEND_URL : z.string().min(1),
+
     // Server
     NODE_ENV: z.enum(['development', 'production', 'test']),
     SERVER_PORT: z.coerce.number().int().positive(),
+    UPLOAD_URL : z.string().min(1),
 
     // Database
     DB_HOST: z.string().min(1),
