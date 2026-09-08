@@ -4,6 +4,8 @@ import { logger } from "../configs/pino.config.js";
 import { InternalServerError } from "../utils/appError.js";
 import variantPriceService from "../services/variantPrice.service.js";
 import { variantPriceQueue } from "../queue/variantPrice.queue.js";
+import failedJobRepository from "../repository/failedJob.repository.js";
+import { FailedJobStatus } from "../types/failedJob.enum.js";
 
 let variantPriceWorker: Worker | null = null;
 
@@ -43,7 +45,8 @@ export async function initVariantPriceWorker() {
         logger.info({ jobId: job.id , jobName : job.name }, "Variant Price Job Completed");
     })
 
-    variantPriceWorker.on("failed", (job, err) => {
+    variantPriceWorker.on("failed", async (job, err) => {
+        // Logs
         logger.error(
             {
                 jobId: job?.id,
@@ -52,6 +55,27 @@ export async function initVariantPriceWorker() {
             },
             "Variant Price Job Failed"
         )
+
+        // Failed Job
+        if (!job) return
+
+        const maxAttempts = job.opts.attempts ?? 1;
+        const isFinalAttempt = job.attemptsMade >= maxAttempts;
+        if (!isFinalAttempt) return
+        
+        await failedJobRepository.addFailedJob({
+            jobId : job.id ?? null,
+            jobName : job.name,
+            queue : 'variant-price',
+            payload : JSON.stringify(job.data),
+            errorMessage : err.message,
+            errorTrace : err.stack ?? null,
+            attempts : job.attemptsMade,
+            priority : 5,
+            status : FailedJobStatus.FAILED,
+            isAutoRetry : false
+        })
+
     })
 
     return variantPriceWorker;

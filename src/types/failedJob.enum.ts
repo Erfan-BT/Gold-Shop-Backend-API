@@ -1,5 +1,5 @@
 export enum FailedJobStatus {
-    FAILED = 'Failed',
-    DONE = 'Done',
-    CANCELED = 'Canceled'
+    FAILED = 'FAILED',
+    DONE = 'DONE',
+    CANCELED = 'CANCELED'
 }

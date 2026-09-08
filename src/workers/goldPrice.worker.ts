@@ -9,6 +9,8 @@ import sequelize from "../configs/sequelize.config.js";
 import { RedisCache } from "../utils/cache.redis.js";
 import { goldPriceQueue } from "../queue/goldPrice.queue.js";
 import { getGoldPriceUpdateInterval, getGoldPriceUpdateIntervalV2, GOLD_PRICE_DISABLED_INTERVAL } from "../utils/goldPrice.helper.js";
+import failedJobRepository from "../repository/failedJob.repository.js";
+import { FailedJobStatus } from "../types/failedJob.enum.js";
 
 let goldPriceWorker: Worker | null = null;
 
@@ -127,7 +129,8 @@ export async function initGoldPriceWorker() {
         logger.info({ jobId: job.id , jobName : job.name }, "Gold Price Job Completed");
     })
 
-    goldPriceWorker.on("failed", (job, err) => {
+    goldPriceWorker.on("failed", async (job, err) => {
+        // Logs
         logger.error(
             {
                 jobId: job?.id,
@@ -136,6 +139,27 @@ export async function initGoldPriceWorker() {
             },
             "Gold Price Job Failed"
         )
+
+        // Failed Job
+        if (!job) return
+
+        const maxAttempts = job.opts.attempts ?? 1;
+        const isFinalAttempt = job.attemptsMade >= maxAttempts;
+        if (!isFinalAttempt) return
+
+        await failedJobRepository.addFailedJob({
+            jobId : job.id ?? null,
+            jobName : job.name,
+            queue : 'gold-price',
+            payload : JSON.stringify(job.data),
+            errorMessage : err.message,
+            errorTrace : err.stack ?? null,
+            attempts : job.attemptsMade,
+            priority : 5,
+            status : FailedJobStatus.FAILED,
+            isAutoRetry : false
+        })
+        
     })
 
     return goldPriceWorker;

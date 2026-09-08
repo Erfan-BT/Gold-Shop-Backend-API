@@ -14,6 +14,7 @@ class FailedJob extends Model<
 > {
     declare id: CreationOptional<number>;
 
+    declare jobId : string | null;
     declare jobName: string;
     declare queue: string;
     declare payload: string;
@@ -40,6 +41,10 @@ FailedJob.init(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
+        },
+        jobId : {
+            type : DataTypes.STRING,
+            allowNull : true
         },
         jobName: {
             type: DataTypes.STRING(100),
@@ -100,6 +105,10 @@ FailedJob.init(
             },
             {
                 fields: ["status"]
+            },
+            {
+                fields : ['jobId'],
+                unique : true
             }
         ]
     }

@@ -13,6 +13,8 @@ import returnRepository from "../repository/return.repository.js";
 import { RefundStatus, ReturnStatus } from "../types/return.enum.js";
 import adminAuditLogRepository from "../repository/adminAuditLog.repository.js";
 import { AdminAuditAction, AdminAuditEntity } from "../types/adminAuditLog.enum.js";
+import failedJobRepository from "../repository/failedJob.repository.js";
+import { FailedJobStatus } from "../types/failedJob.enum.js";
 
 let refundWorker: Worker | null = null;
 
@@ -203,7 +205,8 @@ export async function initRefundWorker() {
         logger.info({ jobId: job.id , jobName : job.name }, "Refund Job Completed");
     })
 
-    refundWorker.on("failed", (job, err) => {
+    refundWorker.on("failed", async (job, err) => {
+        // Logs
         logger.error(
             {
                 jobId: job?.id,
@@ -212,6 +215,26 @@ export async function initRefundWorker() {
             },
             "Refund Job Failed"
         )
+
+        // Failed Job
+        if (!job) return
+
+        const maxAttempts = job.opts.attempts ?? 1;
+        const isFinalAttempt = job.attemptsMade >= maxAttempts;
+        if (!isFinalAttempt) return
+
+        await failedJobRepository.addFailedJob({
+            jobId: job.id ?? null,
+            jobName: job.name,
+            queue: "refund",
+            payload: JSON.stringify(job.data),
+            attempts: job.attemptsMade,
+            errorMessage: err.message,
+            errorTrace: err.stack ?? null,
+            status: FailedJobStatus.FAILED,
+            priority : 1,
+            isAutoRetry : true
+        })
     })
 
     return refundWorker;
