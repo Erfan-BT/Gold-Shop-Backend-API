@@ -2,6 +2,4 @@
 dist/
 node_modules/
 package-lock.json
-tsconfig.test.json
-vitest.config.ts
 test.ts
