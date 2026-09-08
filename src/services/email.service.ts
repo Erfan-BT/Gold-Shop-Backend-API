@@ -44,7 +44,7 @@ class EmailService {
                     <h1>سلام ${name}</h1>
                     <h2>برای تغییر دادن رمزعبورت بزن روی لینک زیر</h2>
                     <hr>
-                    <a href="http://localhost:3000/api/v1/auth/reset-password/${token}">
+                    <a href="http://${env.FRONTEND_URL}/auth/reset-password/${token}">
                         تغییر رمزعبور
                     </a>
                 </center>
