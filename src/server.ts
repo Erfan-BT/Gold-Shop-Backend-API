@@ -11,6 +11,7 @@ import { initOrderScheduler } from './jobs/order.scheduler.js';
 import { initRefundScheduler } from './jobs/refund.scheduler.js';
 import { initGoldPriceScheduler } from './jobs/goldPrice.scheduler.js';
 import { initVariantPriceScheduler } from './jobs/variantPrice.scheduler.js';
+import { UniqueConstraintError } from 'sequelize';
 
 const port = env.SERVER_PORT
 

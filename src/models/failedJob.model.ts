@@ -108,7 +108,6 @@ FailedJob.init(
             },
             {
                 fields : ['jobId'],
-                unique : true
             }
         ]
     }
