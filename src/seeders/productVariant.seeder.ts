@@ -16,7 +16,7 @@ export async function productVariantSeeder() {
             weight: 2.15,
             karat: ProductKarat.KARAT_18,
             color: "Yellow",
-            stoneType: null,
+            stoneType: '',
             soldCount: 10,
             currentPrice: 130000,
             isActive: true
@@ -27,7 +27,7 @@ export async function productVariantSeeder() {
             weight: 2.60,
             karat: ProductKarat.KARAT_18,
             color: "White",
-            stoneType: null,
+            stoneType: '',
             soldCount: 5,
             currentPrice: 145000,
             isActive: true
@@ -51,7 +51,7 @@ export async function productVariantSeeder() {
             weight: 5.00,
             karat: ProductKarat.KARAT_18,
             color: "Yellow",
-            stoneType: null,
+            stoneType: '',
             soldCount: 4,
             currentPrice: 15000,
             isActive: false
@@ -75,7 +75,7 @@ export async function productVariantSeeder() {
             weight: 2.50,
             karat: ProductKarat.KARAT_18,
             color: "Yellow",
-            stoneType: null,
+            stoneType: '',
             soldCount: 10,
             currentPrice: 100000,
             isActive: true
@@ -86,7 +86,7 @@ export async function productVariantSeeder() {
             weight: 2.90,
             karat: ProductKarat.KARAT_21,
             color: "Rose Gold",
-            stoneType: null,
+            stoneType: '',
             soldCount: 5,
             currentPrice: 120000,
             isActive: true
