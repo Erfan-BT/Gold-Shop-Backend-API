@@ -2,6 +2,7 @@ import { NextFunction, Response } from "express";
 import { AuthRequest } from "../../middleware/auth.middleware.js";
 import adminGoldPriceService from "../../services/admin/goldPrice.admin.service.js";
 import { ChangePriceDto } from "../../validation/goldPrice.validation.js";
+import { ReasonDto } from "../../validation/adminAudit.validation.js";
 
 class AdminGoldPriceController {
     async getPrice (req : AuthRequest, res : Response, next : NextFunction) {
@@ -60,6 +61,24 @@ class AdminGoldPriceController {
                 success : true,
                 msg : 'Sync Gold Price Successfully',
                 data : result
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    async changeSalesStatus (req : AuthRequest, res : Response, next : NextFunction) {
+        try {
+            const adminId = req.user!.userId
+            const { reason } = req.validated.body as ReasonDto
+            const result = await adminGoldPriceService.changeSalesStatus(adminId, reason, req.ip ?? '-0-')
+            
+            res.status(200).json({
+                success : true,
+                msg : '',
+                data : {
+                    newStatus : result
+                }
             })
         } catch (error) {
             next(error)

@@ -15,6 +15,7 @@ import orderService from "./order.service.js";
 import paymentRepository from "../repository/payment.repository.js";
 import { CreatePaymentResponseAPI } from "../types/payment.type.js";
 import { PaymentDto } from "../validation/payment.validation.js";
+import goldPriceRepository from "../repository/goldPrice.repository.js";
 
 class PaymentService {
     async beforePayment (paymentData : PaymentDto, userId : number, ipAddress : string)
@@ -22,6 +23,12 @@ class PaymentService {
         orderNumber : string,
         bankResponse : CreatePaymentResponseAPI
     }> {
+        // Check Is Sales Enabled
+        const salesStats = await goldPriceRepository.getSalesStatus()
+        if (!salesStats.isSalesEnabled)
+            throw new ForbiddenError('Pricing And Sales Are Currently Suspended, Please Check Back Later')
+
+
         const variants = new Map<number, ProductVariant>();
         // Validate Token
         const checkoutSession = await RedisCache.get<CheckoutSession>(paymentData.checkoutToken)

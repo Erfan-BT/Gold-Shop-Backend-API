@@ -125,6 +125,32 @@ class AdminGoldPriceService {
 
         return price;
     }
+
+    async changeSalesStatus (adminId : number, reason : string, ipAddress : string)
+    : Promise<boolean> {
+        // Get Sales Status
+        const sales = await goldPriceRepository.getSalesStatus()
+
+        await sequelize.transaction(async t => {
+            // Change Status
+            if (!(await goldPriceRepository.changeSalesStatus(sales.isSalesEnabled, reason, t)))
+                throw new ConflictError('Sales Status Not Changed')
+
+            // Add Admin Audit
+            await adminAuditLogRepository.createAdminAuditLog({
+                adminId,
+                action : AdminAuditAction.UPDATE,
+                entityType : AdminAuditEntity.GOLD_PRICE,
+                entityId : 1,
+                ipAddress,
+                reason,
+                oldValues : sales,
+                newValues : await goldPriceRepository.getSalesStatus()
+            }, t)
+        })
+
+        return !sales.isSalesEnabled
+    }
 }
 
 export default new AdminGoldPriceService()

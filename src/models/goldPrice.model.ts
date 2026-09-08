@@ -18,6 +18,10 @@ class GoldPrice extends Model<
     declare isAutoUpdateEnabled: boolean;
     declare source: CreationOptional<string>;
     declare fluctuationStatus : FluctuationStatus;
+    declare isSalesEnabled : CreationOptional<boolean>;
+    declare salesDisabledReason : CreationOptional<string | null>;
+    declare salesDisabledAt : CreationOptional<Date | null>;
+
 }
 
 GoldPrice.init(
@@ -46,6 +50,21 @@ GoldPrice.init(
             type : DataTypes.ENUM(...Object.values(FluctuationStatus)),
             defaultValue : FluctuationStatus.LOW,
             allowNull : false
+        },
+        isSalesEnabled : {
+            type : DataTypes.BOOLEAN,
+            allowNull : false,
+            defaultValue : true
+        },
+        salesDisabledReason : {
+            type : DataTypes.STRING(200),
+            allowNull : true,
+            defaultValue : null
+        },
+        salesDisabledAt : {
+            type : DataTypes.DATE,
+            allowNull : true,
+            defaultValue : null
         }
     },
     {

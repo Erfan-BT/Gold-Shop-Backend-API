@@ -8,7 +8,7 @@ import inventoryRepository from "../repository/inventory.repository.js"
 import orderRepository from "../repository/order.repository.js"
 import { OrderStatus, ShippingMethod } from "../types/order.enum.js"
 import { CheckoutItem, CheckoutSession, CouponData, Pricing } from "../types/order.type.js"
-import { BadRequestError, ConflictError, InternalServerError, NotFoundError } from "../utils/appError.js"
+import { BadRequestError, ConflictError, ForbiddenError, InternalServerError, NotFoundError } from "../utils/appError.js"
 import { RedisCache } from "../utils/cache.redis.js"
 import cartHelper from "../utils/cart.helper.js"
 import couponHelper from "../utils/coupon.helper.js"
@@ -26,6 +26,11 @@ class OrderService {
         shippingCost: number;
         total: number;
     }> {
+        // Check Is Sales Enabled
+        const salesStats = await goldPriceRepository.getSalesStatus()
+        if (!salesStats.isSalesEnabled)
+            throw new ForbiddenError('Pricing And Sales Are Currently Suspended, Please Check Back Later')
+
         const now = new Date()
         // Get Cart
         const cart = await cartRepository.getCart(userId)
