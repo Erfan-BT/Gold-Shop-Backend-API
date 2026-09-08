@@ -1,6 +1,7 @@
 .env
 dist/
 node_modules/
-tests/
 package-lock.json
+tsconfig.test.json
+vitest.config.ts
 test.ts
