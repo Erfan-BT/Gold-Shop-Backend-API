@@ -18,6 +18,7 @@ import ReturnRoutes from './routes/return.routes.js'
 import GoldPriceRoutes from './routes/goldPrice.routes.js'
 import AdminRoutes from './routes/admin/admin.routes.js'
 import path from 'node:path'
+import { env } from './configs/env.config.js'
 
 const app = express()
 
@@ -33,7 +34,9 @@ app.use(compression({
 }))
 
 app.use(helmet())
-app.use(cors())
+app.use(cors({
+    origin : env.FRONTEND_URL
+}))
 
 app.use(express.json())
 app.use(express.urlencoded({
